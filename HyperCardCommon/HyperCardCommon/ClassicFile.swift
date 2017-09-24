@@ -60,18 +60,21 @@ open class ClassicFile {
     public static func loadResourceFork(_ path: String) -> Data? {
         
         /* Get the size of the fork */
-        let cPath = (path as NSString).utf8String
-        let size = getxattr(cPath, XATTR_RESOURCEFORK_NAME, nil, 0, 0, 0)
+        let urlPath = URL(fileURLWithPath: path)
+		let size = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
+			return getxattr(cPath, XATTR_RESOURCEFORK_NAME, nil, 0, 0, 0)
+		}
         guard size > 0 else {
             return nil
         }
         
         /* Read the fork */
-        guard let data = NSMutableData(capacity: size) else {
-            return nil
-        }
-        data.length = size
-        let readSize = getxattr(cPath, XATTR_RESOURCEFORK_NAME, UnsafeMutableRawPointer(mutating: data.bytes.bindMemory(to: Void.self, capacity: size)), size, 0, 0)
+		var data = Data(count: size)
+		let readSize = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
+			return data.withUnsafeMutableBytes({ (bytes: UnsafeMutablePointer<Int8>) -> Int in
+				getxattr(cPath, XATTR_RESOURCEFORK_NAME, bytes, size, 0, 0)
+			})
+		}
         guard readSize == size else {
             return nil
         }
