@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		554760771F78493C00C867C6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 554760791F78493C00C867C6 /* InfoPlist.strings */; };
 		6C0A99D51E75CD5100548D88 /* HyperCardCommon.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6C9E6A9B1E75BCCE00BBF925 /* HyperCardCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6C1763401F57218C006E72C7 /* CardItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C17633F1F57218C006E72C7 /* CardItemView.swift */; };
 		6C1763421F572809006E72C7 /* CardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1763411F572809006E72C7 /* CardItem.swift */; };
@@ -70,6 +71,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		554760781F78493C00C867C6 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6C17633F1F57218C006E72C7 /* CardItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardItemView.swift; sourceTree = "<group>"; };
 		6C1763411F572809006E72C7 /* CardItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardItem.swift; sourceTree = "<group>"; };
 		6C26B8C21E6D7520006C314B /* HyperCardPreview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HyperCardPreview.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +149,7 @@
 				6C4FE2561E75849700E2BF12 /* Stack.icns */,
 				6CA554AA1F602FD8005914E2 /* Shortcuts.html */,
 				6C26B8D11E6D7520006C314B /* Info.plist */,
+				554760791F78493C00C867C6 /* InfoPlist.strings */,
 			);
 			path = HyperCardPreview;
 			sourceTree = "<group>";
@@ -261,6 +264,7 @@
 				6C4FE2671E75A4CE00E2BF12 /* Application.icns in Resources */,
 				6C4FE2571E75849700E2BF12 /* Stack.icns in Resources */,
 				6C26B8D01E6D7520006C314B /* MainMenu.xib in Resources */,
+				554760771F78493C00C867C6 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,6 +291,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		554760791F78493C00C867C6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				554760781F78493C00C867C6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		6C26B8C91E6D7520006C314B /* Document.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

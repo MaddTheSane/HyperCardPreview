@@ -121,10 +121,9 @@ public extension MaskedImage {
     public init?(named name: String) {
         
         /* Load the image with the proper bundle */
-        guard let path = HyperCardBundle.pathForImageResource(NSImage.Name(rawValue: name)),
-            let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+        guard let image = HyperCardBundle.image(forResource: NSImage.Name(rawValue: name)),
+			let data = image.tiffRepresentation,
             let representation = NSBitmapImageRep(data: data) else {
-                self.init(width: 0, height: 0, image: .clear, mask: .clear)
                 return nil
         }
         
