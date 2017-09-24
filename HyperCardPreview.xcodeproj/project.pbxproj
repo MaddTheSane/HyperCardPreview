@@ -116,6 +116,7 @@
 				6C26B8D71E6D7534006C314B /* Frameworks */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		6C26B8C31E6D7520006C314B /* Products */ = {
 			isa = PBXGroup;

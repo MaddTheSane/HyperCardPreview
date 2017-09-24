@@ -313,6 +313,7 @@
 				6C9E6A8C1E75BCCD00BBF925 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		6C9E6A8C1E75BCCD00BBF925 /* Products */ = {
 			isa = PBXGroup;
