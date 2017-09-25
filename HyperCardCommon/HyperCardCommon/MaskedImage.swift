@@ -142,22 +142,24 @@ public extension MaskedImage {
         
         /* Fill the image */
         for x in 0..<width {
-            for y in 0..<height {
-                
-                /* Get the color */
-                let rawColor = representation.colorAt(x: x, y: y)!
-                let color = rawColor.usingColorSpace(NSColorSpace.sRGB)!
-                
-                /* Black */
-                if color.redComponent < 0.1 && color.greenComponent < 0.1 && color.blueComponent < 0.1 && color.alphaComponent > 0.9 {
-                    image[x, y] = true
-                }
+            autoreleasepool {
+                for y in 0..<height {
                     
-                    /* White */
-                else if color.redComponent > 0.9 && color.greenComponent > 0.9 && color.blueComponent > 0.9 && color.alphaComponent > 0.9 {
-                    mask[x, y] = true
+                    /* Get the color */
+                    let rawColor = representation.colorAt(x: x, y: y)!
+                    let color = rawColor.usingColorSpace(NSColorSpace.sRGB)!
+                    
+                    /* Black */
+                    if color.redComponent < 0.1 && color.greenComponent < 0.1 && color.blueComponent < 0.1 && color.alphaComponent > 0.9 {
+                        image[x, y] = true
+                    }
+                        
+                        /* White */
+                    else if color.redComponent > 0.9 && color.greenComponent > 0.9 && color.blueComponent > 0.9 && color.alphaComponent > 0.9 {
+                        mask[x, y] = true
+                    }
+                    
                 }
-                
             }
         }
         

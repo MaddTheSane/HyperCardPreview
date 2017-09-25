@@ -8,11 +8,11 @@
 
 
 
-func downToMultiple(_ n: Int, _ multiple: Int) -> Int {
+func downToMultiple<A: BinaryInteger>(_ n: A, _ multiple: A) -> A {
     return n - n % multiple
 }
 
-func upToMultiple(_ n: Int, _ multiple: Int) -> Int {
+func upToMultiple<A: BinaryInteger>(_ n: A, _ multiple: A) -> A {
     return n - 1 - (n - 1) % multiple + multiple
 }
 
