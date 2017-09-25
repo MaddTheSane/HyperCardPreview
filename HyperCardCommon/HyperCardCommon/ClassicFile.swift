@@ -61,20 +61,20 @@ open class ClassicFile {
         
         /* Get the size of the fork */
         let urlPath = URL(fileURLWithPath: path)
-		let size = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
-			return getxattr(cPath, XATTR_RESOURCEFORK_NAME, nil, 0, 0, 0)
-		}
+        let size = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
+            return getxattr(cPath, XATTR_RESOURCEFORK_NAME, nil, 0, 0, 0)
+        }
         guard size > 0 else {
             return nil
         }
         
         /* Read the fork */
-		var data = Data(count: size)
-		let readSize = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
-			return data.withUnsafeMutableBytes({ (bytes: UnsafeMutablePointer<Int8>) -> Int in
-				getxattr(cPath, XATTR_RESOURCEFORK_NAME, bytes, size, 0, 0)
-			})
-		}
+        var data = Data(count: size)
+        let readSize = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
+            return data.withUnsafeMutableBytes({ (bytes: UnsafeMutablePointer<Int8>) -> Int in
+                getxattr(cPath, XATTR_RESOURCEFORK_NAME, bytes, size, 0, 0)
+            })
+        }
         guard readSize == size else {
             return nil
         }
