@@ -12,7 +12,7 @@ public typealias HChar = UInt8
 
 
 /// A Mac OS Roman string
-public struct HString: Equatable, Hashable, Comparable, ExpressibleByStringLiteral, CustomStringConvertible {
+public struct HString: Equatable, Hashable, Comparable, ExpressibleByStringLiteral, CustomStringConvertible, CustomDebugStringConvertible {
     
     /// The bytes of the string, without null terminator
     public private(set) var data: Data
@@ -38,12 +38,12 @@ public struct HString: Equatable, Hashable, Comparable, ExpressibleByStringLiter
         self.init(converting: stringLiteral)!
     }
     
-    public init(extendedGraphemeClusterLiteral: String) {
-        self.init(stringLiteral: extendedGraphemeClusterLiteral)
+    public init(extendedGraphemeClusterLiteral egcl: String) {
+        self.init(stringLiteral: String(extendedGraphemeClusterLiteral: egcl))
     }
     
-    public init(unicodeScalarLiteral: String) {
-        self.init(stringLiteral: unicodeScalarLiteral)
+    public init(unicodeScalarLiteral usl: String) {
+        self.init(stringLiteral: String(unicodeScalarLiteral: usl))
     }
     
     /// Get or set a single character
@@ -58,7 +58,7 @@ public struct HString: Equatable, Hashable, Comparable, ExpressibleByStringLiter
     
     public subscript(range: CountableClosedRange<Int>) -> HString {
         get {
-            let extractedData = Data(data[range])
+            let extractedData = data[range]
             return HString(data: extractedData)
         }
         set {
@@ -84,6 +84,10 @@ public struct HString: Equatable, Hashable, Comparable, ExpressibleByStringLiter
     public var description: String {
         let string = String(data: data, encoding: .macOSRoman)
         return string!
+    }
+    
+    public var debugDescription: String {
+        return "`\(description)`, length \(data.count)"
     }
     
     public var hashValue: Int {

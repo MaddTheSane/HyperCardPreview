@@ -21,10 +21,9 @@ public class PictureResourceBlock: ResourceBlock {
         
         /* Copy the data */
         let slice = self.data.sharedData[self.data.offset..<self.data.offset + self.data.length]
-        let data = Data(slice)
         
         /* Create an image */
-        return NSImage(data: data)!
+        return NSImage(data: slice)!
     }
     
 }

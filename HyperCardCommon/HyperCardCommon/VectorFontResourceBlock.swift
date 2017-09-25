@@ -20,14 +20,12 @@ public class VectorFontResourceBlock: ResourceBlock {
     public var cgfont: CGFont {
         
         /* Copy the data */
-        let slice = self.data.sharedData[self.data.offset..<self.data.offset + self.data.length]
-        let data = Data(slice)
+        let slice = data.sharedData[data.offset..<data.offset + data.length]
         
         /* Build a data provider */
-        let nsdata = NSData(data: data)
-        let dataProvider = CGDataProvider(data: nsdata)
+        let dataProvider = CGDataProvider(data: slice as NSData)!
         
-        return CGFont(dataProvider!)!
+        return CGFont(dataProvider)!
     }
     
 }

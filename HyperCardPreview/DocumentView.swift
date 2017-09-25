@@ -41,10 +41,10 @@ class DocumentView: NSView, NSMenuDelegate {
         
         /* Enter Key / Return Key */
         if let characters = event.charactersIgnoringModifiers {
-            let character = Int(characters.utf16[characters.utf16.indices.first!])
+            let character = Int(characters.utf16.first!)
             
             /* Check if the character is return or enter */
-            if (character == 13 || character == 3){
+            if (character == 13 || character == 3) {
                 
                 document.showCards(self)
                 return
@@ -113,9 +113,9 @@ class DocumentView: NSView, NSMenuDelegate {
     
     override func flagsChanged(with event: NSEvent) {
         
-        if event.modifierFlags.contains(NSEvent.ModifierFlags.command) && event.modifierFlags.contains(NSEvent.ModifierFlags.option) {
+        if event.modifierFlags.contains(.command) && event.modifierFlags.contains(.option) {
             
-            if event.modifierFlags.contains(NSEvent.ModifierFlags.shift) {
+            if event.modifierFlags.contains(.shift) {
                 if !partScriptDisplayed {
                     partScriptDisplayed = true
                     NSApp.sendAction(#selector(Document.displayPartScriptBorders(_:)), to: nil, from: nil)
@@ -170,9 +170,7 @@ class DocumentView: NSView, NSMenuDelegate {
         /* Create the menu */
         let menu = NSMenu(title: "Pop Up Menu")
         
-        var index = 0
-        
-        for itemName in itemNames {
+        for (index, itemName) in itemNames.enumerated() {
             
             /* Create a menu item */
             let menuItem = NSMenuItem(title: itemName.description, action: #selector(DocumentView.selectPopupItem(_:)), keyEquivalent: "")
@@ -181,8 +179,6 @@ class DocumentView: NSView, NSMenuDelegate {
             
             /* Add it to the menu */
             menu.addItem(menuItem)
-            
-            index += 1
             
         }
         
