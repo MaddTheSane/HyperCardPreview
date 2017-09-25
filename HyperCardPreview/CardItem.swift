@@ -11,13 +11,8 @@ import Cocoa
 class CardItem: NSCollectionViewItem {
     
     override var isSelected: Bool {
-        get {
-            return super.isSelected
-        }
-        set {
-            super.isSelected = newValue
-            
-            (self.view as! CardItemView).displaySelected(newValue)
+        didSet {
+            (self.view as! CardItemView).displaySelected(super.isSelected)
         }
     }
     
