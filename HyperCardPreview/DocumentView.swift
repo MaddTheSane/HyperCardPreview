@@ -437,12 +437,12 @@ class DocumentView: NSView, NSMenuDelegate {
     }
     
     override func swipe(with event: NSEvent) {
-            if event.deltaX < 0 {
-                document.goToPreviousPage(self)
-            }
-            else {
-                document.goToNextPage(self)
-            }        
+        if event.deltaX < 0 {
+            document.goToPreviousPage(self)
+        }
+        else {
+            document.goToNextPage(self)
+        }        
     }
     
 } 
