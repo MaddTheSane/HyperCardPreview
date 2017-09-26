@@ -133,33 +133,166 @@ public enum UserLevel: Int {
 }
 
 /// All the variants that can be applied to a font
-public struct TextStyle: Equatable, CustomStringConvertible {
+public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
+    public var rawValue: UInt8
+    public init(rawValue: UInt8) {
+        self.rawValue = rawValue
+    }
     
     /// Characters are drawn thicker
-    public var bold: Bool
+    public static var bold: TextStyle {
+        return TextStyle(rawValue: 1 << 0)
+    }
     
     /// Characters are drawn slanted
-    public var italic: Bool
+    public static var italic: TextStyle {
+        return TextStyle(rawValue: 1 << 1)
+    }
+
+    /// Characters are drawn with an under-line
+    public static var underline: TextStyle {
+        return TextStyle(rawValue: 1 << 2)
+    }
+
+    /// The borders of the characters are drawn in black and the interiors in white
+    public static var outline: TextStyle {
+        return TextStyle(rawValue: 1 << 3)
+    }
+
+    /// Characters are drawn with an under-line
+    public static var shadow: TextStyle {
+        return TextStyle(rawValue: 1 << 4)
+    }
+    
+    /// Characters are drawn closer to each other
+    public static var condense: TextStyle {
+        return TextStyle(rawValue: 1 << 5)
+    }
+
+    /// Characters are drawn further from each other
+    public static var extend: TextStyle {
+        return TextStyle(rawValue: 1 << 6)
+    }
+
+    /// Specific HyperCard type used to mark the hyperlinks
+    public static var group: TextStyle {
+        return TextStyle(rawValue: 1 << 7)
+    }
+    
+    /// Characters are drawn thicker
+    public var bold: Bool {
+        get {
+            return self.contains(TextStyle.bold)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.bold)
+            } else {
+                self.remove(TextStyle.bold)
+            }
+        }
+    }
+    
+    /// Characters are drawn slanted
+    public var italic: Bool {
+        get {
+            return self.contains(TextStyle.italic)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.italic)
+            } else {
+                self.remove(TextStyle.italic)
+            }
+        }
+    }
     
     /// Characters are drawn with an under-line
-    public var underline: Bool
+    public var underline: Bool {
+        get {
+            return self.contains(TextStyle.underline)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.underline)
+            } else {
+                self.remove(TextStyle.underline)
+            }
+        }
+    }
     
     /// The borders of the characters are drawn in black and the interiors in white
-    public var outline: Bool
+    public var outline: Bool {
+        get {
+            return self.contains(TextStyle.outline)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.outline)
+            } else {
+                self.remove(TextStyle.outline)
+            }
+        }
+    }
     
     /// Characters are drawn outlined and with a shadow
-    public var shadow: Bool
+    public var shadow: Bool {
+        get {
+            return self.contains(TextStyle.shadow)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.shadow)
+            } else {
+                self.remove(TextStyle.shadow)
+            }
+        }
+    }
     
-    /// Characters are drawn closer from each other
-    public var condense: Bool
+    /// Characters are drawn closer to each other
+    public var condense: Bool {
+        get {
+            return self.contains(TextStyle.condense)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.condense)
+            } else {
+                self.remove(TextStyle.condense)
+            }
+        }
+    }
     
     /// Characters are drawn further from each other
-    public var extend: Bool
+    public var extend: Bool {
+        get {
+            return self.contains(TextStyle.extend)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.extend)
+            } else {
+                self.remove(TextStyle.extend)
+            }
+        }
+    }
     
     /// Specific HyperCard type used to mark the hyperlinks
-    public var group: Bool
+    public var group: Bool {
+        get {
+            return self.contains(TextStyle.group)
+        }
+        set {
+            if newValue {
+                self.insert(TextStyle.group)
+            } else {
+                self.remove(TextStyle.group)
+            }
+        }
+    }
     
     public init(bold: Bool = false, italic: Bool = false, underline: Bool = false, outline: Bool = false, shadow: Bool = false, condense: Bool = false, extend: Bool = false, group: Bool = false) {
+        rawValue = 0
         self.bold = bold
         self.italic = italic
         self.underline = underline
@@ -206,29 +339,12 @@ public struct TextStyle: Equatable, CustomStringConvertible {
 
 public let PlainTextStyle = TextStyle()
 
-public func ==(s1: TextStyle, s2: TextStyle) -> Bool {
-    return s1.bold == s2.bold &&
-        s1.italic == s2.italic &&
-        s1.underline == s2.underline &&
-        s1.shadow == s2.shadow &&
-        s1.outline == s2.outline &&
-        s1.extend == s2.extend &&
-        s1.condense == s2.condense &&
-        s1.group == s2.group
-}
-
 public extension TextStyle {
     
     /// Init a text style from a 8 bit flag
-    public init(flags: Int) {
-        bold = (flags & (1 << 0)) != 0
-        italic = (flags & (1 << 1)) != 0
-        underline = (flags & (1 << 2)) != 0
-        outline = (flags & (1 << 3)) != 0
-        shadow = (flags & (1 << 4)) != 0
-        condense = (flags & (1 << 5)) != 0
-        extend = (flags & (1 << 6)) != 0
-        group = (flags & (1 << 7)) != 0
+    public init(flags: UInt8) {
+        self.init(rawValue: flags)
+        
     }
     
 }

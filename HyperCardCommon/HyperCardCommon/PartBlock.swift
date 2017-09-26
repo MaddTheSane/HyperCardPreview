@@ -195,8 +195,8 @@ public class PartBlock: DataBlock {
     
     /// Text Style
     public var textStyle: TextStyle {
-        let flags: Int = data.readUInt8(at: 0x1A)
-        return TextStyle(flags: flags)
+        let flags: UInt8 = data.readUInt8(at: 0x1A)
+        return TextStyle(rawValue: flags)
     }
     
     /// Line Height

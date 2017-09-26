@@ -164,7 +164,7 @@ public class FontFamilyResourceBlock: ResourceBlock {
             let size: Int = data.readUInt16(at: offset)
             let styleFlags: Int = data.readUInt16(at: offset + 2)
             let identifier: Int = data.readUInt16(at: offset + 4)
-            table.append(FontAssociation(size: size, style: TextStyle(flags: styleFlags), resourceIdentifier: identifier))
+            table.append(FontAssociation(size: size, style: TextStyle(flags: UInt8(styleFlags)), resourceIdentifier: identifier))
             offset += 6
         }
         return table
