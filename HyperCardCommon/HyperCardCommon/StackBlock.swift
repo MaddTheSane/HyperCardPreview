@@ -137,7 +137,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at creation
     public var versionAtCreation: Version? {
-        let code: Int = data.readUInt32(at: 0x60)
+        let code: UInt32 = data.readUInt32(at: 0x60)
         guard code != 0 else {
             return nil
         }
@@ -146,7 +146,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at last compacting
     public var versionAtLastCompacting: Version? {
-        let code: Int = data.readUInt32(at: 0x64)
+        let code: UInt32 = data.readUInt32(at: 0x64)
         guard code != 0 else {
             return nil
         }
@@ -155,7 +155,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at last modification since last compacting
     public var versionAtLastModificationSinceLastCompacting: Version? {
-        let code: Int = data.readUInt32(at: 0x68)
+        let code: UInt32 = data.readUInt32(at: 0x68)
         guard code != 0 else {
             return nil
         }
@@ -164,7 +164,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at last modification
     public var versionAtLastModification: Version? {
-        let code: Int = data.readUInt32(at: 0x6C)
+        let code: UInt32 = data.readUInt32(at: 0x6C)
         guard code != 0 else {
             return nil
         }

@@ -374,33 +374,78 @@ public enum PartStyle {
 public struct Version: CustomStringConvertible, Equatable {
     
     /// Major version
-    public var major: Int
+    public var major: UInt8
     
     /// Minor version
-    public var minor1: Int
+    public var minor1: UInt8 {
+        get {
+            return minor >> 4
+        }
+        set {
+            minor &= 0x0F
+            minor |= newValue << 4
+        }
+    }
     
     /// Second minor version
-    public var minor2: Int
+    public var minor2: UInt8 {
+        get {
+            return minor & 0x0F
+        }
+        set {
+            minor &= 0xf0
+            minor |= newValue & 0x0F
+        }
+    }
+    
+    /// Minor versions
+    public var minor: UInt8
     
     /// Whether the version is alpha, beta, final...
     public var state: State
     
     /// The internal release number for alpha and beta versions
-    public var release: Int
+    public var release: UInt8
     
-    public enum State {
+    public enum State: CustomStringConvertible {
         case final
         case beta
         case development
         case alpha
+        
+        public var description: String {
+            switch self {
+            case .final:
+                return "final"
+            case .beta:
+                return "beta"
+            case .development:
+                return "development"
+            case .alpha:
+                return "alpha"
+            }
+        }
+    }
+    
+    public init(major: UInt8, minor1: UInt8, minor2: UInt8, state: State, release: UInt8) {
+        self.major = major
+        self.minor = UInt8(minor1) << 4 | UInt8(minor2)
+        self.state = state
+        self.release = release
+    }
+    
+    public init(major: UInt8, minor: UInt8, state: State, release: UInt8) {
+        self.major = major
+        self.minor = minor
+        self.state = state
+        self.release = release
     }
     
     public init(major: Int, minor1: Int, minor2: Int, state: State, release: Int) {
-        self.major = major
-        self.minor1 = minor1
-        self.minor2 = minor2
+        self.major = UInt8(major)
+        self.minor = UInt8(minor1) << 4 | UInt8(minor2)
         self.state = state
-        self.release = release
+        self.release = UInt8(release)
     }
     
     public var description: String {
@@ -420,7 +465,7 @@ public struct Version: CustomStringConvertible, Equatable {
         }
     }
     
-    private func writeReleaseDescription(_ release: Int) -> String {
+    private func writeReleaseDescription(_ release: UInt8) -> String {
         if release == 0 {
             return ""
         }
@@ -432,10 +477,9 @@ public extension Version {
     
     /// Init the version from its encoded form in the resources
     public init(code: Int) {
-        self.major = code >> 24
-        self.minor1 = (code >> 20) & 0xF
-        self.minor2 = (code >> 16) & 0xF
-        self.release = code & 0xFF
+        self.major = UInt8(code >> 24)
+        self.minor = UInt8((code >> 16) & 0xFF)
+        self.release = UInt8(code & 0xFF)
         
         let stateNumber = (code >> 8) & 0xFF
         switch stateNumber {
@@ -451,6 +495,28 @@ public extension Version {
             self.state = .final
         }
     }
+    
+    /// Init the version from its encoded form in the resources
+    public init(code: UInt32) {
+        self.major = UInt8(code >> 24)
+        self.minor = UInt8((code >> 16) & 0xFF)
+        self.release = UInt8(code & 0xFF)
+        
+        let stateNumber = (code >> 8) & 0xFF
+        switch stateNumber {
+        case 0x20:
+            self.state = .development
+        case 0x40:
+            self.state = .alpha
+        case 0x60:
+            self.state = .beta
+        case 0x80:
+            self.state = .final
+        default:
+            self.state = .final
+        }
+    }
+
     
 }
 
