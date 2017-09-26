@@ -137,7 +137,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at creation
     public var versionAtCreation: Version? {
-        let code = data.readUInt32(at: 0x60)
+        let code: Int = data.readUInt32(at: 0x60)
         guard code != 0 else {
             return nil
         }
@@ -146,7 +146,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at last compacting
     public var versionAtLastCompacting: Version? {
-        let code = data.readUInt32(at: 0x64)
+        let code: Int = data.readUInt32(at: 0x64)
         guard code != 0 else {
             return nil
         }
@@ -155,7 +155,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at last modification since last compacting
     public var versionAtLastModificationSinceLastCompacting: Version? {
-        let code = data.readUInt32(at: 0x68)
+        let code: Int = data.readUInt32(at: 0x68)
         guard code != 0 else {
             return nil
         }
@@ -164,7 +164,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// HyperCard Version at last modification
     public var versionAtLastModification: Version? {
-        let code = data.readUInt32(at: 0x6C)
+        let code: Int = data.readUInt32(at: 0x6C)
         guard code != 0 else {
             return nil
         }
@@ -180,20 +180,20 @@ public class StackBlock: HyperCardFileBlock {
     public func isChecksumValid() -> Bool {
         var sum: UInt32 = 0
         for i in 0..<0x180 {
-            sum = sum &+ UInt32(data.readUInt32(at: i*4))
+            sum = sum &+ data.readUInt32(at: i*4)
         }
         
         /* The checksum is done with the decoded data, so subtract the encoded data and
          add the decoded one. */
         if let decodedHeader = self.decodedHeader {
             for i in 0..<0xC {
-                sum = sum &+ UInt32(decodedHeader.readUInt32(at: i*4))
-                sum = sum &- UInt32(data.readUInt32(at: 0x18 + i*4))
+                sum = sum &+ decodedHeader.readUInt32(at: i*4)
+                sum = sum &- data.readUInt32(at: 0x18 + i*4)
             }
             
             /* The last integer is half encoded half clear */
-            sum = sum &+ UInt32(decodedHeader.readUInt16(at: 0x30) << 16 | data.readUInt16(at: 0x4A))
-            sum = sum &- UInt32(data.readUInt32(at: 0x48))
+            sum = sum &+ UInt32((decodedHeader.readUInt16(at: 0x30) as Int) << 16 | data.readUInt16(at: 0x4A) as Int)
+            sum = sum &- data.readUInt32(at: 0x48)
         }
         
         return sum == 0
@@ -216,14 +216,14 @@ public class StackBlock: HyperCardFileBlock {
     
     /// Origin of scroll
     public var scrollPoint: Point {
-        let y = data.readUInt32(at: 0x88)
-        let x = data.readUInt32(at: 0x8A)
+        let y: Int = data.readUInt32(at: 0x88)
+        let x: Int = data.readUInt32(at: 0x8A)
         return Point(x: x, y: y)
     }
     
     /// ID of the FTBL (font table) block
     public var fontBlockIdentifier: Int? {
-        let value = data.readUInt32(at: 0x1B0)
+        let value: Int = data.readUInt32(at: 0x1B0)
         guard value != 0 else {
             return nil
         }
@@ -232,7 +232,7 @@ public class StackBlock: HyperCardFileBlock {
     
     /// ID of the STBL (style table) block
     public var styleBlockIdentifier: Int? {
-        let value = data.readUInt32(at: 0x1B4)
+        let value: Int = data.readUInt32(at: 0x1B4)
         guard value != 0 else {
             return nil
         }
@@ -244,8 +244,8 @@ public class StackBlock: HyperCardFileBlock {
     
     /// 2D size of the cards in this stack
     public var size: Size {
-        let dataWidth = data.readUInt16(at: 0x1BA)
-        let dataHeight = data.readUInt16(at: 0x1B8)
+        let dataWidth: Int = data.readUInt16(at: 0x1BA)
+        let dataHeight: Int = data.readUInt16(at: 0x1B8)
         let width = (dataWidth == 0) ? StackBlock.defaultWidth : dataWidth
         let height = (dataHeight == 0) ? StackBlock.defaultHeight : dataHeight
         return Size(width: width, height: height)
@@ -280,8 +280,8 @@ public class StackBlock: HyperCardFileBlock {
         var offset = 0x400
         let count = self.freeCount
         for _ in 0..<count {
-            let freeOffset = data.readUInt32(at: offset)
-            let freeSize = data.readUInt32(at: offset + 4)
+            let freeOffset: Int = data.readUInt32(at: offset)
+            let freeSize: Int = data.readUInt32(at: offset + 4)
             locations.append(FreeLocation(offset: freeOffset, size: freeSize))
             offset += 8
         }

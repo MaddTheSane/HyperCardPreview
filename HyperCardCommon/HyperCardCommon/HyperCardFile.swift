@@ -96,11 +96,11 @@ public class HyperCardFile: ClassicFile {
     private func hackFirstXor() -> Int? {
     
         /* Get the first XORed integer */
-        let xoredInteger = self.dataFork!.readUInt32(at: 0x18)
+        let xoredInteger: Int = self.dataFork!.readUInt32(at: 0x18)
         
         /* The initial value of the integer is the STAK size. XOR it with the STAK size so we have
          the value used to XOR the integer */
-        let stackBlockSize = self.dataFork!.readUInt32(at: 0x0)
+        let stackBlockSize: Int = self.dataFork!.readUInt32(at: 0x0)
         let xor = xoredInteger ^ stackBlockSize
         
         /* The XOR is equal to a result x = x ^ (hashNumber(x) >> 16). We have to find x. As the
@@ -139,7 +139,7 @@ public class HyperCardFile: ClassicFile {
         }
         
         /* Check the user level */
-        let xoredUserLevel = self.dataFork!.readUInt16(at: 0x48)
+        let xoredUserLevel: Int = self.dataFork!.readUInt16(at: 0x48)
         let userLevel = xoredUserLevel ^ (hash & 0xFFFF)
         
         return (userLevel >= 0 && userLevel <= 5)
@@ -158,7 +158,7 @@ public class HyperCardFile: ClassicFile {
         let passwordHash = hashPassword(firstHashString)
         
         /* The decoded header, if correct, contains the password hash */
-        let decodedPasswordHash = decodedHeader.readUInt32(at: 0x2C)
+        let decodedPasswordHash: Int = decodedHeader.readUInt32(at: 0x2C)
         guard passwordHash == decodedPasswordHash else {
             return nil
         }

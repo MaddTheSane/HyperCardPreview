@@ -67,7 +67,7 @@ public class PartBlock: DataBlock {
     
     /// Family, only for buttons
     public var family: Int {
-        let flags = data.readUInt8(at: 0xE)
+        let flags: Int = data.readUInt8(at: 0xE)
         let value = flags & 0b1111
         return value
     }
@@ -114,7 +114,7 @@ public class PartBlock: DataBlock {
     
     /// Visual style of the part
     public var style: PartStyle {
-        let styleIndex = data.readUInt8(at: 0xF)
+        let styleIndex: UInt8 = data.readUInt8(at: 0xF)
         switch styleIndex {
         case 0:
             return PartStyle.transparent
@@ -162,13 +162,13 @@ public class PartBlock: DataBlock {
     
     /// Icon, only for buttons
     public var icon: Int {
-        let value = data.readSInt16(at: 0x12)
+        let value: Int = data.readSInt16(at: 0x12)
         return value
     }
     
     /// Text Alignment
     public var textAlign: TextAlign {
-        let textAlignIndex = data.readSInt16(at: 0x14)
+        let textAlignIndex: Int16 = data.readSInt16(at: 0x14)
         switch textAlignIndex {
         case 0:
             return TextAlign.left
@@ -184,7 +184,7 @@ public class PartBlock: DataBlock {
     /// Text Font
     public var textFontIdentifier: Int {
         /* For unknown reasons, the identifier may be negative */
-        let identifier = data.readSInt16(at: 0x16)
+        let identifier: Int = data.readSInt16(at: 0x16)
         return ((identifier >= 0) ? identifier : -identifier-1)
     }
     
@@ -195,7 +195,7 @@ public class PartBlock: DataBlock {
     
     /// Text Style
     public var textStyle: TextStyle {
-        let flags = data.readUInt8(at: 0x1A)
+        let flags: Int = data.readUInt8(at: 0x1A)
         return TextStyle(flags: flags)
     }
     

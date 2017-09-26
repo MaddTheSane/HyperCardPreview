@@ -43,11 +43,11 @@ public class StyleBlock: HyperCardFileBlock {
         var offset = 0x18
         var styles: [Style] = []
         for _ in 0..<count {
-            let number = data.readUInt32(at: offset)
-            let runCount = data.readUInt16(at: offset + 0x6)
-            let fontFamilyIdentifierValue = data.readSInt16(at: offset + 0xC)
-            let styleFlagsValue = data.readSInt16(at: offset + 0xE)
-            let sizeValue = data.readSInt16(at: offset + 0x10)
+            let number: Int = data.readUInt32(at: offset)
+            let runCount: Int = data.readUInt16(at: offset + 0x6)
+            let fontFamilyIdentifierValue: Int = data.readSInt16(at: offset + 0xC)
+            let styleFlagsValue: Int = data.readSInt16(at: offset + 0xE)
+            let sizeValue: Int = data.readSInt16(at: offset + 0x10)
             let fontFamilyIdentifier: Int? = (fontFamilyIdentifierValue == -1) ? nil : fontFamilyIdentifierValue
             let style: TextStyle? = (styleFlagsValue == -1) ? nil : TextStyle(flags: styleFlagsValue >> 8)
             let size: Int? = (sizeValue == -1) ? nil : sizeValue

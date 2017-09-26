@@ -21,14 +21,14 @@ public class HyperCardFileData: DataBlock {
     
     /// The stack block
     public var stack: StackBlock {
-        let length = data.readUInt32(at: 0x0)
+        let length: Int = data.readUInt32(at: 0x0)
         let dataRange = DataRange(sharedData: data.sharedData, offset: data.offset, length: length)
         return StackBlock(data: dataRange, decodedHeader: decodedHeader)
     }
     
     /// The master block
     public var master: MasterBlock {
-        let stackLength = data.readUInt32(at: 0x0)
+        let stackLength: Int = data.readUInt32(at: 0x0)
         
         /* In the "Stack Templates" stack in 2.4.1, there is a flag in the 2nd higher bit */
         let masterLength = data.readUInt32(at: stackLength) & 0x0FFF_FFFF
@@ -168,13 +168,13 @@ public class HyperCardFileData: DataBlock {
             }
             
             /* Check the name */
-            let entryNameValue = data.readUInt32(at: entry.offset + 4)
+            let entryNameValue: Int = data.readUInt32(at: entry.offset + 4)
             guard entryNameValue == T.Name.value else {
                 continue
             }
             
             /* Build the element */
-            let length = data.readUInt32(at: entry.offset)
+            let length: Int = data.readUInt32(at: entry.offset)
             let dataRange = DataRange(sharedData: data.sharedData, offset: data.offset + entry.offset, length: length)
             let element = initializer(dataRange)
             
@@ -187,10 +187,10 @@ public class HyperCardFileData: DataBlock {
     func loadBlock<T: HyperCardFileBlock>(identifier: Int, initializer: (DataRange) -> T) -> T {
         
         /* Find the data element */
-        let offset = findBlockOffset(name: T.Name.value, identifier: identifier)!
+        let offset = findBlockOffset(name: Int(T.Name.value), identifier: identifier)!
         
         /* Build the object */
-        let length = data.readUInt32(at: offset)
+        let length: Int = data.readUInt32(at: offset)
         let dataRange = DataRange(sharedData: data.sharedData, offset: data.offset + offset, length: length)
         let element = initializer(dataRange)
         return element
@@ -215,13 +215,13 @@ public class HyperCardFileData: DataBlock {
             }
             
             /* Check the full name */
-            let entryName = data.readUInt32(at: entry.offset + 4)
+            let entryName: Int = data.readUInt32(at: entry.offset + 4)
             guard entryName == name else {
                 continue
             }
             
             /* Check the full identifier */
-            let entryIdentifier = data.readUInt32(at: entry.offset + 8)
+            let entryIdentifier: Int = data.readUInt32(at: entry.offset + 8)
             guard entryIdentifier == identifier else {
                 continue
             }

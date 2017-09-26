@@ -140,7 +140,7 @@ public class BitmapBlock: HyperCardFileBlock {
             while x < rowWidth {
                 
                 /* Read the opcode */
-                let opcode = data.readUInt8(at: offset)
+                let opcode: Int = data.readUInt8(at: offset)
                 offset += 1
                 
                 /* Execute opcode */
@@ -152,7 +152,7 @@ public class BitmapBlock: HyperCardFileBlock {
                     let dataLength = opcode >> 4
                     let totalLength = zeroLength + dataLength
                     for i in 0..<dataLength {
-                        let value = data.readUInt8(at: offset)
+                        let value: Int = data.readUInt8(at: offset)
                         offset += 1
                         for r in 0..<repeatCount {
                             writeByteInRow(value, row: &pixels, rowPixelIndex: pixelIndex, x: x + (zeroLength + i + r * totalLength) * 8)
@@ -164,7 +164,7 @@ public class BitmapBlock: HyperCardFileBlock {
                 case 0x80:
                     /* One row of uncompressed data */
                     for i in 0..<integerLength {
-                        let value = UInt32(data.readUInt32(at: offset + i*4))
+                        let value: UInt32 = data.readUInt32(at: offset + i*4)
                         for r in 0..<repeatCount {
                             pixels[i + pixelIndex + r * integerLength] = value
                         }
@@ -196,7 +196,7 @@ public class BitmapBlock: HyperCardFileBlock {
                     
                 case 0x83:
                     /* One row of a repeated byte of data */
-                    let v = data.readUInt8(at: offset)
+                    let v: Int = data.readUInt8(at: offset)
                     offset += 1
                     let integer = UInt32(v | (v << 8) | (v << 16) | (v << 24))
                     repeatedBytes[y % 8] = v
@@ -282,7 +282,7 @@ public class BitmapBlock: HyperCardFileBlock {
                     /* Bytes of data */
                     let dataLength = (opcode & 0b11111) * 8
                     for i in 0..<dataLength {
-                        let value = data.readUInt8(at: offset)
+                        let value: Int = data.readUInt8(at: offset)
                         offset += 1
                         for j in 0..<repeatCount {
                             writeByteInRow(value, row: &pixels, rowPixelIndex: pixelIndex, x: x + (i + j * dataLength) * 8)

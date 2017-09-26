@@ -27,7 +27,7 @@ public class FontBlock: HyperCardFileBlock {
         var offset = 0x18
         var fonts: [FontNameReference] = []
         for _ in 0..<count {
-            let identifier = data.readUInt16(at: offset)
+            let identifier: Int = data.readUInt16(at: offset)
             let name = data.readString(at: offset + 0x2)
             fonts.append(FontNameReference(identifier: identifier, name: name))
             

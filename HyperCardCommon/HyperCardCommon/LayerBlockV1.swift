@@ -20,7 +20,7 @@ public class LayerBlockV1: DataBlock {
     
     /* The values are shifted */
     public var bitmapIdentifier: Int? {
-        let value = data.readSInt32(at: 0xC)
+        let value: Int = data.readSInt32(at: 0xC)
         guard value != 0 else {
             return nil
         }
@@ -49,7 +49,7 @@ public class LayerBlockV1: DataBlock {
         for _ in 0..<contentCount {
             
             /* Read the identifier and size */
-            let storedIdentifier = data.readSInt16(at: offset)
+            let storedIdentifier: Int = data.readSInt16(at: offset)
             
             /* If the identifier is <0, then it is a card content */
             let identifier = abs(storedIdentifier)

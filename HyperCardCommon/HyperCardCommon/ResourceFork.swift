@@ -99,7 +99,7 @@ public class ResourceFork: DataBlock {
             
             /* Read the size of the data block */
             let offset = self.dataOffset + reference.dataOffset
-            let length = data.readUInt32(at: offset)
+            let length: Int = data.readUInt32(at: offset)
             
             /* Create the resource */
             let dataRange = DataRange(sharedData: self.data.sharedData, offset: self.data.offset + offset + 4, length: length)
@@ -127,7 +127,7 @@ public class ResourceMap: DataBlock {
     
     /// Number of resource types in the map
     public var typeCount: Int {
-        let countMinusOne = data.readSInt16(at: 0x1C)
+        let countMinusOne: Int = data.readSInt16(at: 0x1C)
         return countMinusOne + 1
     }
     
@@ -144,9 +144,9 @@ public class ResourceMap: DataBlock {
         for _ in 0..<self.typeCount {
             
             /* Read the type */
-            let type = data.readUInt32(at: typeOffset)
-            let referenceCountMinusOne = data.readUInt16(at: typeOffset+0x4)
-            let referenceListOffset = data.readUInt16(at: typeOffset+0x6)
+            let type: OSType = data.readUInt32(at: typeOffset)
+            let referenceCountMinusOne: Int = data.readUInt16(at: typeOffset+0x4)
+            let referenceListOffset: Int = data.readUInt16(at: typeOffset+0x6)
             
             /* Define the offset in the reference list, to read the references for this type */
             var referenceOffset = referenceListOffset + ResourceMap.HeaderLength - 2
@@ -155,9 +155,9 @@ public class ResourceMap: DataBlock {
             for _ in 0...referenceCountMinusOne {
                 
                 /* Read the reference */
-                let identifier = data.readSInt16(at: referenceOffset)
-                let nameOffsetInList = data.readSInt16(at: referenceOffset + 0x2)
-                let dataOffsetWithFlags = data.readUInt32(at: referenceOffset + 0x4)
+                let identifier: Int = data.readSInt16(at: referenceOffset)
+                let nameOffsetInList: Int = data.readSInt16(at: referenceOffset + 0x2)
+                let dataOffsetWithFlags: Int = data.readUInt32(at: referenceOffset + 0x4)
                 let dataOffset = dataOffsetWithFlags & 0xFF_FFFF
                 
                 /* Read the name */
@@ -186,7 +186,7 @@ public class ResourceMap: DataBlock {
         let offset = nameListOffset + nameOffsetInList
         
         /* Read the length */
-        let length = data.readUInt8(at: offset)
+        let length: Int = data.readUInt8(at: offset)
         
         /* Read the string */
         return data.readString(at: offset+1, length: length)

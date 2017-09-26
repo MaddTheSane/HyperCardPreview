@@ -58,6 +58,35 @@ public struct DataRange {
         return self.sharedData.readSInt32(at: self.offset + offset)
     }
     
+    /// Reads a unsigned byte in the pointed data
+    public func readUInt8(at offset: Int) -> UInt8 {
+        return self.sharedData.readUInt8(at: self.offset + offset)
+    }
+    
+    /// Reads a signed byte in the pointed data
+    public func readSInt8(at offset: Int) -> Int8 {
+        return self.sharedData.readSInt8(at: self.offset + offset)
+    }
+    
+    /// Reads a big-endian unsigned 2-byte integer in the pointed data
+    public func readUInt16(at offset: Int) -> UInt16 {
+        return self.sharedData.readUInt16(at: self.offset + offset)
+    }
+    
+    /// Reads a big-endian signed 2-byte integer in the pointed data
+    public func readSInt16(at offset: Int) -> Int16 {
+        return self.sharedData.readSInt16(at: self.offset + offset)
+    }
+    
+    /// Reads a big-endian unsigned 4-byte integer in the pointed data
+    public func readUInt32(at offset: Int) -> UInt32 {
+        return self.sharedData.readUInt32(at: self.offset + offset)
+    }
+    
+    /// Reads a big-endian signed 4-byte integer in the pointed data
+    public func readSInt32(at offset: Int) -> Int32 {
+        return self.sharedData.readSInt32(at: self.offset + offset)
+    }
 }
 
 
@@ -66,7 +95,7 @@ public extension DataRange {
     /// Reads a bit inside a big-endian 2-byte integer in the pointed data
     public func readFlag(at offset: Int, bitOffset: Int) -> Bool {
         
-        let flags = readUInt16(at: offset)
+        let flags: Int = readUInt16(at: offset)
         return (flags & (1 << bitOffset)) != 0
     }
     
@@ -82,7 +111,7 @@ public extension DataRange {
     
     private func readCoordinate(at offset: Int) -> Int {
         
-        let value = self.readUInt16(at: offset)
+        let value: Int = self.readUInt16(at: offset)
         
         let topBits = value >> 14
         
@@ -115,45 +144,72 @@ public extension Data {
     
     /// Reads a unsigned byte
     public func readUInt8(at offset: Int) -> Int {
-        return Int(self[offset])
+        let value: UInt8 = readUInt8(at: offset)
+        return Int(value)
+    }
+    
+    /// Reads a unsigned byte
+    public func readUInt8(at offset: Int) -> UInt8 {
+        return self[offset]
+    }
+    
+    /// Reads a signed byte
+    public func readSInt8(at offset: Int) -> Int8 {
+        let value: UInt8 = readUInt8(at: offset)
+        return Int8(bitPattern: value)
     }
     
     /// Reads a signed byte
     public func readSInt8(at offset: Int) -> Int {
-        let value = readUInt8(at: offset)
-        if value > Int(Int8.max) {
-            return value - Int(UInt8.max) - 1
-        }
-        return value
+        let value: Int8 = readSInt8(at: offset)
+        return Int(value)
     }
     
     /// Reads a big-endian unsigned 2-byte integer
     public func readUInt16(at offset: Int) -> Int {
-        return Int(self[offset]) << 8 | Int(self[offset+1])
+        let value: UInt16 = readUInt16(at: offset)
+        return Int(value)
+    }
+    
+    /// Reads a big-endian unsigned 2-byte integer
+    public func readUInt16(at offset: Int) -> UInt16 {
+        return UInt16(self[offset]) << 8 | UInt16(self[offset+1])
     }
     
     /// Reads a big-endian signed 2-byte integer
     public func readSInt16(at offset: Int) -> Int {
-        let value = readUInt16(at: offset)
-        if value > Int(Int16.max) {
-            return value - Int(UInt16.max) - 1
-        }
-        return value
+        let value: Int16 = readSInt16(at: offset)
+        return Int(value)
+    }
+    
+    /// Reads a big-endian signed 2-byte integer
+    public func readSInt16(at offset: Int) -> Int16 {
+        let value: UInt16 = readUInt16(at: offset)
+        return Int16(bitPattern: value)
     }
     
     /// Reads a big-endian unsigned 4-byte integer
     public func readUInt32(at offset: Int) -> Int {
+        let value: UInt32 = readUInt32(at: offset)
+        return Int(value)
+    }
+    
+    /// Reads a big-endian unsigned 4-byte integer
+    public func readUInt32(at offset: Int) -> UInt32 {
         /* If use multiplications because Swift tells "Expression too complex" when I use bit shifts */
-        return Int(self[offset])*16777216 | Int(self[offset+1])*65536 | Int(self[offset+2])*256 | Int(self[offset+3])
+        return UInt32(self[offset])*16777216 | UInt32(self[offset+1])*65536 | UInt32(self[offset+2])*256 | UInt32(self[offset+3])
+    }
+    
+    /// Reads a big-endian signed 4-byte integer
+    public func readSInt32(at offset: Int) -> Int32 {
+        let value: UInt32 = readUInt32(at: offset)
+        return Int32(bitPattern: value)
     }
     
     /// Reads a big-endian signed 4-byte integer
     public func readSInt32(at offset: Int) -> Int {
-        let value = readUInt32(at: offset)
-        if value > Int(Int32.max) {
-            return value - Int(UInt32.max) - 1
-        }
-        return value
+        let value: Int32 = readSInt32(at: offset)
+        return Int(value)
     }
     
 }
@@ -170,7 +226,7 @@ public extension Image {
         if width & 31 == 0 {
             let count = width * height / 32
             for i in 0..<count {
-                self.data[i] = UInt32(data.readUInt32(at: offset + i*4))
+                self.data[i] = data.readUInt32(at: offset + i*4)
             }
             return
         }

@@ -58,7 +58,7 @@ public class HdmxTableReader {
         
         for i in 0..<recordCount {
             let offset = headerLength + recordSize * i
-            let fontSize = data.readUInt8(at: offset)
+            let fontSize: Int = data.readUInt8(at: offset)
             fontSizes.append(fontSize)
         }
         
@@ -76,7 +76,7 @@ public class HdmxTableReader {
         record.maximumWidth = data.readUInt8(at: recordOffset + 0x1)
         
         for offset in 2..<size {
-            let width = data.readUInt8(at: recordOffset + offset)
+            let width: Int = data.readUInt8(at: recordOffset + offset)
             record.widths.append(width)
         }
         

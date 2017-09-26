@@ -34,7 +34,7 @@ public class FontFamilyResourceBlock: ResourceBlock {
     }
     
     private func readFraction(at offset: Int) -> Double {
-        let bits = data.readUInt16(at: offset)
+        let bits: Int = data.readUInt16(at: offset)
         
         /* Check sign bit */
         let negative = ((bits >> 15) == 1)
@@ -156,14 +156,14 @@ public class FontFamilyResourceBlock: ResourceBlock {
     /// The font records
     public var fontAssociationTable: [FontAssociation] {
         var offset = 0x34
-        let countMinusOne = data.readUInt16(at: offset)
+        let countMinusOne: Int = data.readUInt16(at: offset)
         offset += 2
         let count = countMinusOne + 1
         var table: [FontAssociation] = []
         for _ in 0..<count {
-            let size = data.readUInt16(at: offset)
-            let styleFlags = data.readUInt16(at: offset + 2)
-            let identifier = data.readUInt16(at: offset + 4)
+            let size: Int = data.readUInt16(at: offset)
+            let styleFlags: Int = data.readUInt16(at: offset + 2)
+            let identifier: Int = data.readUInt16(at: offset + 4)
             table.append(FontAssociation(size: size, style: TextStyle(flags: styleFlags), resourceIdentifier: identifier))
             offset += 6
         }

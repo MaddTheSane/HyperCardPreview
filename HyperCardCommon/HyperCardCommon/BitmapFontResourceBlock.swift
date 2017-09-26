@@ -107,7 +107,7 @@ public class BitmapFontResourceBlock: ResourceBlock {
         var locations = [Int](repeating: 0, count: tableCount)
         let startOffset = 0x1A + self.bitImageSize
         for i in 0..<tableCount {
-            let value = data.readUInt16(at: startOffset + 2 * i)
+            let value: Int = data.readUInt16(at: startOffset + 2 * i)
             locations[i] = value
         }
         return locations
@@ -121,7 +121,7 @@ public class BitmapFontResourceBlock: ResourceBlock {
         var widths = [Int](repeating: 0, count: count)
         let startOffset = 0x1A + self.bitImageSize + self.bitmapLocationTableSize
         for i in 0..<count {
-            let value = data.readSInt16(at: startOffset + 2 * i)
+            let value: Int = data.readSInt16(at: startOffset + 2 * i)
             if value == -1 {
                 continue
             }
@@ -136,7 +136,7 @@ public class BitmapFontResourceBlock: ResourceBlock {
         var widths = [Int](repeating: 0, count: count)
         let startOffset = 0x1A + self.bitImageSize + self.bitmapLocationTableSize
         for i in 0..<count {
-            let value = data.readSInt16(at: startOffset + 2 * i)
+            let value: Int = data.readSInt16(at: startOffset + 2 * i)
             if value == -1 {
                 continue
             }

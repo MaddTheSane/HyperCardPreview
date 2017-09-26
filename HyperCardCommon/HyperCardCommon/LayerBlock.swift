@@ -20,7 +20,7 @@ public class LayerBlock: HyperCardFileBlock {
     
     /// ID of bitmap block storing the picture of the layer. Nil if there is no picture.
     public var bitmapIdentifier: Int? {
-        let value = data.readSInt32(at: 0x10)
+        let value: Int = data.readSInt32(at: 0x10)
         guard value != 0 else {
             return nil
         }
@@ -78,7 +78,7 @@ public class LayerBlock: HyperCardFileBlock {
         for _ in 0..<partCount {
             
             /* Read the size of the part block */
-            let size = data.readUInt16(at: offset)
+            let size: Int = data.readUInt16(at: offset)
             
             /* Build the part block */
             let dataRange = DataRange(sharedData: self.data.sharedData, offset: self.data.offset + offset, length: size)
@@ -103,8 +103,8 @@ public class LayerBlock: HyperCardFileBlock {
         for _ in 0..<contentCount {
             
             /* Read the identifier and size */
-            let storedIdentifier = data.readSInt16(at: offset)
-            let size = data.readUInt16(at: offset + 2)
+            let storedIdentifier: Int = data.readSInt16(at: offset)
+            let size: Int = data.readUInt16(at: offset + 2)
             
             /* If the identifier is <0, then it is a card content */
             let identifier = abs(storedIdentifier)

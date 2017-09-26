@@ -90,23 +90,23 @@ public class AddColorResourceBlock: ResourceBlock {
     
     private func readElement(at offset: inout Int) -> AddColorElement {
         
-        let typeAndFlags = data.readUInt8(at: offset)
+        let typeAndFlags: Int = data.readUInt8(at: offset)
         let type = typeAndFlags & 0x7F
         let enabled = ((typeAndFlags >> 7) & 1) == 0
         
         switch type {
         
         case 1: // button
-            let identifier = data.readUInt16(at: offset + 0x1)
-            let bevel = data.readUInt16(at: offset + 0x3)
+            let identifier: Int = data.readUInt16(at: offset + 0x1)
+            let bevel: Int = data.readUInt16(at: offset + 0x3)
             let color = self.readColor(at: offset + 0x5)
             offset += 11
             let element = AddColorButton(buttonIdentifier: identifier, bevel: bevel, color: color, enabled: enabled)
             return AddColorElement.button(element)
             
         case 2: // field
-            let identifier = data.readUInt16(at: offset + 0x1)
-            let bevel = data.readUInt16(at: offset + 0x3)
+            let identifier: Int = data.readUInt16(at: offset + 0x1)
+            let bevel: Int = data.readUInt16(at: offset + 0x3)
             let color = self.readColor(at: offset + 0x5)
             offset += 11
             let element = AddColorField(fieldIdentifier: identifier, bevel: bevel, color: color, enabled: enabled)
@@ -114,7 +114,7 @@ public class AddColorResourceBlock: ResourceBlock {
             
         case 3: // rectangle
             let rectangle = data.readRectangle(at: offset + 0x1)
-            let bevel = data.readUInt16(at: offset + 0x9)
+            let bevel: Int = data.readUInt16(at: offset + 0x9)
             let color = self.readColor(at: offset + 0xB)
             offset += 17
             let element = AddColorRectangle(rectangle: rectangle, bevel: bevel, color: color, enabled: enabled)
@@ -122,8 +122,8 @@ public class AddColorResourceBlock: ResourceBlock {
             
         case 4: // picture resource
             let rectangle = data.readRectangle(at: offset + 0x1)
-            let transparentValue = data.readUInt8(at: offset + 0x9)
-            let nameLength = data.readUInt8(at: offset + 0xA)
+            let transparentValue: Int = data.readUInt8(at: offset + 0x9)
+            let nameLength: Int = data.readUInt8(at: offset + 0xA)
             let name = data.readString(at: offset + 0xB, length: nameLength)
             offset += 11 + name.length
             
@@ -133,8 +133,8 @@ public class AddColorResourceBlock: ResourceBlock {
             
         case 5:  // picture file
             let rectangle = data.readRectangle(at: offset + 0x1)
-            let transparentValue = data.readUInt8(at: offset + 0x9)
-            let nameLength = data.readUInt8(at: offset + 0xA)
+            let transparentValue: Int = data.readUInt8(at: offset + 0x9)
+            let nameLength: Int = data.readUInt8(at: offset + 0xA)
             let name = data.readString(at: offset + 0xB, length: nameLength)
             offset += 11 + name.length
             
@@ -151,9 +151,9 @@ public class AddColorResourceBlock: ResourceBlock {
     private func readColor(at offset: Int) -> AddColor {
         
         /* Read the values */
-        let red16Bits = data.readUInt16(at: offset)
-        let green16Bits = data.readUInt16(at: offset + 2)
-        let blue16Bits = data.readUInt16(at: offset + 4)
+        let red16Bits: UInt16 = data.readUInt16(at: offset)
+        let green16Bits: UInt16 = data.readUInt16(at: offset + 2)
+        let blue16Bits: UInt16 = data.readUInt16(at: offset + 4)
         
         /* Convert to double */
         let factor = Double(UInt16.max)
