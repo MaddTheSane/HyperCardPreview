@@ -32,7 +32,7 @@ public class HyperCardFile: ClassicFile {
         if self.parsedData.stack.privateAccess {
             
             /* We must have a password to decrypt the header */
-            if let decodedHeader = hackEncryptedHeader() {
+            if possiblePassword == nil, let decodedHeader = hackEncryptedHeader() {
                 self.decodedHeader = decodedHeader
                 return
             }
