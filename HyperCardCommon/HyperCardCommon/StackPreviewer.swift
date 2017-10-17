@@ -11,32 +11,32 @@ public class StackPreviewer: NSObject {
     
     private let browser: Browser
     
-    public init(url: URL) throws {
+    @objc public init(url: URL) throws {
         let file = try HyperCardFile(path: url.path)
         browser = Browser(stack: file.stack)
     }
     
-    public func moveToCard(_ index: Int) {
+    @objc public func moveToCard(_ index: Int) {
         browser.cardIndex = index
     }
     
-    public var cardCount: Int {
+    @objc public var cardCount: Int {
         return browser.stack.cards.count
     }
     
-    public var width: Int {
+    @objc public var width: Int {
         return browser.image.width
     }
     
-    public var height: Int {
+    @objc public var height: Int {
         return browser.image.height
     }
     
-    public var integerCountInRows: Int {
+    @objc public var integerCountInRows: Int {
         return browser.image.integerCountInRow
     }
     
-    public var imageData: UnsafePointer<UInt32> {
+    @objc public var imageData: UnsafePointer<UInt32> {
         return UnsafePointer<UInt32>(browser.image.data)
     }
 
