@@ -74,7 +74,7 @@ private class AppResourceIcon: Resource<Image> {
     
 }
 
-private let IconFilePrefix = "icon_"
+private let IconFilePrefix = "Icons/"
 private let IconPath = "Icons"
 
 private func listIconIdentifiers() -> [Int] {
