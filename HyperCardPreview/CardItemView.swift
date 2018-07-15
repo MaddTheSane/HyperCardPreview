@@ -195,24 +195,3 @@ class CardItemView: NSView {
     }
     
 }
-
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToCATextLayerAlignmentMode(_ input: String) -> CATextLayerAlignmentMode {
-	return CATextLayerAlignmentMode(rawValue: input)
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromCATextLayerAlignmentMode(_ input: CATextLayerAlignmentMode) -> String {
-	return input.rawValue
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToCATextLayerTruncationMode(_ input: String) -> CATextLayerTruncationMode {
-	return CATextLayerTruncationMode(rawValue: input)
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromCATextLayerTruncationMode(_ input: CATextLayerTruncationMode) -> String {
-	return input.rawValue
-}

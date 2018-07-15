@@ -6,13 +6,7 @@
 //  Copyright © 2017 Pierre Lorenzi. All rights reserved.
 //
 
-
-/// Result of a string comparison
-public enum ComparisonResult {
-    case equal
-    case less
-    case greater
-}
+import Foundation
 
 /// Compares two strings byte-to-byte
 public func compare(_ string1: HString, _ string2: HString) -> ComparisonResult {
@@ -52,21 +46,21 @@ private func compareGeneric(_ string1: HString, _ string2: HString, transform: (
     for (character1, character2) in zip(transformed1, transformed2) {
         
         if character1 < character2 {
-            return ComparisonResult.less
+            return ComparisonResult.orderedDescending
         }
         if character1 > character2 {
-            return ComparisonResult.greater
+            return ComparisonResult.orderedAscending
         }
     }
     
     if string1.length < string2.length {
-        return ComparisonResult.less
+        return ComparisonResult.orderedDescending
     }
     if string1.length > string2.length {
-        return ComparisonResult.greater
+        return ComparisonResult.orderedAscending
     }
     
-    return ComparisonResult.equal
+    return ComparisonResult.orderedSame
 }
 
 

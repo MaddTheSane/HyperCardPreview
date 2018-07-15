@@ -26,9 +26,9 @@ public struct NumericName: Equatable, CustomStringConvertible {
     public var description: String {
         return UTCreateStringForOSType(value).takeRetainedValue() as String
     }
-}
+    
+    public static func ==(i1: NumericName, i2: NumericName) -> Bool {
+        return i1.value == i2.value
+    }
 
-
-public func ==(i1: NumericName, i2: NumericName) -> Bool {
-    return i1.value == i2.value
 }

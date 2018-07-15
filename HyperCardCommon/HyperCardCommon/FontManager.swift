@@ -98,7 +98,7 @@ public class FontManager {
         let fontName = fontNameReference.name
         
         /* If the name is right, we're good */
-        if let familyResource = possibleFamilyResource, compareCase(familyResource.name, fontName) == .equal {
+        if let familyResource = possibleFamilyResource, compareCase(familyResource.name, fontName) == .orderedSame {
             return possibleFamily
         }
         
