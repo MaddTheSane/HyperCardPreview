@@ -93,9 +93,9 @@ public struct DataRange {
 public extension DataRange {
     
     /// Reads a bit inside a big-endian 2-byte integer in the pointed data
-    public func readFlag(at offset: Int, bitOffset: Int) -> Bool {
+    public func readFlag(at offset: Int, bitOffset: UInt16) -> Bool {
         
-        let flags: Int = readUInt16(at: offset)
+        let flags: UInt16 = readUInt16(at: offset)
         return (flags & (1 << bitOffset)) != 0
     }
     

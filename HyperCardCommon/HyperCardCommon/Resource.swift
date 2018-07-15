@@ -52,7 +52,7 @@ public struct FontFamilyResourceType: ResourceType {
 }
 public typealias FontFamilyResource = Resource<FontFamilyResourceType>
 
-/// Bitmap Fonts, naformerly namedmed 'NFNT' or 'FONT'
+/// Bitmap Fonts, formerly named 'NFNT' or 'FONT'
 public struct BitmapFontResourceType: ResourceType {
     public typealias ContentType = BitmapFont
 }

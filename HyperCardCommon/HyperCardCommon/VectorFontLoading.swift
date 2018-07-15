@@ -14,10 +14,9 @@ public extension VectorFont {
         
         /* Copy the data */
         let slice = dataRange.sharedData[dataRange.offset..<dataRange.offset + dataRange.length]
-        let data = Data(slice)
+        let nsdata = slice as NSData
         
         /* Build a data provider */
-        let nsdata = NSData(data: data)
         let dataProvider = CGDataProvider(data: nsdata)
         
         let cgfont = CGFont(dataProvider!)!

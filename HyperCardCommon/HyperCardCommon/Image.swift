@@ -15,7 +15,7 @@ import AppKit
 public struct Image: Equatable {
     
     /// The underlying integer type used to store the pixel data. Can be UInt32 or UInt64.
-    public typealias Integer = UInt64
+    public typealias Integer = UInt32
     
     /// The bits, stored in 32-bit integers. A row always starts at the beginning of an integer,
     /// so there may be unused bits at the end of every row for 32-bit alignment.

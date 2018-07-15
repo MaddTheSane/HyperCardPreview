@@ -111,22 +111,20 @@ public struct StackBlockDecrypter {
         return x & 0xFFFF_FFFF
     }
     
+    /// This function replicates the Random function of old Mac OS. It was used to make hashes.
     private func hashNumber(_ x: Int) -> Int {
         
-        /* This function replicates the Random function of old Mac OS. It was used to make hashes. */
         var result = x * 0x41A7
         result += result >> 31
         result &= 0x7fff_ffff
         return result
     }
     
+    /// This function replicates the Random function of old Mac OS. It was used to make hashes.
     private func hashNumber(_ x: UInt32) -> UInt32 {
         
-        /* This function replicates the Random function of old Mac OS. It was used to make hashes. */
-        var result = x * 0x41A7
-        result += result >> 31
-        result &= 0x7fff_ffff
-        return result
+        let hashed = hashNumber(Int(x))
+        return UInt32(hashed)
     }
 
     

@@ -6,6 +6,7 @@
 //  Copyright © 2018 Pierre Lorenzi. All rights reserved.
 //
 
+import CoreGraphics.CGFont
 
 /// A vector font in TrueType format
 public struct VectorFont {
