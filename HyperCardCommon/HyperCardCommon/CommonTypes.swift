@@ -404,6 +404,12 @@ public enum PartContent {
     }
 }
 
+/// A layer can be either a card or a background
+public enum LayerType {
+    case card
+    case background
+}
+
 /// Type of a card or background part
 public enum PartType {
     case field
@@ -650,6 +656,7 @@ public enum FontIdentifiers {
     public static let london = 6
     public static let athens = 7
     public static let sanFrancisco = 8
+    public static let toronto = 9
     public static let cairo = 11
     public static let losAngeles = 12
     public static let palatino = 16
@@ -657,6 +664,7 @@ public enum FontIdentifiers {
     public static let helvetica = 21
     public static let courier = 22
     public static let symbol = 23
+    public static let taliesin = 24
     public static let charcoal = 2002
 }
 
@@ -680,5 +688,15 @@ public struct FontNameReference {
     
     /// Name of the font
     public var name: HString
+}
+
+/// The version of a HyperCard file
+public enum FileVersion {
+    case v1
+    case v2
+    
+    public func isTwo() -> Bool {
+        return self == FileVersion.v2
+    }
 }
 

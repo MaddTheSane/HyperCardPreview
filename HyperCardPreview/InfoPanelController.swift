@@ -32,8 +32,9 @@ class InfoPanelController {
         
     }
     
-    func displayStack(_ stack: Stack) {
+    func displayStack(_ hyperCardFile: HyperCardFile) {
         window.title = "Stack Info"
+        let stack = hyperCardFile.stack
         displayScript(stack.script)
         tabView.removeTabViewItem(tabView.tabViewItem(at: 1))
         
@@ -42,7 +43,7 @@ class InfoPanelController {
         
         infoView.string = ["Number of Cards: \(stack.cards.count)",
             "Number of Backgrounds: \(stack.backgrounds.count)",
-            "Resources: \(stack.resources != nil)\n",
+            "Resources: \(hyperCardFile.resources != nil)\n",
             "Password: \(stack.passwordHash != nil)",
             "User Level: \(stack.userLevel.rawValue)",
             "Can't Abort: \(stack.cantAbort)",
@@ -150,7 +151,7 @@ class InfoPanelController {
                 return false
             }
             let indexBefore = realIndex - string.length + 1
-            if indexBefore >= 0 && script[indexBefore..<(realIndex + 1)] == string {
+            if indexBefore >= 0 && compareCaseDiacritics(script[indexBefore..<(realIndex + 1)], string) == .equal {
                 if indexBefore == 0 {
                     return true
                 }
@@ -165,7 +166,7 @@ class InfoPanelController {
         
         func isWordAfterIndex(_ index: Int, _ string: HString) -> Bool {
             let indexAfter = index + string.length + 1
-            if indexAfter <= script.length && script[(index + 1)..<indexAfter] == string {
+            if indexAfter <= script.length && compareCaseDiacritics(script[(index + 1)..<indexAfter], string) == .equal {
                 if indexAfter == script.length {
                    return true
                 }

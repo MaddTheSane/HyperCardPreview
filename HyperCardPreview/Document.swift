@@ -15,7 +15,6 @@ import QuickLook
 
 class Document: NSDocument, NSAnimationDelegate {
     
-    var file: HyperCardFile!
     var browser: Browser!
     
     var panels: [InfoPanelController] = []
@@ -40,29 +39,31 @@ class Document: NSDocument, NSAnimationDelegate {
     private func readStack(atPath path: String, password: HString? = nil) throws {
         
         do {
-            try file = HyperCardFile(path: path, password: password)
+            let file = ClassicFile(path: path)
+            let hyperCardFile = try HyperCardFile(file: file, password: password)
+            self.browser = Browser(hyperCardFile: hyperCardFile)
         }
-        catch HyperCardFile.StackError.notStack {
+        catch OpeningError.notStack {
             
             /* Tell the user we can't open the file */
-            let alert = NSAlert(error: HyperCardFile.StackError.notStack)
+            let alert = NSAlert(error: OpeningError.notStack)
             alert.messageText = "The file is not a stack"
             alert.informativeText = "The file can't be opened because it is not recognized as a stack"
             alert.runModal()
-            throw HyperCardFile.StackError.notStack
+            throw OpeningError.notStack
             
         }
-        catch HyperCardFile.StackError.corrupted {
+        catch OpeningError.corrupted {
             
             /* Tell the user we can't open the file */
-            let alert = NSAlert(error: HyperCardFile.StackError.notStack)
+            let alert = NSAlert(error: OpeningError.notStack)
             alert.messageText = "The stack is corrupted"
             alert.informativeText = "The stack can't be opened because the data is corrupted"
             alert.runModal()
-            throw HyperCardFile.StackError.notStack
+            throw OpeningError.notStack
             
         }
-        catch HyperCardFile.StackError.missingPassword {
+        catch OpeningError.missingPassword {
             
             /* Ask the user for a password */
             let alert = NSAlert()
@@ -76,13 +77,13 @@ class Document: NSDocument, NSAnimationDelegate {
             
             /* If cancel, stop */
             guard answer == NSApplication.ModalResponse.alertFirstButtonReturn else {
-                throw HyperCardFile.StackError.wrongPassword
+                throw OpeningError.wrongPassword
             }
             
             /* Get the password */
             let passwordString = textField.stringValue
             guard passwordString != "" else {
-                throw HyperCardFile.StackError.wrongPassword
+                throw OpeningError.wrongPassword
             }
             
             /* Convert it to Mac OS Roman encoding */
@@ -92,18 +93,18 @@ class Document: NSDocument, NSAnimationDelegate {
                 let alert = NSAlert()
                 alert.messageText = "Wrong Password"
                 alert.runModal()
-                throw HyperCardFile.StackError.wrongPassword
+                throw OpeningError.wrongPassword
             }
             
             /* Try again to open the file, this time with the password */
             try self.readStack(atPath: path, password: password)
             
         }
-        catch HyperCardFile.StackError.wrongPassword {
+        catch OpeningError.wrongPassword {
             let alert = NSAlert()
             alert.messageText = "Wrong Password"
             alert.runModal()
-            throw HyperCardFile.StackError.wrongPassword
+            throw OpeningError.wrongPassword
         }
         
     }
@@ -115,11 +116,9 @@ class Document: NSDocument, NSAnimationDelegate {
         
         let window = self.windowControllers[0].window!
         let currentFrame = window.frame
-        let newFrame = window.frameRect(forContentRect: NSMakeRect(currentFrame.origin.x, currentFrame.origin.y, CGFloat(file.stack.size.width), CGFloat(file.stack.size.height)))
+        let newFrame = window.frameRect(forContentRect: NSMakeRect(currentFrame.origin.x, currentFrame.origin.y, CGFloat(browser.stack.size.width), CGFloat(browser.stack.size.height)))
         window.setFrame(newFrame, display: false)
-        view.frame = NSMakeRect(0, 0, CGFloat(file.stack.size.width), CGFloat(file.stack.size.height))
-        
-        browser = Browser(stack: file.stack)
+        view.frame = NSMakeRect(0, 0, CGFloat(browser.stack.size.width), CGFloat(browser.stack.size.height))
         
         browser.needsDisplayProperty.startNotifications(for: self, by: {
             [weak self] in
@@ -163,7 +162,7 @@ class Document: NSDocument, NSAnimationDelegate {
             
             /* Animate the card view appearing */
             let imageSize = NSSize(width: browser.image.width, height: browser.image.height)
-            let image = NSImage(cgImage: createScreenImage(from: browser.cgimage), size: imageSize)
+            let image = NSImage(cgImage: createScreenImage(from: browser.buildImage()), size: imageSize)
             animateCardAppearing(atIndex: browser.cardIndex, withImage: image)
             
             return
@@ -171,7 +170,7 @@ class Document: NSDocument, NSAnimationDelegate {
         
         /* Check if the thumbnails are managed */
         if self.collectionViewManager == nil {
-            self.collectionViewManager = CollectionViewManager(collectionView: self.collectionView, stack: file.stack, document: self)
+            self.collectionViewManager = CollectionViewManager(collectionView: self.collectionView, hyperCardFile: browser.hyperCardFile, document: self)
         }
         
         /* Display the card list */
@@ -220,7 +219,7 @@ class Document: NSDocument, NSAnimationDelegate {
         
         /* Animate the image becoming the thumbnail */
         let imageSize = NSSize(width: browser.image.width, height: browser.image.height)
-        let image = NSImage(cgImage: createScreenImage(from: browser.cgimage), size: imageSize)
+        let image = NSImage(cgImage: createScreenImage(from: browser.buildImage()), size: imageSize)
         let finalFrame = self.computeAnimationFrameInList(ofCardAtIndex: browser.cardIndex)
         self.animateImageView(fromFrame: self.view.frame, toFrame: finalFrame, withImage: image, onCompletion: {
             [unowned self] in
@@ -291,7 +290,7 @@ class Document: NSDocument, NSAnimationDelegate {
         browser.refresh()
         
         /* Create a copy of the image for the screen */
-        let screenImage = createScreenImage(from: browser.cgimage)
+        let screenImage = createScreenImage(from: browser.buildImage())
         
         /* Display the image in the layer */
         CATransaction.setDisableActions(true)
@@ -315,7 +314,7 @@ class Document: NSDocument, NSAnimationDelegate {
         /* Fill the image */
         context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
         
-        return RgbConverter.createImage(owningRgbData: data, width: width, height: height)
+        return RgbConverter.createImage(forRgbData: data, isOwner: true, width: width, height: height)
     }
     
     func applyVisualEffect(from image: Image, advance: Bool) {
@@ -575,7 +574,7 @@ class Document: NSDocument, NSAnimationDelegate {
         
         /* Convert the rectangle into current coordinates */
         let rectangle = part.part.rectangle
-        let frame = NSMakeRect(CGFloat(rectangle.x), CGFloat(file.stack.size.height - rectangle.bottom), CGFloat(rectangle.width), CGFloat(rectangle.height))
+        let frame = NSMakeRect(CGFloat(rectangle.x), CGFloat(browser.stack.size.height - rectangle.bottom), CGFloat(rectangle.width), CGFloat(rectangle.height))
         
         /* Create a view */
         let view = ScriptBorderView(frame: frame, part: part, content: retrieveContent(part: part, inLayerType: layerType), document: self)
@@ -617,7 +616,7 @@ class Document: NSDocument, NSAnimationDelegate {
     }
     
     @objc func displayStackInfo(_ sender: AnyObject) {
-        displayInfo().displayStack(browser.stack)
+        displayInfo().displayStack(browser.hyperCardFile)
     }
     
     @objc func displayBackgroundInfo(_ sender: AnyObject) {

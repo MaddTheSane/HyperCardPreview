@@ -8,28 +8,31 @@
 
 
 
-private let trueHiliteContent: HString = "1"
+private let trueHiliteContent = "1"
 
 
 /// Browses through a stack: maintains a current card and current background and draws them.
 public class Browser {
     
     /// The stack being browsed
-    public let stack: Stack
+    public let hyperCardFile: HyperCardFile
+    public var stack: Stack {
+        return self.hyperCardFile.stack
+    }
     
     /// The index of the current card. Set it to browse.
     public var cardIndex: Int {
         get { return cardIndexProperty.value }
         set { if (newValue != cardIndexProperty.value) { cardIndexProperty.value = newValue } }
     }
-    public let cardIndexProperty: Property<Int>
+    public var cardIndexProperty: Property<Int>
     
     /// Activate this flag for the background view: only the background is drawn
     public var displayOnlyBackground: Bool {
         get { return displayOnlyBackgroundProperty.value }
         set { displayOnlyBackgroundProperty.value = newValue }
     }
-    public let displayOnlyBackgroundProperty = Property<Bool>(false)
+    public var displayOnlyBackgroundProperty = Property<Bool>(false)
     
     private let drawing: Drawing
     
@@ -57,7 +60,7 @@ public class Browser {
         get { return needsDisplayProperty.value }
         set { needsDisplayProperty.value = newValue }
     }
-    public let needsDisplayProperty = Property<Bool>(false)
+    public var needsDisplayProperty = Property<Bool>(false)
     
     /// the background before changing card
     private var backgroundBefore: Background? = nil
@@ -68,7 +71,6 @@ public class Browser {
     /// if the white view is in the view stack
     private var isShowingWhiteView = false
     
-    public let cgimage: CGImage
     private let cgdata: UnsafeMutableRawPointer
     private let cgcontext: CGContext
     
@@ -90,12 +92,13 @@ public class Browser {
     }
     
     /// Builds a new browser from the given stack. A starting card index can be given.
-    public init(stack: Stack, cardIndex: Int = 0) {
-        self.stack = stack
+    public init(hyperCardFile: HyperCardFile, cardIndex: Int = 0) {
+        self.hyperCardFile = hyperCardFile
+        let stack = hyperCardFile.stack
         drawing = Drawing(width: stack.size.width, height: stack.size.height)
         
         var resources = ResourceSystem()
-        if let stackResources = stack.resources {
+        if let stackResources = hyperCardFile.resources {
             resources.repositories.append(stackResources)
         }
         resources.repositories.append(ResourceRepository.mainRepository)
@@ -109,11 +112,10 @@ public class Browser {
         let height = stack.size.height
         let cgdata = RgbConverter.createRgbData(width: width, height: height)
         self.cgdata = cgdata
-        self.cgimage = RgbConverter.createImage(owningRgbData: cgdata, width: width, height: height)
         self.cgcontext = RgbConverter.createContext(forRgbData: cgdata, width: width, height: height)
         self.whiteView = WhiteView(cardRectangle: Rectangle(x: 0, y: 0, width: width, height: height))
         
-        self.areThereColors = Browser.areThereColors(inStack: stack)
+        self.areThereColors = Browser.areThereColors(inFile: hyperCardFile)
         
         /* Flip the contect */
         cgcontext.translateBy(x: 0, y: CGFloat(height))
@@ -129,15 +131,13 @@ public class Browser {
         self.displayOnlyBackgroundProperty.startNotifications(for: self, by: { [unowned self] in self.rebuildViews() })
     }
     
-    private static func areThereColors(inStack stack: Stack) -> Bool {
+    private static func areThereColors(inFile hyperCardFile: HyperCardFile) -> Bool {
         
-        if let resources = stack.resources?.resources {
-            if let _ = resources.index(where: { $0 is Resource<[AddColorElement]> }) {
-                return true
-            }
+        guard let repository = hyperCardFile.resources else {
+            return false
         }
         
-        return false
+        return !repository.cardColors.isEmpty || !repository.backgroundColors.isEmpty
     }
     
     private func rebuildViews() {
@@ -317,7 +317,7 @@ public class Browser {
         cgcontext.fill(CGRect(x: 0, y: 0, width: image.width, height: image.height))
         
         /* Draw the colors */
-        AddColorPainter.paintAddColor(ofStack: stack, atCardIndex: cardIndex, excludeCardParts: self.displayOnlyBackground, onContext: cgcontext)
+        AddColorPainter.paintAddColor(ofFile: hyperCardFile, atCardIndex: cardIndex, excludeCardParts: self.displayOnlyBackground, onContext: cgcontext)
         
         /* Update data */
         cgcontext.flush()
@@ -434,21 +434,21 @@ public class Browser {
     private func buildFieldView(for field: Field) -> View {
         
         /* Content */
-        let content = retrieveContent(of: field)
+        let contentComputation = retrieveContent(of: field)
         
-        let view = FieldView(field: field, contentProperty: content, fontManager: self.fontManager)
+        let view = FieldView(field: field, contentComputation: contentComputation, fontManager: self.fontManager)
         
         return view
         
     }
     
-    private func retrieveContent(of field: Field) -> Property<PartContent> {
+    private func retrieveContent(of field: Field) -> Computation<PartContent> {
         
         /* Special case: bg buttons with not shared hilite */
         if !field.sharedText && isPartInBackground(field) {
             
-            let property = Property<PartContent>(compute: {
-                [unowned self, unowned field] in
+            let computation = Computation<PartContent> {
+                [unowned self, unowned field] () -> PartContent in
             
                 /* If we're displaying the background, do not display the card contents */
                 if self.displayOnlyBackground {
@@ -462,35 +462,40 @@ public class Browser {
                 
                 return PartContent.string("")
                 
-            })
+            }
             
             /* Dependencies */
-            property.dependsOn(self.cardIndexProperty)
-            property.dependsOn(self.displayOnlyBackgroundProperty)
+            computation.dependsOn(self.cardIndexProperty)
+            computation.dependsOn(self.displayOnlyBackgroundProperty)
             
-            return property
+            return computation
             
         }
         
         /* Usual case: just return the content of the parent layer */
-        return field.contentProperty
+        let computation = Computation<PartContent> {
+            [unowned field] () -> PartContent in
+            return field.content
+        }
+        computation.dependsOn(field.contentProperty)
         
+        return computation
     }
     
     private func buildButtonView(for button: Button) -> View {
         
-        let hiliteProperty = retrieveHilite(of: button)
+        let hiliteComputation = retrieveHilite(of: button)
         
-        return ButtonView(button: button, hiliteProperty: hiliteProperty, fontManager: fontManager, resources: resources)
+        return ButtonView(button: button, hiliteComputation: hiliteComputation, fontManager: fontManager, resources: resources)
     }
     
-    private func retrieveHilite(of button: Button) -> Property<Bool> {
+    private func retrieveHilite(of button: Button) -> Computation<Bool> {
         
         /* Special case: bg buttons with not shared hilite */
         if !button.sharedHilite && isPartInBackground(button) {
             
-            let property = Property<Bool>(compute: {
-                [unowned self, unowned button] in
+            let computation = Computation<Bool> {
+                [unowned self, unowned button] () -> Bool in
             
                 /* If we're displaying the background, do not display the card contents */
                 if self.displayOnlyBackground {
@@ -503,23 +508,28 @@ public class Browser {
                 }
                 
                 /* If the card content is equal to "1", the button is hilited */
-                guard case PartContent.string(trueHiliteContent) = content  else {
+                guard case PartContent.string(let textContent) = content, textContent == trueHiliteContent  else {
                     return false
                 }
             
                 return true
-            })
+            }
             
             /* Dependencies */
-            property.dependsOn(self.cardIndexProperty)
-            property.dependsOn(self.displayOnlyBackgroundProperty)
+            computation.dependsOn(self.cardIndexProperty)
+            computation.dependsOn(self.displayOnlyBackgroundProperty)
             
-            return property
+            return computation
         }
         
         /* Usual case: just return hilite */
-        return button.hiliteProperty
+        let computation = Computation<Bool> {
+            [unowned button] () -> Bool in
+            return button.hilite
+        }
+        computation.dependsOn(button.hiliteProperty)
         
+        return computation
     }
     
     private func isPartInBackground(_ part: Part) -> Bool {
@@ -537,6 +547,11 @@ public class Browser {
         }
         
         return content.partContent
+    }
+    
+    public func buildImage() -> CGImage {
+        
+        return RgbConverter.createImage(forRgbData: cgdata, isOwner: false, width: self.image.width, height: self.image.height)
     }
     
     public func findViewRespondingToMouseEvent(at position: Point) -> MouseResponder? {

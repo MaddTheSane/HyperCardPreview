@@ -9,6 +9,8 @@
 import Foundation
 
 
+/// Contains utility functions for image conversion between black & white and
+/// modern RGB.
 public class RgbConverter {
 
     /* The representations of the RGB colors in memory */
@@ -32,6 +34,7 @@ public class RgbConverter {
     private static let RgbWhiteBlack: RgbColor2 = 0xFF00_0000_FFFF_FFFF
     private static let rgbColor2Table: [RgbColor2] = [RgbWhiteWhite, RgbWhiteBlack, RgbBlackWhite, RgbBlackBlack]
     
+    /// Converts a black & white image to a modern CoreGraphics image
     public static func convertImage(_ image: Image) -> CGImage {
         
         /* Allocate a buffer for the image */
@@ -41,7 +44,7 @@ public class RgbConverter {
         fillRgbData(data, withImage: image)
         
         /* Build the image */
-        return createImage(owningRgbData: data, width: image.width, height: image.height)
+        return createImage(forRgbData: data, isOwner: true, width: image.width, height: image.height)
     }
     
     public static func fillRgbData(_ rawBuffer: UnsafeMutableRawPointer, withImage image: Image, rectangle possibleRectangle: Rectangle? = nil) {
@@ -54,11 +57,11 @@ public class RgbConverter {
         let rectangle = Rectangle(top: unevenRectangle.top, left: downToMultiple(unevenRectangle.left, 2), bottom: unevenRectangle.bottom, right: upToMultiple(unevenRectangle.right, 2))
         
         var offset = (rectangle.top * image.width + rectangle.left) / 2
-        var integerIndex = rectangle.top * image.integerCountInRow + rectangle.left / 32
+        var integerIndex = rectangle.top * image.integerCountInRow + rectangle.left / Image.Integer.bitWidth
         
         /* Compute the bounds of the integers */
-        let startInteger = rectangle.left / 32
-        let endInteger = upToMultiple(rectangle.right, 32) / 32
+        let startInteger = rectangle.left / Image.Integer.bitWidth
+        let endInteger = upToMultiple(rectangle.right, Image.Integer.bitWidth) / Image.Integer.bitWidth
         
         /* Compute horizontal increments between the end of one row and the start of the next */
         let offsetIncrement = (rectangle.left + image.width - rectangle.right) / 2
@@ -68,17 +71,17 @@ public class RgbConverter {
             for integerIndexInRow in startInteger..<endInteger {
                 
                 /* Get 32 pixels */
-                let integer = Int(image.data[integerIndex])
+                let integer = image.data[integerIndex]
                 integerIndex += 1
                 
                 /* Do no not copy pixels after the end of the image */
-                let startBit = 32 - max(0, rectangle.left - integerIndexInRow * 32)
-                let endBit = 32 - min(32, rectangle.right - integerIndexInRow * 32)
+                let startBit = Image.Integer.bitWidth - max(0, rectangle.left - integerIndexInRow * Image.Integer.bitWidth)
+                let endBit = Image.Integer.bitWidth - min(Image.Integer.bitWidth, rectangle.right - integerIndexInRow * Image.Integer.bitWidth)
                 
                 /* Copy the pixels two by two */
                 var i = startBit - 2
                 while i >= endBit {
-                    let twoPixelValue = (integer >> i) & 0b11
+                    let twoPixelValue = Int(truncatingIfNeeded: (integer >> i) & Image.Integer(0b11))
                     let twoPixelColor = rgbColor2Table[twoPixelValue]
                     buffer[offset] = twoPixelColor
                     offset += 1
@@ -104,21 +107,19 @@ public class RgbConverter {
             for integerIndexInRow in 0..<image.integerCountInRow {
                 
                 /* Get 32 pixels */
-                let integer = Int(image.data[integerIndex])
+                let integer = image.data[integerIndex]
                 integerIndex += 1
                 
                 /* Do no not copy pixels after the end of the image */
-                let bitCount = min(32, image.width - integerIndexInRow * 32)
+                let bitCount = min(Image.Integer.bitWidth, image.width - integerIndexInRow * Image.Integer.bitWidth)
                 
                 /* Copy the pixels */
-                var i = bitCount - 1
-                while i >= 0 {
-                    let pixelValue = (integer >> i) & 1
-                    if pixelValue == 1 {
+                for i in 0..<bitCount {
+                    let pixelValue = (integer >> (Image.Integer.bitWidth - 1 - i)) & Image.Integer(1)
+                    if pixelValue == Image.Integer(1) {
                         buffer[offset] = RgbBlack
                     }
                     offset += 1
-                    i -= 1
                 }
             }
         }
@@ -127,7 +128,7 @@ public class RgbConverter {
     public static func createRgbData(width: Int, height: Int) -> UnsafeMutableRawPointer {
         
         let length = width * height * MemoryLayout<RgbColor>.size
-        return UnsafeMutableRawPointer.allocate(bytes: length, alignedTo: 0)
+        return UnsafeMutableRawPointer.allocate(byteCount: length, alignment: 0)
     }
     
     public static func createContext(forRgbData data: UnsafeMutableRawPointer, width: Int, height: Int) -> CGContext {
@@ -141,12 +142,14 @@ public class RgbConverter {
                          bitmapInfo: BitmapInfo.rawValue)!
     }
     
-    public static func createImage(owningRgbData data: UnsafeMutableRawPointer, width: Int, height: Int) -> CGImage {
+    public static func createImage(forRgbData data: UnsafeMutableRawPointer, isOwner: Bool, width: Int, height: Int) -> CGImage {
         
         let length = width * height * MemoryLayout<RgbColor>.size
-        let dataProvider = CGDataProvider(dataInfo: nil, data: data, size: length, releaseData: {
-            (_, data: UnsafeRawPointer, length: Int) in
-            data.deallocate(bytes: length, alignedTo: 0)
+        let dataProvider = CGDataProvider(dataInfo: isOwner ? data : nil, data: data, size: length, releaseData: {
+            (dataInfo: UnsafeMutableRawPointer?, data: UnsafeRawPointer, length: Int) in
+            if dataInfo != nil {
+                data.deallocate()
+            }
         })!
         
         let cgimage = CGImage(

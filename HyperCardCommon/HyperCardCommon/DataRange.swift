@@ -9,7 +9,7 @@
 import Foundation
 
 
-/// An object pointing to a section of a data
+/// An reference to a section of a data
 public struct DataRange {
     
     /// The data pointed by by the object
@@ -222,36 +222,27 @@ public extension Image {
         /* Create the image */
         self.init(width: width, height: height)
         
-        /* Optimization if data can be read with 32-bit integers */
-        if width & 31 == 0 {
-            let count = width * height / 32
-            for i in 0..<count {
-                self.data[i] = data.readUInt32(at: offset + i*4)
-            }
-            return
-        }
-        
         /* Fill the rows */
         let rowSize = width / 8
         var integerIndex = 0
-        var shift: UInt32 = 24
+        var shift = Image.Integer(Image.Integer.bitWidth - 8)
         var i = offset
         for _ in 0..<height {
             for _ in 0..<rowSize {
                 let byte = data[i]
                 i += 1
-                self.data[integerIndex] |= UInt32(byte) << shift
+                self.data[integerIndex] |= Image.Integer(byte) << shift
                 if shift == 0 {
-                    shift = 24
+                    shift = Image.Integer(Image.Integer.bitWidth - 8)
                     integerIndex += 1
                 }
                 else {
                     shift -= 8
                 }
             }
-            if shift != 24 {
+            if shift != Image.Integer(Image.Integer.bitWidth - 8) {
                 integerIndex += 1
-                shift = 24
+                shift = Image.Integer(Image.Integer.bitWidth - 8)
             }
         }
         

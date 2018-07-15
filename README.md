@@ -1,12 +1,12 @@
-**[Screenshot](http://www.hostingpics.net/viewer.php?id=554516HyperCardPreview.png)**
+**[Screenshot](http://pierrelorenzi.fr/hypercard/screenshot.png)**
 
-**[Download v1.1](https://github.com/PierreLorenzi/HyperCardPreview/releases/download/1.1.0/HyperCardPreview.app.zip)**
+**[Download v1.2](https://github.com/PierreLorenzi/HyperCardPreview/releases/download/1.2.0/HyperCardPreview.app.zip)** (November 14, 2017)
 
 Mac OS 10.12 minimum
 
 This application displays HyperCard stacks in Mac OS X.
 
-The binary format of HyperCard stacks has been retro-engineered by numerous people, and now it is known with pretty good reliability. If you want to learn more about it, see the site [hypercard.org](http://hypercard.org).
+The binary format of HyperCard stacks has been retro-engineered by numerous people, and now it is known with pretty good reliability. If you want to learn more about it, see the [format description](http://pierrelorenzi.fr/hypercard/stack_format.html).
 
 HyperCardPreview only displays the stacks, it does not edit them, it does not execute them. To do that you have to use a emulator: SheepShaver, Basilisk or vMac.
 
@@ -43,6 +43,14 @@ Get Info of a Covered Button or Field: right-click somewhere on the card, the li
 
 
 ## Changes since version 1.0
+
+**Changes in v1.2**
+
+The application is now signed.
+
+Bug fixes in the card list.
+
+**Changes in v1.1**
 
 Now the scroll fields can be scrolled, and the pop-up buttons can be popped up.
 

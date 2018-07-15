@@ -7,79 +7,77 @@
 //
 
 
-
 /* Differences from original: underline extends too much around the characters, start offset of text can shift one pixel */
 
 
-public enum FontDecorating {
+public extension BitmapFont {
     
     /// Applies a font variation to a bitmap font
-    public static func decorateFont(from baseFont: BitmapFont, with style: TextStyle, in possibleFamily: FontFamily?, size: Int) -> BitmapFont {
+    public convenience init(decorate baseFont: BitmapFont, with style: TextStyle, in possibleFamily: FontFamily?, size: Int) {
         
         /* Copy the font */
-        let font = BitmapFont()
-        font.maximumWidth = baseFont.maximumWidth
-        font.maximumKerning = baseFont.maximumKerning
-        font.fontRectangleWidth = baseFont.fontRectangleWidth
-        font.fontRectangleHeight = baseFont.fontRectangleHeight
-        font.maximumAscent = baseFont.maximumAscent
-        font.maximumDescent = baseFont.maximumDescent
-        font.leading = baseFont.leading
+        self.init()
+        self.maximumWidth = baseFont.maximumWidth
+        self.maximumKerning = baseFont.maximumKerning
+        self.fontRectangleWidth = baseFont.fontRectangleWidth
+        self.fontRectangleHeight = baseFont.fontRectangleHeight
+        self.maximumAscent = baseFont.maximumAscent
+        self.maximumDescent = baseFont.maximumDescent
+        self.leading = baseFont.leading
         
         /* Decorate the glyphs */
-        font.glyphs = baseFont.glyphs.map({ DecoratedGlyph(baseGlyph: $0, style: style, properties: possibleFamily?.styleProperties, size: size, maximumDescent: font.maximumDescent) })
+        self.glyphs = baseFont.glyphs.map({ Glyph(baseGlyph: $0, style: style, properties: possibleFamily?.styleProperties, size: size, maximumDescent: self.maximumDescent) })
         
         /* Adjust the metrics */
-        FontDecorating.adjustMeasures(of: font, for: style, properties: possibleFamily?.styleProperties, size: size)
+        self.adjustMeasures(for: style, properties: possibleFamily?.styleProperties, size: size)
         
-        return font
     }
     
-    private static func adjustMeasures(of font: BitmapFont, for style: TextStyle, properties: FontStyleProperties?, size: Int) {
+    private func adjustMeasures(for style: TextStyle, properties: FontStyleProperties?, size: Int) {
         
         if style.bold {
-            font.maximumWidth += computeExtraWidth(byDefault: 1, property: properties?.boldExtraWidth, size: size)
-            font.fontRectangleWidth += 1
+            self.maximumWidth += computeExtraWidth(byDefault: 1, property: properties?.boldExtraWidth, size: size)
+            self.fontRectangleWidth += 1
         }
         
         if style.italic {
-            font.maximumWidth += computeExtraWidth(byDefault: 0, property: properties?.italicExtraWidth, size: size)
-            font.maximumKerning -= font.maximumDescent/2
-            font.fontRectangleWidth += font.fontRectangleHeight/2
+            self.maximumWidth += computeExtraWidth(byDefault: 0, property: properties?.italicExtraWidth, size: size)
+            self.maximumKerning -= self.maximumDescent/2
+            self.fontRectangleWidth += self.fontRectangleHeight/2
         }
         
         if style.underline {
-            font.maximumWidth += computeExtraWidth(byDefault: 0, property: properties?.underlineExtraWidth, size: size)
-            font.fontRectangleWidth += 2
-            if font.maximumDescent < 2 {
-                font.fontRectangleHeight += 2 - font.maximumDescent
-                font.maximumDescent = 2
+            self.maximumWidth += computeExtraWidth(byDefault: 0, property: properties?.underlineExtraWidth, size: size)
+            self.fontRectangleWidth += 2
+            if self.maximumDescent < 2 {
+                self.fontRectangleHeight += 2 - self.maximumDescent
+                self.maximumDescent = 2
             }
         }
         
         if style.outline || style.shadow {
-            font.maximumWidth += computeExtraWidth(byDefault: 1, property: properties?.outlineExtraWidth, size: size)
-            font.maximumKerning -= 1
-            font.fontRectangleWidth += 2
-            font.fontRectangleHeight += 2
-            font.maximumAscent += 1
-            font.maximumDescent += 1
+            self.maximumWidth += computeExtraWidth(byDefault: 1, property: properties?.outlineExtraWidth, size: size)
+            self.maximumKerning -= 1
+            self.fontRectangleWidth += 2
+            self.fontRectangleHeight += 2
+            self.maximumAscent += 1
+            self.maximumDescent += 1
         }
         
         if style.shadow {
             let value = (style.outline ? 2 : 1)
-            font.maximumWidth += value * computeExtraWidth(byDefault: 1, property: properties?.shadowExtraWidth, size: size)
-            font.fontRectangleWidth += value
-            font.maximumDescent += value
-            font.fontRectangleHeight += value
+            self.maximumWidth += value * computeExtraWidth(byDefault: 1, property: properties?.shadowExtraWidth, size: size)
+            self.fontRectangleWidth += value
+            self.maximumDescent += value
+            self.fontRectangleHeight += value
         }
         
         if style.condense {
-            font.maximumWidth += computeExtraWidth(byDefault: -1, property: properties?.condensedExtraWidth, size: size)
+            self.maximumWidth += computeExtraWidth(byDefault: -1, property: properties?.condensedExtraWidth, size: size)
         }
         
         if style.extend {
-            font.maximumWidth += computeExtraWidth(byDefault: 1, property: properties?.extendedExtraWidth, size: size)
+            self.maximumWidth += computeExtraWidth(byDefault: 1, property: properties?.extendedExtraWidth, size: size)
         }
         
     }
@@ -104,39 +102,29 @@ private func computeExtraWidth(byDefault: Int, property: Double?, size: Int) -> 
 
 
 /// A glyph that lazily applies a font variation to a base glyph
-public class DecoratedGlyph: Glyph {
+private extension Glyph {
     
-    private let baseGlyph: Glyph
-    private let style: TextStyle
-    private let properties: FontStyleProperties?
-    private let size: Int
-    private let maximumDescent: Int
-    
-    private var decoratedImageWidth: Int
-    private var decoretedImageHeight: Int
-    
-    public init(baseGlyph: Glyph, style: TextStyle, properties: FontStyleProperties?, size: Int, maximumDescent: Int) {
-        self.baseGlyph = baseGlyph
-        self.style = style
-        self.properties = properties
-        self.size = size
-        self.maximumDescent = maximumDescent
+    convenience init(baseGlyph: Glyph, style: TextStyle, properties: FontStyleProperties?, size: Int, maximumDescent: Int) {
         
-        self.decoratedImageWidth = baseGlyph.imageWidth
-        self.decoretedImageHeight = baseGlyph.imageHeight
-        
-        super.init()
+        self.init()
         
         /* Copy the measures of the base glyph */
         self.width = baseGlyph.width
         self.imageOffset = baseGlyph.imageOffset
         self.imageTop = baseGlyph.imageTop
+        self.imageWidth = baseGlyph.imageWidth
+        self.imageHeight = baseGlyph.imageHeight
+        self.isThereImage = baseGlyph.isThereImage
         
         /* Change the measures for the style */
-        self.readjustMeasures()
+        self.readjustMeasures(baseGlyph: baseGlyph, style: style, properties: properties, size: size)
+        
+        self.imageProperty.lazyCompute { () -> MaskedImage? in
+            return self.buildImage(baseGlyph: baseGlyph, style: style, maximumDescent: maximumDescent)
+        }
     }
     
-    private func readjustMeasures() {
+    private func readjustMeasures(baseGlyph: Glyph, style: TextStyle, properties: FontStyleProperties?, size: Int) {
         
         /* Underline: if there is no image, make an image of the line under */
         if style.underline && !baseGlyph.isThereImage {
@@ -206,39 +194,7 @@ public class DecoratedGlyph: Glyph {
         
     }
     
-    public override var imageWidth: Int {
-        get {
-            return decoratedImageWidth
-        }
-        set {
-            decoratedImageWidth = newValue
-        }
-    }
-    
-    public override var imageHeight: Int {
-        get {
-            return decoretedImageHeight
-        }
-        set {
-            decoretedImageHeight = newValue
-        }
-    }
-    
-    private var imageLoaded = false
-    public override var image: MaskedImage? {
-        get {
-            if !imageLoaded {
-                super.image = buildImage()
-                imageLoaded = true
-            }
-            return super.image
-        }
-        set {
-            super.image = newValue
-        }
-    }
-    
-    private func buildImage() -> MaskedImage? {
+    private func buildImage(baseGlyph: Glyph, style: TextStyle, maximumDescent: Int) -> MaskedImage? {
         
         /* Check if there is an image in the base glyph */
         guard self.imageWidth > 0 && self.imageHeight > 0 else {
@@ -290,7 +246,7 @@ public class DecoratedGlyph: Glyph {
                 drawing.shiftRowRight( (imageTop - y + maximumDescent - 1) / 2 - maximumDescent / 2)
                 
                 /* Draw it on the image */
-                drawing.applyRow(Point(x: 0, y: y), length: drawing.width, composition: {(a: inout UInt32, b: UInt32, integerIndex: Int, y: Int) in a = b})
+                drawing.applyRow(Point(x: 0, y: y), length: drawing.width, composition: {(a: inout Image.Integer, b: Image.Integer, integerIndex: Int, y: Int) in a = b})
                 
             }
             
@@ -354,7 +310,7 @@ public class DecoratedGlyph: Glyph {
             drawing.drawImage(initialBitmap, position: Point(x: -1, y: 1))
             
             /* Keep a clean underline */
-            var row: [UInt32] = []
+            var row: [Image.Integer] = []
             if style.underline {
                 
                 /* Remove the pixels around the underline that the outline has put */
@@ -372,7 +328,7 @@ public class DecoratedGlyph: Glyph {
                 
                 /* Save the state of the underline before applying the shadow */
                 let newRow = drawing.image.data[drawing.image.integerCountInRow * (imageTop + 1) ..< drawing.image.integerCountInRow * (imageTop + 2)]
-                row = [UInt32](newRow)
+                row = [Image.Integer](newRow)
             }
             
             /* Shadow */
@@ -426,7 +382,7 @@ public class DecoratedGlyph: Glyph {
         
         /* Make the image black */
         for i in 0..<image.integerCountInRow {
-            image.data[i] = UInt32.max
+            image.data[i] = Image.Integer.max
         }
         
         /* Create the masked image */

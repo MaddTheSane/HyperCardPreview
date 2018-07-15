@@ -10,22 +10,36 @@
 		554760721F78464700C867C6 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 554760711F78464700C867C6 /* Media.xcassets */; };
 		6C2AD44A1F51A0BE00E2F8B9 /* WhiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C2AD4491F51A0BE00E2F8B9 /* WhiteView.swift */; };
 		6C2AD44C1F51A4BB00E2F8B9 /* AddColorPainter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C2AD44B1F51A4BB00E2F8B9 /* AddColorPainter.swift */; };
-		6C30878D1F48957100CCA9A7 /* FilePart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C30878C1F48957100CCA9A7 /* FilePart.swift */; };
-		6C30E8D11F4D117A00ACB457 /* CharacterTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C30E8D01F4D117A00ACB457 /* CharacterTable.swift */; };
+		6C2EF95520CAC0A400FAB8CA /* TestBitmap.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C2EF95320CAC0A300FAB8CA /* TestBitmap.stack */; };
+		6C2EF95820CAC0E900FAB8CA /* TestBitmap 1.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6C2EF95720CAC0E900FAB8CA /* TestBitmap 1.gif */; };
+		6C30878D1F48957100CCA9A7 /* PartLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C30878C1F48957100CCA9A7 /* PartLoading.swift */; };
+		6C30E8D11F4D117A00ACB457 /* StringComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C30E8D01F4D117A00ACB457 /* StringComparison.swift */; };
 		6C549B1C1F50DA0000836AE2 /* RgbConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C549B1B1F50DA0000836AE2 /* RgbConversion.swift */; };
-		6C549B201F5112E300836AE2 /* AddColorResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C549B1F1F5112E300836AE2 /* AddColorResourceBlock.swift */; };
 		6C56FD081F56BBA40036FF8A /* TestStrangeFlags.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C56FD071F56BBA40036FF8A /* TestStrangeFlags.stack */; };
 		6C56FD0A1F56BC2B0036FF8A /* DataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C56FD091F56BC2B0036FF8A /* DataTests.swift */; };
 		6C6064071F5B1DF600988560 /* HdmxTableReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6064061F5B1DF600988560 /* HdmxTableReader.swift */; };
+		6C76AA9820C5956C009A3446 /* Computation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C76AA9720C5956C009A3446 /* Computation.swift */; };
 		6C7F7B9C1F4F7A1F00C9D3DC /* TestFieldProperties.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C7F7B9B1F4F7A1F00C9D3DC /* TestFieldProperties.stack */; };
 		6C7F7B9E1F4F7AF500C9D3DC /* TestFreeSize.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C7F7B9D1F4F7AF500C9D3DC /* TestFreeSize.stack */; };
 		6C7F7BA21F4F7DD200C9D3DC /* TestContents.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C7F7BA11F4F7DD200C9D3DC /* TestContents.stack */; };
 		6C7F7BA61F4F845900C9D3DC /* TestFormattedContent.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C7F7BA51F4F845900C9D3DC /* TestFormattedContent.stack */; };
 		6C7F7BA81F4F9C3500C9D3DC /* TestV1.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6C7F7BA71F4F9C3500C9D3DC /* TestV1.stack */; };
 		6C8746271F5402E0005A41AB /* Responder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C8746261F5402E0005A41AB /* Responder.swift */; };
+		6C9DF4D620C703DF0024F61B /* ResourceRepositoryLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4D520C703DF0024F61B /* ResourceRepositoryLoading.swift */; };
+		6C9DF4D820C708A80024F61B /* MainRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4D720C708A80024F61B /* MainRepository.swift */; };
+		6C9DF4F920C7252C0024F61B /* ResourceMapReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4F120C7252C0024F61B /* ResourceMapReader.swift */; };
+		6C9DF4FA20C7252D0024F61B /* FontFamilyResourceReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4F220C7252C0024F61B /* FontFamilyResourceReader.swift */; };
+		6C9DF4FB20C7252D0024F61B /* BitmapFontResourceReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4F320C7252C0024F61B /* BitmapFontResourceReader.swift */; };
+		6C9DF4FD20C7252D0024F61B /* ResourceRepositoryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4F520C7252C0024F61B /* ResourceRepositoryReader.swift */; };
+		6C9DF4FE20C7252D0024F61B /* ColorResourceReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4F620C7252C0024F61B /* ColorResourceReader.swift */; };
+		6C9DF50020C725620024F61B /* ResourceReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF4FF20C725620024F61B /* ResourceReference.swift */; };
+		6C9DF50220C7257C0024F61B /* AddColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF50120C7257C0024F61B /* AddColor.swift */; };
+		6C9DF50420C726090024F61B /* ResourceExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF50320C726090024F61B /* ResourceExtractor.swift */; };
+		6C9DF50720C732B10024F61B /* RichText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF50620C732B10024F61B /* RichText.swift */; };
+		6C9DF50B20C73A8A0024F61B /* TextLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF50A20C73A8A0024F61B /* TextLayout.swift */; };
+		6C9DF50D20C7445A0024F61B /* TextDrawing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9DF50C20C7445A0024F61B /* TextDrawing.swift */; };
 		6C9E6A901E75BCCD00BBF925 /* HyperCardCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C9E6A8E1E75BCCD00BBF925 /* HyperCardCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6C9E6AFB1E75BCFA00BBF925 /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6A9C1E75BCFA00BBF925 /* Browser.swift */; };
-		6C9E6AFC1E75BCFA00BBF925 /* StackPreviewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6A9D1E75BCFA00BBF925 /* StackPreviewer.swift */; };
 		6C9E6AFD1E75BCFA00BBF925 /* CommonTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6A9E1E75BCFA00BBF925 /* CommonTypes.swift */; };
 		6C9E6AFE1E75BCFA00BBF925 /* Numeric Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6A9F1E75BCFA00BBF925 /* Numeric Functions.swift */; };
 		6C9E6AFF1E75BCFA00BBF925 /* HyperCardBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AA01E75BCFA00BBF925 /* HyperCardBundle.swift */; };
@@ -44,50 +58,16 @@
 		6C9E6B0C1E75BCFA00BBF925 /* ResourceSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AAF1E75BCFA00BBF925 /* ResourceSystem.swift */; };
 		6C9E6B0D1E75BCFA00BBF925 /* FontFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB01E75BCFA00BBF925 /* FontFamily.swift */; };
 		6C9E6B0E1E75BCFA00BBF925 /* BitmapFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB11E75BCFA00BBF925 /* BitmapFont.swift */; };
-		6C9E6B0F1E75BCFA00BBF925 /* Glyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB21E75BCFA00BBF925 /* Glyph.swift */; };
 		6C9E6B101E75BCFA00BBF925 /* ClassicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB51E75BCFA00BBF925 /* ClassicFile.swift */; };
 		6C9E6B111E75BCFA00BBF925 /* DataRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB61E75BCFA00BBF925 /* DataRange.swift */; };
-		6C9E6B121E75BCFA00BBF925 /* DataBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB71E75BCFA00BBF925 /* DataBlock.swift */; };
-		6C9E6B131E75BCFA00BBF925 /* FileBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AB81E75BCFA00BBF925 /* FileBlock.swift */; };
-		6C9E6B141E75BCFA00BBF925 /* HyperCardFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABA1E75BCFA00BBF925 /* HyperCardFile.swift */; };
-		6C9E6B151E75BCFA00BBF925 /* HyperCardFileData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABB1E75BCFA00BBF925 /* HyperCardFileData.swift */; };
-		6C9E6B161E75BCFA00BBF925 /* StackBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABC1E75BCFA00BBF925 /* StackBlock.swift */; };
-		6C9E6B171E75BCFA00BBF925 /* MasterBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABD1E75BCFA00BBF925 /* MasterBlock.swift */; };
-		6C9E6B181E75BCFA00BBF925 /* ListBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABE1E75BCFA00BBF925 /* ListBlock.swift */; };
-		6C9E6B191E75BCFA00BBF925 /* PageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABF1E75BCFA00BBF925 /* PageBlock.swift */; };
-		6C9E6B1A1E75BCFA00BBF925 /* LayerBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC01E75BCFA00BBF925 /* LayerBlock.swift */; };
-		6C9E6B1B1E75BCFA00BBF925 /* CardBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC11E75BCFA00BBF925 /* CardBlock.swift */; };
-		6C9E6B1C1E75BCFA00BBF925 /* BackgroundBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC21E75BCFA00BBF925 /* BackgroundBlock.swift */; };
-		6C9E6B1D1E75BCFA00BBF925 /* PartBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC31E75BCFA00BBF925 /* PartBlock.swift */; };
-		6C9E6B1E1E75BCFA00BBF925 /* ContentBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC41E75BCFA00BBF925 /* ContentBlock.swift */; };
-		6C9E6B1F1E75BCFA00BBF925 /* BitmapBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC51E75BCFA00BBF925 /* BitmapBlock.swift */; };
-		6C9E6B201E75BCFA00BBF925 /* StyleBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC61E75BCFA00BBF925 /* StyleBlock.swift */; };
-		6C9E6B211E75BCFA00BBF925 /* FontBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC71E75BCFA00BBF925 /* FontBlock.swift */; };
-		6C9E6B221E75BCFA00BBF925 /* HyperCardFileDataV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AC91E75BCFA00BBF925 /* HyperCardFileDataV1.swift */; };
-		6C9E6B231E75BCFA00BBF925 /* StackBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ACA1E75BCFA00BBF925 /* StackBlockV1.swift */; };
-		6C9E6B241E75BCFA00BBF925 /* ListBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ACB1E75BCFA00BBF925 /* ListBlockV1.swift */; };
-		6C9E6B251E75BCFA00BBF925 /* PageBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ACC1E75BCFA00BBF925 /* PageBlockV1.swift */; };
-		6C9E6B261E75BCFA00BBF925 /* LayerBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ACD1E75BCFA00BBF925 /* LayerBlockV1.swift */; };
-		6C9E6B271E75BCFA00BBF925 /* CardBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ACE1E75BCFA00BBF925 /* CardBlockV1.swift */; };
-		6C9E6B281E75BCFA00BBF925 /* BackgroundBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ACF1E75BCFA00BBF925 /* BackgroundBlockV1.swift */; };
-		6C9E6B291E75BCFA00BBF925 /* ContentBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD01E75BCFA00BBF925 /* ContentBlockV1.swift */; };
-		6C9E6B2A1E75BCFA00BBF925 /* BitmapBlockV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD11E75BCFA00BBF925 /* BitmapBlockV1.swift */; };
-		6C9E6B2B1E75BCFA00BBF925 /* ResourceFork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD41E75BCFA00BBF925 /* ResourceFork.swift */; };
-		6C9E6B2C1E75BCFA00BBF925 /* ResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD51E75BCFA00BBF925 /* ResourceBlock.swift */; };
-		6C9E6B2D1E75BCFA00BBF925 /* IconResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD61E75BCFA00BBF925 /* IconResourceBlock.swift */; };
-		6C9E6B2E1E75BCFA00BBF925 /* FontFamilyResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD71E75BCFA00BBF925 /* FontFamilyResourceBlock.swift */; };
-		6C9E6B2F1E75BCFA00BBF925 /* BitmapFontResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD81E75BCFA00BBF925 /* BitmapFontResourceBlock.swift */; };
-		6C9E6B301E75BCFA00BBF925 /* VectorFontResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AD91E75BCFA00BBF925 /* VectorFontResourceBlock.swift */; };
-		6C9E6B311E75BCFA00BBF925 /* FileStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADB1E75BCFA00BBF925 /* FileStack.swift */; };
-		6C9E6B321E75BCFA00BBF925 /* FileLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADC1E75BCFA00BBF925 /* FileLayer.swift */; };
-		6C9E6B331E75BCFA00BBF925 /* FileCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADD1E75BCFA00BBF925 /* FileCard.swift */; };
-		6C9E6B341E75BCFA00BBF925 /* FileBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADE1E75BCFA00BBF925 /* FileBackground.swift */; };
-		6C9E6B351E75BCFA00BBF925 /* FileField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADF1E75BCFA00BBF925 /* FileField.swift */; };
-		6C9E6B361E75BCFA00BBF925 /* FileButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE01E75BCFA00BBF925 /* FileButton.swift */; };
-		6C9E6B371E75BCFA00BBF925 /* FileIconResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE21E75BCFA00BBF925 /* FileIconResource.swift */; };
-		6C9E6B381E75BCFA00BBF925 /* FileFontFamilyResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE31E75BCFA00BBF925 /* FileFontFamilyResource.swift */; };
-		6C9E6B391E75BCFA00BBF925 /* FileBitmapFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE41E75BCFA00BBF925 /* FileBitmapFont.swift */; };
-		6C9E6B3A1E75BCFA00BBF925 /* FileGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE51E75BCFA00BBF925 /* FileGlyph.swift */; };
+		6C9E6B141E75BCFA00BBF925 /* StackLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ABA1E75BCFA00BBF925 /* StackLoading.swift */; };
+		6C9E6B321E75BCFA00BBF925 /* LayerLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADC1E75BCFA00BBF925 /* LayerLoading.swift */; };
+		6C9E6B331E75BCFA00BBF925 /* CardLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADD1E75BCFA00BBF925 /* CardLoading.swift */; };
+		6C9E6B341E75BCFA00BBF925 /* BackgroundLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADE1E75BCFA00BBF925 /* BackgroundLoading.swift */; };
+		6C9E6B351E75BCFA00BBF925 /* FieldLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6ADF1E75BCFA00BBF925 /* FieldLoading.swift */; };
+		6C9E6B361E75BCFA00BBF925 /* ButtonLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE01E75BCFA00BBF925 /* ButtonLoading.swift */; };
+		6C9E6B381E75BCFA00BBF925 /* FontFamilyLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE31E75BCFA00BBF925 /* FontFamilyLoading.swift */; };
+		6C9E6B391E75BCFA00BBF925 /* BitmapFontLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE41E75BCFA00BBF925 /* BitmapFontLoading.swift */; };
 		6C9E6B3B1E75BCFA00BBF925 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AE91E75BCFA00BBF925 /* Image.swift */; };
 		6C9E6B3C1E75BCFA00BBF925 /* MaskedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AEA1E75BCFA00BBF925 /* MaskedImage.swift */; };
 		6C9E6B3D1E75BCFA00BBF925 /* Drawing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E6AEB1E75BCFA00BBF925 /* Drawing.swift */; };
@@ -115,7 +95,17 @@
 		6C9E6D3D1E75BEEA00BBF925 /* Symbol.dfont in Resources */ = {isa = PBXBuildFile; fileRef = 6C9E6C421E75BEEA00BBF925 /* Symbol.dfont */; };
 		6C9E6D3E1E75BEEA00BBF925 /* Times.dfont in Resources */ = {isa = PBXBuildFile; fileRef = 6C9E6C431E75BEEA00BBF925 /* Times.dfont */; };
 		6C9E6D3F1E75BEEA00BBF925 /* Venice.dfont in Resources */ = {isa = PBXBuildFile; fileRef = 6C9E6C441E75BEEA00BBF925 /* Venice.dfont */; };
-		6CADFE871F520A6600465A00 /* PictureResourceBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CADFE861F520A6600465A00 /* PictureResourceBlock.swift */; };
+		6CA2CCB820C829DD0042148A /* OpeningError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCB720C829DD0042148A /* OpeningError.swift */; };
+		6CA2CCBA20C82A500042148A /* HyperCardFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCB920C82A500042148A /* HyperCardFile.swift */; };
+		6CA2CCBC20C82A6C0042148A /* HyperCardFileLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCBB20C82A6C0042148A /* HyperCardFileLoading.swift */; };
+		6CA2CCC020C82F820042148A /* StackBlockDecrypter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCBF20C82F820042148A /* StackBlockDecrypter.swift */; };
+		6CA2CCC820C83DE10042148A /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCC720C83DE10042148A /* Icon.swift */; };
+		6CA2CCCA20C83FF40042148A /* VectorFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCC920C83FF40042148A /* VectorFont.swift */; };
+		6CA2CCCC20C842CE0042148A /* Picture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCCB20C842CE0042148A /* Picture.swift */; };
+		6CA2CCCE20C8437B0042148A /* IconLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCCD20C8437B0042148A /* IconLoading.swift */; };
+		6CA2CCD020C843F60042148A /* VectorFontLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCCF20C843F60042148A /* VectorFontLoading.swift */; };
+		6CA2CCD220C8445C0042148A /* LayerColorLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCD120C8445C0042148A /* LayerColorLoading.swift */; };
+		6CA2CCD420C845000042148A /* PictureLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA2CCD320C845000042148A /* PictureLoading.swift */; };
 		6CB025481F4ED75700B57D87 /* HyperCardCommonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB025471F4ED75700B57D87 /* HyperCardCommonTests.swift */; };
 		6CB0254A1F4ED75700B57D87 /* HyperCardCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C9E6A8B1E75BCCD00BBF925 /* HyperCardCommon.framework */; };
 		6CB51D6A1F4F5486000C43D3 /* TestCardProperties.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CB51D691F4F5486000C43D3 /* TestCardProperties.stack */; };
@@ -135,8 +125,40 @@
 		6CE0C0FC1F4EF460003AA9FC /* TestPrivateAccess.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CE0C0FB1F4EF460003AA9FC /* TestPrivateAccess.stack */; };
 		6CE0C1011F4EF716003AA9FC /* TestVersion.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CE0C1001F4EF716003AA9FC /* TestVersion.stack */; };
 		6CE0C1031F4EFC6D003AA9FC /* TestCardsBackgrounds.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CE0C1021F4EFC6D003AA9FC /* TestCardsBackgrounds.stack */; };
+		6CE8F5BF20C4296600B99E39 /* ListBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5BB20C4296600B99E39 /* ListBlockReader.swift */; };
+		6CE8F5C020C4296600B99E39 /* StackReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5BC20C4296600B99E39 /* StackReader.swift */; };
+		6CE8F5C120C4296600B99E39 /* PageBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5BD20C4296600B99E39 /* PageBlockReader.swift */; };
+		6CE8F5C220C4296600B99E39 /* MasterBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5BE20C4296600B99E39 /* MasterBlockReader.swift */; };
+		6CE8F5C420C4297600B99E39 /* StackBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5C320C4297600B99E39 /* StackBlockReader.swift */; };
+		6CE8F5C620C429C400B99E39 /* CardReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5C520C429C400B99E39 /* CardReference.swift */; };
+		6CE8F5C820C429CB00B99E39 /* PageReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5C720C429CB00B99E39 /* PageReference.swift */; };
+		6CE8F5CA20C429E800B99E39 /* MasterRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5C920C429E700B99E39 /* MasterRecord.swift */; };
+		6CE8F5CC20C42A0900B99E39 /* FreeLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5CB20C42A0800B99E39 /* FreeLocation.swift */; };
+		6CE8F5CE20C42A6A00B99E39 /* LayerBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5CD20C42A6A00B99E39 /* LayerBlockReader.swift */; };
+		6CE8F5D020C42B3100B99E39 /* CardBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5CF20C42B3100B99E39 /* CardBlockReader.swift */; };
+		6CE8F5D220C42B7400B99E39 /* BackgroundBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5D120C42B7400B99E39 /* BackgroundBlockReader.swift */; };
+		6CE8F5D420C42BAB00B99E39 /* PartBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5D320C42BAB00B99E39 /* PartBlockReader.swift */; };
+		6CE8F5D620C42C8200B99E39 /* ContentBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5D520C42C8200B99E39 /* ContentBlockReader.swift */; };
+		6CE8F5D820C42CB300B99E39 /* IndexedTextFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5D720C42CB300B99E39 /* IndexedTextFormatting.swift */; };
+		6CE8F5DA20C42D1900B99E39 /* BitmapBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5D920C42D1900B99E39 /* BitmapBlockReader.swift */; };
+		6CE8F5DC20C42DEA00B99E39 /* StyleBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5DB20C42DEA00B99E39 /* StyleBlockReader.swift */; };
+		6CE8F5DE20C42E1100B99E39 /* IndexedStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5DD20C42E1100B99E39 /* IndexedStyle.swift */; };
+		6CE8F5E020C42E4500B99E39 /* FontBlockReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5DF20C42E4500B99E39 /* FontBlockReader.swift */; };
+		6CE8F5EE20C4330700B99E39 /* LayerBlockCommonReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE8F5ED20C4330700B99E39 /* LayerBlockCommonReader.swift */; };
 		6CEBC0101F4F2E760031BDDC /* TestWindowSize.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CEBC00F1F4F2E760031BDDC /* TestWindowSize.stack */; };
 		6CEBC0121F4F337D0031BDDC /* TestStackScript.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CEBC0111F4F337D0031BDDC /* TestStackScript.stack */; };
+		6CEED1F920C9A83900A0DBE0 /* GraphicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CEED1F820C9A83900A0DBE0 /* GraphicTests.swift */; };
+		6CEED20F20C9AADF00A0DBE0 /* Home.stack in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED20E20C9AADF00A0DBE0 /* Home.stack */; };
+		6CEED22B20C9B5A200A0DBE0 /* Home 7.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22220C9B5A100A0DBE0 /* Home 7.gif */; };
+		6CEED22C20C9B5A200A0DBE0 /* Home 6.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22320C9B5A100A0DBE0 /* Home 6.gif */; };
+		6CEED22D20C9B5A200A0DBE0 /* Home 3.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22420C9B5A200A0DBE0 /* Home 3.gif */; };
+		6CEED22F20C9B5A200A0DBE0 /* Home 5.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22620C9B5A200A0DBE0 /* Home 5.gif */; };
+		6CEED23120C9B5A200A0DBE0 /* Home 8.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22820C9B5A200A0DBE0 /* Home 8.gif */; };
+		6CEED23220C9B5A200A0DBE0 /* Home 2.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22920C9B5A200A0DBE0 /* Home 2.gif */; };
+		6CEED23320C9B5A200A0DBE0 /* Home 4.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED22A20C9B5A200A0DBE0 /* Home 4.gif */; };
+		6CEED23520C9B92200A0DBE0 /* Home.rsrc in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED23420C9B92100A0DBE0 /* Home.rsrc */; };
+		6CEED23720C9BE1800A0DBE0 /* Home 1.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED23620C9BE1800A0DBE0 /* Home 1.gif */; };
+		6CEED23920C9BE2800A0DBE0 /* Home 9.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6CEED23820C9BE2800A0DBE0 /* Home 9.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -153,24 +175,38 @@
 		554760711F78464700C867C6 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		6C2AD4491F51A0BE00E2F8B9 /* WhiteView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WhiteView.swift; sourceTree = "<group>"; };
 		6C2AD44B1F51A4BB00E2F8B9 /* AddColorPainter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddColorPainter.swift; sourceTree = "<group>"; };
-		6C30878C1F48957100CCA9A7 /* FilePart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilePart.swift; sourceTree = "<group>"; };
-		6C30E8D01F4D117A00ACB457 /* CharacterTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterTable.swift; sourceTree = "<group>"; };
+		6C2EF95320CAC0A300FAB8CA /* TestBitmap.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestBitmap.stack; sourceTree = "<group>"; };
+		6C2EF95720CAC0E900FAB8CA /* TestBitmap 1.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "TestBitmap 1.gif"; sourceTree = "<group>"; };
+		6C30878C1F48957100CCA9A7 /* PartLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartLoading.swift; sourceTree = "<group>"; };
+		6C30E8D01F4D117A00ACB457 /* StringComparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringComparison.swift; sourceTree = "<group>"; };
 		6C549B1B1F50DA0000836AE2 /* RgbConversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RgbConversion.swift; sourceTree = "<group>"; };
-		6C549B1F1F5112E300836AE2 /* AddColorResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddColorResourceBlock.swift; sourceTree = "<group>"; };
 		6C56FD071F56BBA40036FF8A /* TestStrangeFlags.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestStrangeFlags.stack; sourceTree = "<group>"; };
 		6C56FD091F56BC2B0036FF8A /* DataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTests.swift; sourceTree = "<group>"; };
 		6C6064061F5B1DF600988560 /* HdmxTableReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HdmxTableReader.swift; sourceTree = "<group>"; };
+		6C76AA9720C5956C009A3446 /* Computation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Computation.swift; sourceTree = "<group>"; };
 		6C7F7B9B1F4F7A1F00C9D3DC /* TestFieldProperties.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestFieldProperties.stack; sourceTree = "<group>"; };
 		6C7F7B9D1F4F7AF500C9D3DC /* TestFreeSize.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestFreeSize.stack; sourceTree = "<group>"; };
 		6C7F7BA11F4F7DD200C9D3DC /* TestContents.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestContents.stack; sourceTree = "<group>"; };
 		6C7F7BA51F4F845900C9D3DC /* TestFormattedContent.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestFormattedContent.stack; sourceTree = "<group>"; };
 		6C7F7BA71F4F9C3500C9D3DC /* TestV1.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestV1.stack; sourceTree = "<group>"; };
 		6C8746261F5402E0005A41AB /* Responder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Responder.swift; sourceTree = "<group>"; };
+		6C9DF4D520C703DF0024F61B /* ResourceRepositoryLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceRepositoryLoading.swift; sourceTree = "<group>"; };
+		6C9DF4D720C708A80024F61B /* MainRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainRepository.swift; sourceTree = "<group>"; };
+		6C9DF4F120C7252C0024F61B /* ResourceMapReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceMapReader.swift; sourceTree = "<group>"; };
+		6C9DF4F220C7252C0024F61B /* FontFamilyResourceReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontFamilyResourceReader.swift; sourceTree = "<group>"; };
+		6C9DF4F320C7252C0024F61B /* BitmapFontResourceReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitmapFontResourceReader.swift; sourceTree = "<group>"; };
+		6C9DF4F520C7252C0024F61B /* ResourceRepositoryReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceRepositoryReader.swift; sourceTree = "<group>"; };
+		6C9DF4F620C7252C0024F61B /* ColorResourceReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorResourceReader.swift; sourceTree = "<group>"; };
+		6C9DF4FF20C725620024F61B /* ResourceReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceReference.swift; sourceTree = "<group>"; };
+		6C9DF50120C7257C0024F61B /* AddColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddColor.swift; sourceTree = "<group>"; };
+		6C9DF50320C726090024F61B /* ResourceExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceExtractor.swift; sourceTree = "<group>"; };
+		6C9DF50620C732B10024F61B /* RichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichText.swift; sourceTree = "<group>"; };
+		6C9DF50A20C73A8A0024F61B /* TextLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayout.swift; sourceTree = "<group>"; };
+		6C9DF50C20C7445A0024F61B /* TextDrawing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDrawing.swift; sourceTree = "<group>"; };
 		6C9E6A8B1E75BCCD00BBF925 /* HyperCardCommon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HyperCardCommon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C9E6A8E1E75BCCD00BBF925 /* HyperCardCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HyperCardCommon.h; sourceTree = "<group>"; };
 		6C9E6A8F1E75BCCD00BBF925 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6C9E6A9C1E75BCFA00BBF925 /* Browser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Browser.swift; sourceTree = "<group>"; };
-		6C9E6A9D1E75BCFA00BBF925 /* StackPreviewer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackPreviewer.swift; sourceTree = "<group>"; };
 		6C9E6A9E1E75BCFA00BBF925 /* CommonTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonTypes.swift; sourceTree = "<group>"; };
 		6C9E6A9F1E75BCFA00BBF925 /* Numeric Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Numeric Functions.swift"; sourceTree = "<group>"; };
 		6C9E6AA01E75BCFA00BBF925 /* HyperCardBundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperCardBundle.swift; sourceTree = "<group>"; };
@@ -189,50 +225,16 @@
 		6C9E6AAF1E75BCFA00BBF925 /* ResourceSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceSystem.swift; sourceTree = "<group>"; };
 		6C9E6AB01E75BCFA00BBF925 /* FontFamily.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontFamily.swift; sourceTree = "<group>"; };
 		6C9E6AB11E75BCFA00BBF925 /* BitmapFont.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitmapFont.swift; sourceTree = "<group>"; };
-		6C9E6AB21E75BCFA00BBF925 /* Glyph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Glyph.swift; sourceTree = "<group>"; };
 		6C9E6AB51E75BCFA00BBF925 /* ClassicFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassicFile.swift; sourceTree = "<group>"; };
 		6C9E6AB61E75BCFA00BBF925 /* DataRange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataRange.swift; sourceTree = "<group>"; };
-		6C9E6AB71E75BCFA00BBF925 /* DataBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBlock.swift; sourceTree = "<group>"; };
-		6C9E6AB81E75BCFA00BBF925 /* FileBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileBlock.swift; sourceTree = "<group>"; };
-		6C9E6ABA1E75BCFA00BBF925 /* HyperCardFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperCardFile.swift; sourceTree = "<group>"; };
-		6C9E6ABB1E75BCFA00BBF925 /* HyperCardFileData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperCardFileData.swift; sourceTree = "<group>"; };
-		6C9E6ABC1E75BCFA00BBF925 /* StackBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackBlock.swift; sourceTree = "<group>"; };
-		6C9E6ABD1E75BCFA00BBF925 /* MasterBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterBlock.swift; sourceTree = "<group>"; };
-		6C9E6ABE1E75BCFA00BBF925 /* ListBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListBlock.swift; sourceTree = "<group>"; };
-		6C9E6ABF1E75BCFA00BBF925 /* PageBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC01E75BCFA00BBF925 /* LayerBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC11E75BCFA00BBF925 /* CardBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC21E75BCFA00BBF925 /* BackgroundBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC31E75BCFA00BBF925 /* PartBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC41E75BCFA00BBF925 /* ContentBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC51E75BCFA00BBF925 /* BitmapBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitmapBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC61E75BCFA00BBF925 /* StyleBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC71E75BCFA00BBF925 /* FontBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontBlock.swift; sourceTree = "<group>"; };
-		6C9E6AC91E75BCFA00BBF925 /* HyperCardFileDataV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperCardFileDataV1.swift; sourceTree = "<group>"; };
-		6C9E6ACA1E75BCFA00BBF925 /* StackBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6ACB1E75BCFA00BBF925 /* ListBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6ACC1E75BCFA00BBF925 /* PageBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6ACD1E75BCFA00BBF925 /* LayerBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6ACE1E75BCFA00BBF925 /* CardBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6ACF1E75BCFA00BBF925 /* BackgroundBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6AD01E75BCFA00BBF925 /* ContentBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6AD11E75BCFA00BBF925 /* BitmapBlockV1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitmapBlockV1.swift; sourceTree = "<group>"; };
-		6C9E6AD41E75BCFA00BBF925 /* ResourceFork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceFork.swift; sourceTree = "<group>"; };
-		6C9E6AD51E75BCFA00BBF925 /* ResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceBlock.swift; sourceTree = "<group>"; };
-		6C9E6AD61E75BCFA00BBF925 /* IconResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconResourceBlock.swift; sourceTree = "<group>"; };
-		6C9E6AD71E75BCFA00BBF925 /* FontFamilyResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontFamilyResourceBlock.swift; sourceTree = "<group>"; };
-		6C9E6AD81E75BCFA00BBF925 /* BitmapFontResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitmapFontResourceBlock.swift; sourceTree = "<group>"; };
-		6C9E6AD91E75BCFA00BBF925 /* VectorFontResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorFontResourceBlock.swift; sourceTree = "<group>"; };
-		6C9E6ADB1E75BCFA00BBF925 /* FileStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStack.swift; sourceTree = "<group>"; };
-		6C9E6ADC1E75BCFA00BBF925 /* FileLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileLayer.swift; sourceTree = "<group>"; };
-		6C9E6ADD1E75BCFA00BBF925 /* FileCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileCard.swift; sourceTree = "<group>"; };
-		6C9E6ADE1E75BCFA00BBF925 /* FileBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileBackground.swift; sourceTree = "<group>"; };
-		6C9E6ADF1E75BCFA00BBF925 /* FileField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileField.swift; sourceTree = "<group>"; };
-		6C9E6AE01E75BCFA00BBF925 /* FileButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileButton.swift; sourceTree = "<group>"; };
-		6C9E6AE21E75BCFA00BBF925 /* FileIconResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileIconResource.swift; sourceTree = "<group>"; };
-		6C9E6AE31E75BCFA00BBF925 /* FileFontFamilyResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFontFamilyResource.swift; sourceTree = "<group>"; };
-		6C9E6AE41E75BCFA00BBF925 /* FileBitmapFont.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileBitmapFont.swift; sourceTree = "<group>"; };
-		6C9E6AE51E75BCFA00BBF925 /* FileGlyph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileGlyph.swift; sourceTree = "<group>"; };
+		6C9E6ABA1E75BCFA00BBF925 /* StackLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackLoading.swift; sourceTree = "<group>"; };
+		6C9E6ADC1E75BCFA00BBF925 /* LayerLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerLoading.swift; sourceTree = "<group>"; };
+		6C9E6ADD1E75BCFA00BBF925 /* CardLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardLoading.swift; sourceTree = "<group>"; };
+		6C9E6ADE1E75BCFA00BBF925 /* BackgroundLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundLoading.swift; sourceTree = "<group>"; };
+		6C9E6ADF1E75BCFA00BBF925 /* FieldLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FieldLoading.swift; sourceTree = "<group>"; };
+		6C9E6AE01E75BCFA00BBF925 /* ButtonLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonLoading.swift; sourceTree = "<group>"; };
+		6C9E6AE31E75BCFA00BBF925 /* FontFamilyLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontFamilyLoading.swift; sourceTree = "<group>"; };
+		6C9E6AE41E75BCFA00BBF925 /* BitmapFontLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitmapFontLoading.swift; sourceTree = "<group>"; };
 		6C9E6AE91E75BCFA00BBF925 /* Image.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		6C9E6AEA1E75BCFA00BBF925 /* MaskedImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MaskedImage.swift; sourceTree = "<group>"; };
 		6C9E6AEB1E75BCFA00BBF925 /* Drawing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Drawing.swift; sourceTree = "<group>"; };
@@ -260,7 +262,17 @@
 		6C9E6C421E75BEEA00BBF925 /* Symbol.dfont */ = {isa = PBXFileReference; lastKnownFileType = file; path = Symbol.dfont; sourceTree = "<group>"; };
 		6C9E6C431E75BEEA00BBF925 /* Times.dfont */ = {isa = PBXFileReference; lastKnownFileType = file; path = Times.dfont; sourceTree = "<group>"; };
 		6C9E6C441E75BEEA00BBF925 /* Venice.dfont */ = {isa = PBXFileReference; lastKnownFileType = file; path = Venice.dfont; sourceTree = "<group>"; };
-		6CADFE861F520A6600465A00 /* PictureResourceBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PictureResourceBlock.swift; sourceTree = "<group>"; };
+		6CA2CCB720C829DD0042148A /* OpeningError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpeningError.swift; sourceTree = "<group>"; };
+		6CA2CCB920C82A500042148A /* HyperCardFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperCardFile.swift; sourceTree = "<group>"; };
+		6CA2CCBB20C82A6C0042148A /* HyperCardFileLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperCardFileLoading.swift; sourceTree = "<group>"; };
+		6CA2CCBF20C82F820042148A /* StackBlockDecrypter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackBlockDecrypter.swift; sourceTree = "<group>"; };
+		6CA2CCC720C83DE10042148A /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
+		6CA2CCC920C83FF40042148A /* VectorFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorFont.swift; sourceTree = "<group>"; };
+		6CA2CCCB20C842CE0042148A /* Picture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picture.swift; sourceTree = "<group>"; };
+		6CA2CCCD20C8437B0042148A /* IconLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLoading.swift; sourceTree = "<group>"; };
+		6CA2CCCF20C843F60042148A /* VectorFontLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorFontLoading.swift; sourceTree = "<group>"; };
+		6CA2CCD120C8445C0042148A /* LayerColorLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerColorLoading.swift; sourceTree = "<group>"; };
+		6CA2CCD320C845000042148A /* PictureLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureLoading.swift; sourceTree = "<group>"; };
 		6CB025451F4ED75700B57D87 /* HyperCardCommonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HyperCardCommonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB025471F4ED75700B57D87 /* HyperCardCommonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperCardCommonTests.swift; sourceTree = "<group>"; };
 		6CB025491F4ED75700B57D87 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -281,8 +293,40 @@
 		6CE0C0FB1F4EF460003AA9FC /* TestPrivateAccess.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestPrivateAccess.stack; sourceTree = "<group>"; };
 		6CE0C1001F4EF716003AA9FC /* TestVersion.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestVersion.stack; sourceTree = "<group>"; };
 		6CE0C1021F4EFC6D003AA9FC /* TestCardsBackgrounds.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestCardsBackgrounds.stack; sourceTree = "<group>"; };
+		6CE8F5BB20C4296600B99E39 /* ListBlockReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5BC20C4296600B99E39 /* StackReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackReader.swift; sourceTree = "<group>"; };
+		6CE8F5BD20C4296600B99E39 /* PageBlockReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5BE20C4296600B99E39 /* MasterBlockReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5C320C4297600B99E39 /* StackBlockReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5C520C429C400B99E39 /* CardReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardReference.swift; sourceTree = "<group>"; };
+		6CE8F5C720C429CB00B99E39 /* PageReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageReference.swift; sourceTree = "<group>"; };
+		6CE8F5C920C429E700B99E39 /* MasterRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterRecord.swift; sourceTree = "<group>"; };
+		6CE8F5CB20C42A0800B99E39 /* FreeLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FreeLocation.swift; sourceTree = "<group>"; };
+		6CE8F5CD20C42A6A00B99E39 /* LayerBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5CF20C42B3100B99E39 /* CardBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5D120C42B7400B99E39 /* BackgroundBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5D320C42BAB00B99E39 /* PartBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5D520C42C8200B99E39 /* ContentBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5D720C42CB300B99E39 /* IndexedTextFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedTextFormatting.swift; sourceTree = "<group>"; };
+		6CE8F5D920C42D1900B99E39 /* BitmapBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitmapBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5DB20C42DEA00B99E39 /* StyleBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5DD20C42E1100B99E39 /* IndexedStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedStyle.swift; sourceTree = "<group>"; };
+		6CE8F5DF20C42E4500B99E39 /* FontBlockReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontBlockReader.swift; sourceTree = "<group>"; };
+		6CE8F5ED20C4330700B99E39 /* LayerBlockCommonReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerBlockCommonReader.swift; sourceTree = "<group>"; };
 		6CEBC00F1F4F2E760031BDDC /* TestWindowSize.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestWindowSize.stack; sourceTree = "<group>"; };
 		6CEBC0111F4F337D0031BDDC /* TestStackScript.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestStackScript.stack; sourceTree = "<group>"; };
+		6CEED1F820C9A83900A0DBE0 /* GraphicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicTests.swift; sourceTree = "<group>"; };
+		6CEED20E20C9AADF00A0DBE0 /* Home.stack */ = {isa = PBXFileReference; lastKnownFileType = file; path = Home.stack; sourceTree = "<group>"; };
+		6CEED22220C9B5A100A0DBE0 /* Home 7.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 7.gif"; sourceTree = "<group>"; };
+		6CEED22320C9B5A100A0DBE0 /* Home 6.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 6.gif"; sourceTree = "<group>"; };
+		6CEED22420C9B5A200A0DBE0 /* Home 3.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 3.gif"; sourceTree = "<group>"; };
+		6CEED22620C9B5A200A0DBE0 /* Home 5.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 5.gif"; sourceTree = "<group>"; };
+		6CEED22820C9B5A200A0DBE0 /* Home 8.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 8.gif"; sourceTree = "<group>"; };
+		6CEED22920C9B5A200A0DBE0 /* Home 2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 2.gif"; sourceTree = "<group>"; };
+		6CEED22A20C9B5A200A0DBE0 /* Home 4.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 4.gif"; sourceTree = "<group>"; };
+		6CEED23420C9B92100A0DBE0 /* Home.rsrc */ = {isa = PBXFileReference; lastKnownFileType = archive.rsrc; path = Home.rsrc; sourceTree = "<group>"; };
+		6CEED23620C9BE1800A0DBE0 /* Home 1.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 1.gif"; sourceTree = "<group>"; };
+		6CEED23820C9BE2800A0DBE0 /* Home 9.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "Home 9.gif"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -304,6 +348,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C9DF4EE20C725100024F61B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6C9DF4F520C7252C0024F61B /* ResourceRepositoryReader.swift */,
+				6C9DF4F120C7252C0024F61B /* ResourceMapReader.swift */,
+				6C9DF4F220C7252C0024F61B /* FontFamilyResourceReader.swift */,
+				6C9DF4F320C7252C0024F61B /* BitmapFontResourceReader.swift */,
+				6C9DF4F620C7252C0024F61B /* ColorResourceReader.swift */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		6C9DF50520C732860024F61B /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				6C9E6AE91E75BCFA00BBF925 /* Image.swift */,
+				6C9E6AEA1E75BCFA00BBF925 /* MaskedImage.swift */,
+				6C9E6AEB1E75BCFA00BBF925 /* Drawing.swift */,
+				6C9E6AEC1E75BCFA00BBF925 /* Icon Mask.swift */,
+				6C549B1B1F50DA0000836AE2 /* RgbConversion.swift */,
+				6C2AD44B1F51A4BB00E2F8B9 /* AddColorPainter.swift */,
+				6C9DF50620C732B10024F61B /* RichText.swift */,
+				6C9DF50A20C73A8A0024F61B /* TextLayout.swift */,
+				6C9DF50C20C7445A0024F61B /* TextDrawing.swift */,
+			);
+			name = Common;
+			sourceTree = "<group>";
+		};
 		6C9E6A811E75BCCD00BBF925 = {
 			isa = PBXGroup;
 			children = (
@@ -329,9 +401,9 @@
 			children = (
 				6C9E6A8E1E75BCCD00BBF925 /* HyperCardCommon.h */,
 				6C9E6A9C1E75BCFA00BBF925 /* Browser.swift */,
-				6C9E6A9D1E75BCFA00BBF925 /* StackPreviewer.swift */,
+				6C9DF4D720C708A80024F61B /* MainRepository.swift */,
 				6C9E6AA41E75BCFA00BBF925 /* Common */,
-				6C9E6AB41E75BCFA00BBF925 /* Stack */,
+				6C9E6AB41E75BCFA00BBF925 /* Data */,
 				6C9E6AE81E75BCFA00BBF925 /* File */,
 				6C9E6AFA1E75BCFA00BBF925 /* Graphics */,
 				6C9E6A8F1E75BCCD00BBF925 /* Info.plist */,
@@ -349,14 +421,17 @@
 				6C9E6AA21E75BCFA00BBF925 /* HString.swift */,
 				6C9E6AA31E75BCFA00BBF925 /* SearchHash.swift */,
 				6CDAC4EA1F4A2D8000DC5DC9 /* Property.swift */,
-				6C30E8D01F4D117A00ACB457 /* CharacterTable.swift */,
+				6C76AA9720C5956C009A3446 /* Computation.swift */,
+				6C30E8D01F4D117A00ACB457 /* StringComparison.swift */,
+				6C9E6AAF1E75BCFA00BBF925 /* ResourceSystem.swift */,
 			);
 			name = Common;
 			sourceTree = "<group>";
 		};
-		6C9E6AAC1E75BCFA00BBF925 /* Content */ = {
+		6C9E6AAC1E75BCFA00BBF925 /* Stack */ = {
 			isa = PBXGroup;
 			children = (
+				6C9E6AA51E75BCFA00BBF925 /* Stack.swift */,
 				6C9E6AA61E75BCFA00BBF925 /* Layer.swift */,
 				6C9E6AA71E75BCFA00BBF925 /* Card.swift */,
 				6C9E6AA81E75BCFA00BBF925 /* Background.swift */,
@@ -364,113 +439,63 @@
 				6C9E6AAA1E75BCFA00BBF925 /* Field.swift */,
 				6C9E6AAB1E75BCFA00BBF925 /* Button.swift */,
 			);
-			name = Content;
+			name = Stack;
 			sourceTree = "<group>";
 		};
 		6C9E6AB31E75BCFA00BBF925 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E6AAD1E75BCFA00BBF925 /* Resource.swift */,
 				6C9E6AAE1E75BCFA00BBF925 /* ResourceRepository.swift */,
-				6C9E6AAF1E75BCFA00BBF925 /* ResourceSystem.swift */,
+				6C9E6AAD1E75BCFA00BBF925 /* Resource.swift */,
+				6CA2CCC720C83DE10042148A /* Icon.swift */,
 				6C9E6AB01E75BCFA00BBF925 /* FontFamily.swift */,
 				6C9E6AB11E75BCFA00BBF925 /* BitmapFont.swift */,
-				6C9E6AB21E75BCFA00BBF925 /* Glyph.swift */,
+				6CA2CCC920C83FF40042148A /* VectorFont.swift */,
+				6C9DF50120C7257C0024F61B /* AddColor.swift */,
+				6CA2CCCB20C842CE0042148A /* Picture.swift */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		6C9E6AB41E75BCFA00BBF925 /* Stack */ = {
+		6C9E6AB41E75BCFA00BBF925 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E6AA51E75BCFA00BBF925 /* Stack.swift */,
-				6C9E6AAC1E75BCFA00BBF925 /* Content */,
+				6CA2CCB920C82A500042148A /* HyperCardFile.swift */,
+				6C9E6AAC1E75BCFA00BBF925 /* Stack */,
 				6C9E6AB31E75BCFA00BBF925 /* Resources */,
 			);
-			name = Stack;
+			name = Data;
 			sourceTree = "<group>";
 		};
 		6C9E6AB91E75BCFA00BBF925 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				6C9E6AB51E75BCFA00BBF925 /* ClassicFile.swift */,
 				6C9E6AB61E75BCFA00BBF925 /* DataRange.swift */,
-				6C9E6AB71E75BCFA00BBF925 /* DataBlock.swift */,
-				6C9E6AB81E75BCFA00BBF925 /* FileBlock.swift */,
+				6CE8F5C920C429E700B99E39 /* MasterRecord.swift */,
+				6CE8F5C720C429CB00B99E39 /* PageReference.swift */,
+				6CE8F5C520C429C400B99E39 /* CardReference.swift */,
+				6CE8F5CB20C42A0800B99E39 /* FreeLocation.swift */,
+				6CE8F5D720C42CB300B99E39 /* IndexedTextFormatting.swift */,
+				6CE8F5DD20C42E1100B99E39 /* IndexedStyle.swift */,
+				6C9DF4FF20C725620024F61B /* ResourceReference.swift */,
+				6CA2CCB720C829DD0042148A /* OpeningError.swift */,
+				6CA2CCBF20C82F820042148A /* StackBlockDecrypter.swift */,
+				6C9DF50320C726090024F61B /* ResourceExtractor.swift */,
 			);
 			name = Common;
-			sourceTree = "<group>";
-		};
-		6C9E6AC81E75BCFA00BBF925 /* Blocks */ = {
-			isa = PBXGroup;
-			children = (
-				6C9E6ABB1E75BCFA00BBF925 /* HyperCardFileData.swift */,
-				6C9E6ABC1E75BCFA00BBF925 /* StackBlock.swift */,
-				6C9E6ABD1E75BCFA00BBF925 /* MasterBlock.swift */,
-				6C9E6ABE1E75BCFA00BBF925 /* ListBlock.swift */,
-				6C9E6ABF1E75BCFA00BBF925 /* PageBlock.swift */,
-				6C9E6AC01E75BCFA00BBF925 /* LayerBlock.swift */,
-				6C9E6AC11E75BCFA00BBF925 /* CardBlock.swift */,
-				6C9E6AC21E75BCFA00BBF925 /* BackgroundBlock.swift */,
-				6C9E6AC31E75BCFA00BBF925 /* PartBlock.swift */,
-				6C9E6AC41E75BCFA00BBF925 /* ContentBlock.swift */,
-				6C9E6AC51E75BCFA00BBF925 /* BitmapBlock.swift */,
-				6C9E6AC61E75BCFA00BBF925 /* StyleBlock.swift */,
-				6C9E6AC71E75BCFA00BBF925 /* FontBlock.swift */,
-			);
-			name = Blocks;
-			sourceTree = "<group>";
-		};
-		6C9E6AD21E75BCFA00BBF925 /* Blocks v1 */ = {
-			isa = PBXGroup;
-			children = (
-				6C9E6AC91E75BCFA00BBF925 /* HyperCardFileDataV1.swift */,
-				6C9E6ACA1E75BCFA00BBF925 /* StackBlockV1.swift */,
-				6C9E6ACB1E75BCFA00BBF925 /* ListBlockV1.swift */,
-				6C9E6ACC1E75BCFA00BBF925 /* PageBlockV1.swift */,
-				6C9E6ACD1E75BCFA00BBF925 /* LayerBlockV1.swift */,
-				6C9E6ACE1E75BCFA00BBF925 /* CardBlockV1.swift */,
-				6C9E6ACF1E75BCFA00BBF925 /* BackgroundBlockV1.swift */,
-				6C9E6AD01E75BCFA00BBF925 /* ContentBlockV1.swift */,
-				6C9E6AD11E75BCFA00BBF925 /* BitmapBlockV1.swift */,
-			);
-			name = "Blocks v1";
-			sourceTree = "<group>";
-		};
-		6C9E6AD31E75BCFA00BBF925 /* Stack */ = {
-			isa = PBXGroup;
-			children = (
-				6C9E6ABA1E75BCFA00BBF925 /* HyperCardFile.swift */,
-				6C9E6AC81E75BCFA00BBF925 /* Blocks */,
-				6C9E6AD21E75BCFA00BBF925 /* Blocks v1 */,
-			);
-			name = Stack;
-			sourceTree = "<group>";
-		};
-		6C9E6ADA1E75BCFA00BBF925 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				6C9E6AD41E75BCFA00BBF925 /* ResourceFork.swift */,
-				6C9E6AD51E75BCFA00BBF925 /* ResourceBlock.swift */,
-				6C9E6AD61E75BCFA00BBF925 /* IconResourceBlock.swift */,
-				6C9E6AD71E75BCFA00BBF925 /* FontFamilyResourceBlock.swift */,
-				6C9E6AD81E75BCFA00BBF925 /* BitmapFontResourceBlock.swift */,
-				6C9E6AD91E75BCFA00BBF925 /* VectorFontResourceBlock.swift */,
-				6C549B1F1F5112E300836AE2 /* AddColorResourceBlock.swift */,
-				6CADFE861F520A6600465A00 /* PictureResourceBlock.swift */,
-			);
-			name = Resources;
 			sourceTree = "<group>";
 		};
 		6C9E6AE11E75BCFA00BBF925 /* Stack */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E6ADB1E75BCFA00BBF925 /* FileStack.swift */,
-				6C9E6ADC1E75BCFA00BBF925 /* FileLayer.swift */,
-				6C9E6ADD1E75BCFA00BBF925 /* FileCard.swift */,
-				6C9E6ADE1E75BCFA00BBF925 /* FileBackground.swift */,
-				6C30878C1F48957100CCA9A7 /* FilePart.swift */,
-				6C9E6ADF1E75BCFA00BBF925 /* FileField.swift */,
-				6C9E6AE01E75BCFA00BBF925 /* FileButton.swift */,
+				6C9E6ABA1E75BCFA00BBF925 /* StackLoading.swift */,
+				6C9E6ADC1E75BCFA00BBF925 /* LayerLoading.swift */,
+				6C9E6ADD1E75BCFA00BBF925 /* CardLoading.swift */,
+				6C9E6ADE1E75BCFA00BBF925 /* BackgroundLoading.swift */,
+				6C30878C1F48957100CCA9A7 /* PartLoading.swift */,
+				6C9E6ADF1E75BCFA00BBF925 /* FieldLoading.swift */,
+				6C9E6AE01E75BCFA00BBF925 /* ButtonLoading.swift */,
 			);
 			name = Stack;
 			sourceTree = "<group>";
@@ -478,31 +503,33 @@
 		6C9E6AE61E75BCFA00BBF925 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E6AE21E75BCFA00BBF925 /* FileIconResource.swift */,
-				6C9E6AE31E75BCFA00BBF925 /* FileFontFamilyResource.swift */,
-				6C9E6AE41E75BCFA00BBF925 /* FileBitmapFont.swift */,
-				6C9E6AE51E75BCFA00BBF925 /* FileGlyph.swift */,
+				6C9DF4D520C703DF0024F61B /* ResourceRepositoryLoading.swift */,
+				6CA2CCCD20C8437B0042148A /* IconLoading.swift */,
+				6C9E6AE31E75BCFA00BBF925 /* FontFamilyLoading.swift */,
+				6C9E6AE41E75BCFA00BBF925 /* BitmapFontLoading.swift */,
+				6CA2CCCF20C843F60042148A /* VectorFontLoading.swift */,
+				6CA2CCD120C8445C0042148A /* LayerColorLoading.swift */,
+				6CA2CCD320C845000042148A /* PictureLoading.swift */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		6C9E6AE71E75BCFA00BBF925 /* Lazy Model */ = {
+		6C9E6AE71E75BCFA00BBF925 /* Loading */ = {
 			isa = PBXGroup;
 			children = (
+				6CA2CCBB20C82A6C0042148A /* HyperCardFileLoading.swift */,
 				6C9E6AE11E75BCFA00BBF925 /* Stack */,
 				6C9E6AE61E75BCFA00BBF925 /* Resources */,
 			);
-			name = "Lazy Model";
+			name = Loading;
 			sourceTree = "<group>";
 		};
 		6C9E6AE81E75BCFA00BBF925 /* File */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E6AB51E75BCFA00BBF925 /* ClassicFile.swift */,
+				6C9E6AE71E75BCFA00BBF925 /* Loading */,
+				6CA2CCBE20C82D2F0042148A /* Reading */,
 				6C9E6AB91E75BCFA00BBF925 /* Common */,
-				6C9E6AD31E75BCFA00BBF925 /* Stack */,
-				6C9E6ADA1E75BCFA00BBF925 /* Resources */,
-				6C9E6AE71E75BCFA00BBF925 /* Lazy Model */,
 			);
 			name = File;
 			sourceTree = "<group>";
@@ -535,12 +562,7 @@
 		6C9E6AFA1E75BCFA00BBF925 /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E6AE91E75BCFA00BBF925 /* Image.swift */,
-				6C9E6AEA1E75BCFA00BBF925 /* MaskedImage.swift */,
-				6C9E6AEB1E75BCFA00BBF925 /* Drawing.swift */,
-				6C9E6AEC1E75BCFA00BBF925 /* Icon Mask.swift */,
-				6C549B1B1F50DA0000836AE2 /* RgbConversion.swift */,
-				6C2AD44B1F51A4BB00E2F8B9 /* AddColorPainter.swift */,
+				6C9DF50520C732860024F61B /* Common */,
 				6C9E6AF51E75BCFA00BBF925 /* Views */,
 				6C9E6AF91E75BCFA00BBF925 /* Fonts */,
 			);
@@ -581,11 +603,21 @@
 			path = HyperCardCommon/Resources;
 			sourceTree = "<group>";
 		};
+		6CA2CCBE20C82D2F0042148A /* Reading */ = {
+			isa = PBXGroup;
+			children = (
+				6CE8F5BA20C428F400B99E39 /* Stack */,
+				6C9DF4EE20C725100024F61B /* Resources */,
+			);
+			name = Reading;
+			sourceTree = "<group>";
+		};
 		6CB025461F4ED75700B57D87 /* HyperCardCommonTests */ = {
 			isa = PBXGroup;
 			children = (
 				6CB025471F4ED75700B57D87 /* HyperCardCommonTests.swift */,
 				6C56FD091F56BC2B0036FF8A /* DataTests.swift */,
+				6CEED1F820C9A83900A0DBE0 /* GraphicTests.swift */,
 				6CB025501F4ED7A700B57D87 /* Resources */,
 				6CB025491F4ED75700B57D87 /* Info.plist */,
 			);
@@ -593,6 +625,71 @@
 			sourceTree = "<group>";
 		};
 		6CB025501F4ED7A700B57D87 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6CEED1FB20C9AA8F00A0DBE0 /* Data */,
+				6CEED1FA20C9AA8300A0DBE0 /* Graphic */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		6CE0C0FD1F4EF4D2003AA9FC /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				6CE0C0EB1F4EF1D0003AA9FC /* TestCantAbort.stack */,
+				6CE0C0EC1F4EF1D0003AA9FC /* TestCantDelete.stack */,
+				6CE0C0ED1F4EF1D0003AA9FC /* TestCantModify.stack */,
+				6CE0C0EE1F4EF1D0003AA9FC /* TestCantPeek.stack */,
+				6CE0C0EF1F4EF1D0003AA9FC /* TestPassword.stack */,
+				6CE0C0FB1F4EF460003AA9FC /* TestPrivateAccess.stack */,
+				6CE0C0F11F4EF1D0003AA9FC /* TestUserLevel1.stack */,
+				6CE0C0F21F4EF1D0003AA9FC /* TestUserLevel5.stack */,
+			);
+			name = Security;
+			sourceTree = "<group>";
+		};
+		6CE8F5BA20C428F400B99E39 /* Stack */ = {
+			isa = PBXGroup;
+			children = (
+				6CE8F5BC20C4296600B99E39 /* StackReader.swift */,
+				6CE8F5C320C4297600B99E39 /* StackBlockReader.swift */,
+				6CE8F5BE20C4296600B99E39 /* MasterBlockReader.swift */,
+				6CE8F5BB20C4296600B99E39 /* ListBlockReader.swift */,
+				6CE8F5BD20C4296600B99E39 /* PageBlockReader.swift */,
+				6CE8F5CD20C42A6A00B99E39 /* LayerBlockReader.swift */,
+				6CE8F5ED20C4330700B99E39 /* LayerBlockCommonReader.swift */,
+				6CE8F5CF20C42B3100B99E39 /* CardBlockReader.swift */,
+				6CE8F5D120C42B7400B99E39 /* BackgroundBlockReader.swift */,
+				6CE8F5D320C42BAB00B99E39 /* PartBlockReader.swift */,
+				6CE8F5D520C42C8200B99E39 /* ContentBlockReader.swift */,
+				6CE8F5D920C42D1900B99E39 /* BitmapBlockReader.swift */,
+				6CE8F5DB20C42DEA00B99E39 /* StyleBlockReader.swift */,
+				6CE8F5DF20C42E4500B99E39 /* FontBlockReader.swift */,
+			);
+			name = Stack;
+			sourceTree = "<group>";
+		};
+		6CEED1FA20C9AA8300A0DBE0 /* Graphic */ = {
+			isa = PBXGroup;
+			children = (
+				6CEED20E20C9AADF00A0DBE0 /* Home.stack */,
+				6CEED23420C9B92100A0DBE0 /* Home.rsrc */,
+				6CEED23620C9BE1800A0DBE0 /* Home 1.gif */,
+				6CEED22920C9B5A200A0DBE0 /* Home 2.gif */,
+				6CEED22420C9B5A200A0DBE0 /* Home 3.gif */,
+				6CEED22A20C9B5A200A0DBE0 /* Home 4.gif */,
+				6CEED22620C9B5A200A0DBE0 /* Home 5.gif */,
+				6CEED22320C9B5A100A0DBE0 /* Home 6.gif */,
+				6CEED22220C9B5A100A0DBE0 /* Home 7.gif */,
+				6CEED22820C9B5A200A0DBE0 /* Home 8.gif */,
+				6CEED23820C9BE2800A0DBE0 /* Home 9.gif */,
+				6C2EF95320CAC0A300FAB8CA /* TestBitmap.stack */,
+				6C2EF95720CAC0E900FAB8CA /* TestBitmap 1.gif */,
+			);
+			name = Graphic;
+			sourceTree = "<group>";
+		};
+		6CEED1FB20C9AA8F00A0DBE0 /* Data */ = {
 			isa = PBXGroup;
 			children = (
 				6CE0C1021F4EFC6D003AA9FC /* TestCardsBackgrounds.stack */,
@@ -611,22 +708,7 @@
 				6C7F7BA71F4F9C3500C9D3DC /* TestV1.stack */,
 				6C56FD071F56BBA40036FF8A /* TestStrangeFlags.stack */,
 			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
-		6CE0C0FD1F4EF4D2003AA9FC /* Security */ = {
-			isa = PBXGroup;
-			children = (
-				6CE0C0EB1F4EF1D0003AA9FC /* TestCantAbort.stack */,
-				6CE0C0EC1F4EF1D0003AA9FC /* TestCantDelete.stack */,
-				6CE0C0ED1F4EF1D0003AA9FC /* TestCantModify.stack */,
-				6CE0C0EE1F4EF1D0003AA9FC /* TestCantPeek.stack */,
-				6CE0C0EF1F4EF1D0003AA9FC /* TestPassword.stack */,
-				6CE0C0FB1F4EF460003AA9FC /* TestPrivateAccess.stack */,
-				6CE0C0F11F4EF1D0003AA9FC /* TestUserLevel1.stack */,
-				6CE0C0F21F4EF1D0003AA9FC /* TestUserLevel5.stack */,
-			);
-			name = Security;
+			name = Data;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -686,11 +768,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Pierre Lorenzi";
 				TargetAttributes = {
 					6C9E6A8A1E75BCCD00BBF925 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 4635GNGBF8;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -749,28 +832,41 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6CEED22F20C9B5A200A0DBE0 /* Home 5.gif in Resources */,
 				6CE0C0F91F4EF1D0003AA9FC /* TestUserLevel1.stack in Resources */,
 				6CB51D6A1F4F5486000C43D3 /* TestCardProperties.stack in Resources */,
 				6CE0C0F41F4EF1D0003AA9FC /* TestCantDelete.stack in Resources */,
 				6CE0C0F51F4EF1D0003AA9FC /* TestCantModify.stack in Resources */,
 				6CC67B751F4F03840070195B /* TestManyCards.stack in Resources */,
 				6CE0C0F71F4EF1D0003AA9FC /* TestPassword.stack in Resources */,
+				6CEED23120C9B5A200A0DBE0 /* Home 8.gif in Resources */,
 				6C7F7BA81F4F9C3500C9D3DC /* TestV1.stack in Resources */,
 				6CE0C0FC1F4EF460003AA9FC /* TestPrivateAccess.stack in Resources */,
+				6CEED23320C9B5A200A0DBE0 /* Home 4.gif in Resources */,
+				6C2EF95520CAC0A400FAB8CA /* TestBitmap.stack in Resources */,
 				6C7F7B9C1F4F7A1F00C9D3DC /* TestFieldProperties.stack in Resources */,
 				6CB51D7A1F4F640A000C43D3 /* TestButtonProperties.stack in Resources */,
 				6C7F7B9E1F4F7AF500C9D3DC /* TestFreeSize.stack in Resources */,
 				6CB51D6C1F4F5659000C43D3 /* TestBackgroundProperties.stack in Resources */,
 				6C7F7BA21F4F7DD200C9D3DC /* TestContents.stack in Resources */,
 				6CE0C0F61F4EF1D0003AA9FC /* TestCantPeek.stack in Resources */,
+				6CEED22B20C9B5A200A0DBE0 /* Home 7.gif in Resources */,
+				6CEED23220C9B5A200A0DBE0 /* Home 2.gif in Resources */,
 				6CEBC0101F4F2E760031BDDC /* TestWindowSize.stack in Resources */,
+				6C2EF95820CAC0E900FAB8CA /* TestBitmap 1.gif in Resources */,
 				6CE0C1031F4EFC6D003AA9FC /* TestCardsBackgrounds.stack in Resources */,
 				6C7F7BA61F4F845900C9D3DC /* TestFormattedContent.stack in Resources */,
+				6CEED23720C9BE1800A0DBE0 /* Home 1.gif in Resources */,
+				6CEED20F20C9AADF00A0DBE0 /* Home.stack in Resources */,
 				6CE0C0FA1F4EF1D0003AA9FC /* TestUserLevel5.stack in Resources */,
 				6CEBC0121F4F337D0031BDDC /* TestStackScript.stack in Resources */,
 				6C56FD081F56BBA40036FF8A /* TestStrangeFlags.stack in Resources */,
+				6CEED23920C9BE2800A0DBE0 /* Home 9.gif in Resources */,
+				6CEED22D20C9B5A200A0DBE0 /* Home 3.gif in Resources */,
+				6CEED22C20C9B5A200A0DBE0 /* Home 6.gif in Resources */,
 				6CE0C0F31F4EF1D0003AA9FC /* TestCantAbort.stack in Resources */,
 				6CE0C1011F4EF716003AA9FC /* TestVersion.stack in Resources */,
+				6CEED23520C9B92200A0DBE0 /* Home.rsrc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -781,92 +877,100 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6C9E6B331E75BCFA00BBF925 /* FileCard.swift in Sources */,
-				6C9E6B161E75BCFA00BBF925 /* StackBlock.swift in Sources */,
+				6C9E6B331E75BCFA00BBF925 /* CardLoading.swift in Sources */,
 				6C9E6B0C1E75BCFA00BBF925 /* ResourceSystem.swift in Sources */,
-				6C9E6AFC1E75BCFA00BBF925 /* StackPreviewer.swift in Sources */,
+				6C9DF4D820C708A80024F61B /* MainRepository.swift in Sources */,
 				6C9E6B0A1E75BCFA00BBF925 /* Resource.swift in Sources */,
-				6C9E6B1B1E75BCFA00BBF925 /* CardBlock.swift in Sources */,
-				6C9E6B381E75BCFA00BBF925 /* FileFontFamilyResource.swift in Sources */,
+				6C9DF50720C732B10024F61B /* RichText.swift in Sources */,
+				6C9E6B381E75BCFA00BBF925 /* FontFamilyLoading.swift in Sources */,
 				6C9E6B3E1E75BCFA00BBF925 /* Icon Mask.swift in Sources */,
+				6CE8F5C220C4296600B99E39 /* MasterBlockReader.swift in Sources */,
 				6CDAC4ED1F4A46CD00DC5DC9 /* ButtonView.swift in Sources */,
+				6C9DF4FD20C7252D0024F61B /* ResourceRepositoryReader.swift in Sources */,
 				6C9E6B031E75BCFA00BBF925 /* Stack.swift in Sources */,
 				6C9E6AFB1E75BCFA00BBF925 /* Browser.swift in Sources */,
+				6CA2CCCC20C842CE0042148A /* Picture.swift in Sources */,
+				6C76AA9820C5956C009A3446 /* Computation.swift in Sources */,
+				6CE8F5DC20C42DEA00B99E39 /* StyleBlockReader.swift in Sources */,
+				6CE8F5CE20C42A6A00B99E39 /* LayerBlockReader.swift in Sources */,
 				6C2AD44C1F51A4BB00E2F8B9 /* AddColorPainter.swift in Sources */,
+				6CE8F5D020C42B3100B99E39 /* CardBlockReader.swift in Sources */,
 				6C9E6B001E75BCFA00BBF925 /* NumericName.swift in Sources */,
 				6C9E6B421E75BCFA00BBF925 /* PartView.swift in Sources */,
-				6C9E6B1F1E75BCFA00BBF925 /* BitmapBlock.swift in Sources */,
 				6C9E6B071E75BCFA00BBF925 /* Part.swift in Sources */,
 				6C9E6B481E75BCFA00BBF925 /* FontDecorating.swift in Sources */,
-				6C9E6B231E75BCFA00BBF925 /* StackBlockV1.swift in Sources */,
-				6C9E6B2C1E75BCFA00BBF925 /* ResourceBlock.swift in Sources */,
+				6CE8F5D620C42C8200B99E39 /* ContentBlockReader.swift in Sources */,
+				6CA2CCCE20C8437B0042148A /* IconLoading.swift in Sources */,
 				6C2AD44A1F51A0BE00E2F8B9 /* WhiteView.swift in Sources */,
-				6CADFE871F520A6600465A00 /* PictureResourceBlock.swift in Sources */,
+				6C9DF4FB20C7252D0024F61B /* BitmapFontResourceReader.swift in Sources */,
 				6C9E6B3D1E75BCFA00BBF925 /* Drawing.swift in Sources */,
 				6C9E6B3C1E75BCFA00BBF925 /* MaskedImage.swift in Sources */,
-				6C9E6B121E75BCFA00BBF925 /* DataBlock.swift in Sources */,
-				6C9E6B261E75BCFA00BBF925 /* LayerBlockV1.swift in Sources */,
-				6C9E6B2A1E75BCFA00BBF925 /* BitmapBlockV1.swift in Sources */,
+				6C9DF50220C7257C0024F61B /* AddColor.swift in Sources */,
+				6CE8F5BF20C4296600B99E39 /* ListBlockReader.swift in Sources */,
+				6CA2CCCA20C83FF40042148A /* VectorFont.swift in Sources */,
+				6CA2CCD420C845000042148A /* PictureLoading.swift in Sources */,
 				6C9E6AFE1E75BCFA00BBF925 /* Numeric Functions.swift in Sources */,
-				6C9E6B151E75BCFA00BBF925 /* HyperCardFileData.swift in Sources */,
 				6C9E6B3B1E75BCFA00BBF925 /* Image.swift in Sources */,
 				6CDAC4EB1F4A2D8000DC5DC9 /* Property.swift in Sources */,
 				6C9E6B101E75BCFA00BBF925 /* ClassicFile.swift in Sources */,
-				6C9E6B371E75BCFA00BBF925 /* FileIconResource.swift in Sources */,
 				6C9E6B411E75BCFA00BBF925 /* LayerView.swift in Sources */,
-				6C9E6B2D1E75BCFA00BBF925 /* IconResourceBlock.swift in Sources */,
-				6C9E6B291E75BCFA00BBF925 /* ContentBlockV1.swift in Sources */,
-				6C9E6B2E1E75BCFA00BBF925 /* FontFamilyResourceBlock.swift in Sources */,
+				6CE8F5D420C42BAB00B99E39 /* PartBlockReader.swift in Sources */,
+				6CA2CCBA20C82A500042148A /* HyperCardFile.swift in Sources */,
+				6C9DF50420C726090024F61B /* ResourceExtractor.swift in Sources */,
 				6C8746271F5402E0005A41AB /* Responder.swift in Sources */,
 				6C9E6AFD1E75BCFA00BBF925 /* CommonTypes.swift in Sources */,
+				6CE8F5CA20C429E800B99E39 /* MasterRecord.swift in Sources */,
 				6C9E6B021E75BCFA00BBF925 /* SearchHash.swift in Sources */,
 				6C9E6B041E75BCFA00BBF925 /* Layer.swift in Sources */,
-				6C9E6B131E75BCFA00BBF925 /* FileBlock.swift in Sources */,
-				6C549B201F5112E300836AE2 /* AddColorResourceBlock.swift in Sources */,
+				6CE8F5DA20C42D1900B99E39 /* BitmapBlockReader.swift in Sources */,
 				6C9E6B3F1E75BCFA00BBF925 /* View.swift in Sources */,
-				6C9E6B141E75BCFA00BBF925 /* HyperCardFile.swift in Sources */,
+				6C9E6B141E75BCFA00BBF925 /* StackLoading.swift in Sources */,
+				6CA2CCD020C843F60042148A /* VectorFontLoading.swift in Sources */,
+				6CE8F5CC20C42A0900B99E39 /* FreeLocation.swift in Sources */,
+				6CE8F5C820C429CB00B99E39 /* PageReference.swift in Sources */,
 				6C9E6B0E1E75BCFA00BBF925 /* BitmapFont.swift in Sources */,
-				6C9E6B311E75BCFA00BBF925 /* FileStack.swift in Sources */,
-				6C9E6B211E75BCFA00BBF925 /* FontBlock.swift in Sources */,
+				6CA2CCC820C83DE10042148A /* Icon.swift in Sources */,
+				6C9DF50B20C73A8A0024F61B /* TextLayout.swift in Sources */,
 				6C9E6AFF1E75BCFA00BBF925 /* HyperCardBundle.swift in Sources */,
-				6C9E6B1A1E75BCFA00BBF925 /* LayerBlock.swift in Sources */,
-				6C9E6B191E75BCFA00BBF925 /* PageBlock.swift in Sources */,
+				6CE8F5C020C4296600B99E39 /* StackReader.swift in Sources */,
 				6C9E6B091E75BCFA00BBF925 /* Button.swift in Sources */,
 				6C9E6B111E75BCFA00BBF925 /* DataRange.swift in Sources */,
+				6C9DF4F920C7252C0024F61B /* ResourceMapReader.swift in Sources */,
 				6C549B1C1F50DA0000836AE2 /* RgbConversion.swift in Sources */,
-				6C9E6B301E75BCFA00BBF925 /* VectorFontResourceBlock.swift in Sources */,
-				6C9E6B181E75BCFA00BBF925 /* ListBlock.swift in Sources */,
-				6C9E6B271E75BCFA00BBF925 /* CardBlockV1.swift in Sources */,
-				6C9E6B241E75BCFA00BBF925 /* ListBlockV1.swift in Sources */,
 				6C9E6B491E75BCFA00BBF925 /* VectorFontConverting.swift in Sources */,
-				6C9E6B341E75BCFA00BBF925 /* FileBackground.swift in Sources */,
-				6C9E6B1C1E75BCFA00BBF925 /* BackgroundBlock.swift in Sources */,
+				6C9E6B341E75BCFA00BBF925 /* BackgroundLoading.swift in Sources */,
+				6CE8F5D820C42CB300B99E39 /* IndexedTextFormatting.swift in Sources */,
 				6C6064071F5B1DF600988560 /* HdmxTableReader.swift in Sources */,
 				6C9E6B011E75BCFA00BBF925 /* HString.swift in Sources */,
-				6C9E6B2F1E75BCFA00BBF925 /* BitmapFontResourceBlock.swift in Sources */,
-				6C9E6B361E75BCFA00BBF925 /* FileButton.swift in Sources */,
-				6C9E6B3A1E75BCFA00BBF925 /* FileGlyph.swift in Sources */,
-				6C9E6B171E75BCFA00BBF925 /* MasterBlock.swift in Sources */,
-				6C9E6B2B1E75BCFA00BBF925 /* ResourceFork.swift in Sources */,
+				6C9E6B361E75BCFA00BBF925 /* ButtonLoading.swift in Sources */,
+				6CE8F5C420C4297600B99E39 /* StackBlockReader.swift in Sources */,
+				6C9DF4FA20C7252D0024F61B /* FontFamilyResourceReader.swift in Sources */,
+				6CE8F5C620C429C400B99E39 /* CardReference.swift in Sources */,
 				6C9E6B0D1E75BCFA00BBF925 /* FontFamily.swift in Sources */,
-				6C9E6B221E75BCFA00BBF925 /* HyperCardFileDataV1.swift in Sources */,
-				6C9E6B281E75BCFA00BBF925 /* BackgroundBlockV1.swift in Sources */,
-				6C9E6B0F1E75BCFA00BBF925 /* Glyph.swift in Sources */,
-				6C9E6B321E75BCFA00BBF925 /* FileLayer.swift in Sources */,
-				6C30E8D11F4D117A00ACB457 /* CharacterTable.swift in Sources */,
+				6CE8F5EE20C4330700B99E39 /* LayerBlockCommonReader.swift in Sources */,
+				6C9DF50D20C7445A0024F61B /* TextDrawing.swift in Sources */,
+				6C9E6B321E75BCFA00BBF925 /* LayerLoading.swift in Sources */,
+				6CE8F5DE20C42E1100B99E39 /* IndexedStyle.swift in Sources */,
+				6CA2CCD220C8445C0042148A /* LayerColorLoading.swift in Sources */,
+				6CA2CCC020C82F820042148A /* StackBlockDecrypter.swift in Sources */,
+				6CA2CCBC20C82A6C0042148A /* HyperCardFileLoading.swift in Sources */,
+				6CA2CCB820C829DD0042148A /* OpeningError.swift in Sources */,
+				6C9DF4FE20C7252D0024F61B /* ColorResourceReader.swift in Sources */,
+				6CE8F5D220C42B7400B99E39 /* BackgroundBlockReader.swift in Sources */,
+				6C30E8D11F4D117A00ACB457 /* StringComparison.swift in Sources */,
+				6CE8F5E020C42E4500B99E39 /* FontBlockReader.swift in Sources */,
 				6C9E6B0B1E75BCFA00BBF925 /* ResourceRepository.swift in Sources */,
-				6C30878D1F48957100CCA9A7 /* FilePart.swift in Sources */,
-				6C9E6B251E75BCFA00BBF925 /* PageBlockV1.swift in Sources */,
+				6C30878D1F48957100CCA9A7 /* PartLoading.swift in Sources */,
 				6C9E6B051E75BCFA00BBF925 /* Card.swift in Sources */,
-				6C9E6B201E75BCFA00BBF925 /* StyleBlock.swift in Sources */,
 				6C9E6B461E75BCFA00BBF925 /* FieldView.swift in Sources */,
 				6C9E6B081E75BCFA00BBF925 /* Field.swift in Sources */,
-				6C9E6B1D1E75BCFA00BBF925 /* PartBlock.swift in Sources */,
+				6C9DF50020C725620024F61B /* ResourceReference.swift in Sources */,
+				6CE8F5C120C4296600B99E39 /* PageBlockReader.swift in Sources */,
 				6C9E6B471E75BCFA00BBF925 /* FontManager.swift in Sources */,
 				6C9E6B061E75BCFA00BBF925 /* Background.swift in Sources */,
-				6C9E6B1E1E75BCFA00BBF925 /* ContentBlock.swift in Sources */,
-				6C9E6B351E75BCFA00BBF925 /* FileField.swift in Sources */,
-				6C9E6B391E75BCFA00BBF925 /* FileBitmapFont.swift in Sources */,
+				6C9E6B351E75BCFA00BBF925 /* FieldLoading.swift in Sources */,
+				6C9DF4D620C703DF0024F61B /* ResourceRepositoryLoading.swift in Sources */,
+				6C9E6B391E75BCFA00BBF925 /* BitmapFontLoading.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -876,6 +980,7 @@
 			files = (
 				6CB025481F4ED75700B57D87 /* HyperCardCommonTests.swift in Sources */,
 				6C56FD0A1F56BC2B0036FF8A /* DataTests.swift in Sources */,
+				6CEED1F920C9A83900A0DBE0 /* GraphicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,6 +1008,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -910,6 +1016,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -961,6 +1068,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -968,6 +1076,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1004,6 +1113,7 @@
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 4635GNGBF8;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1024,6 +1134,7 @@
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 4635GNGBF8;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

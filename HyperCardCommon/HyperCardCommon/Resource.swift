@@ -7,9 +7,16 @@
 //
 
 
+/// Represents a resource type, symbolized in Mac OS by a four-letter name like
+/// 'ICON' for icons or 'NFNT' for fonts.
+/// <p>
+/// ContentType is the type used in the code to represent its data content.
+public protocol ResourceType {
+    associatedtype ContentType
+}
 
-/// A resource data in a resource fork. T is the type of the data contained in the resource.
-public class Resource<T> {
+/// The content of a resource in a resource fork.
+public class Resource<T: ResourceType> {
     
     /// The identifier
     public var identifier: Int
@@ -17,40 +24,60 @@ public class Resource<T> {
     /// The name
     public var name: HString
     
-    /// The type, linked to the type of the data contained in the resource
-    public var type: ResourceType<T>
-    
     /// The data contained in the resource
-    public var content: T
+    public var content: T.ContentType {
+        get { return self.contentProperty.value }
+        set { self.contentProperty.value = newValue }
+    }
+    public let contentProperty: Property<T.ContentType>
     
     /// Main constructor, explicit so it is public
-    public init(identifier: Int, name: HString, type: ResourceType<T>, content: T) {
+    public init(identifier: Int, name: HString, contentProperty: Property<T.ContentType>) {
         self.identifier = identifier
         self.name = name
-        self.type = type
-        self.content = content
+        self.contentProperty = contentProperty
     }
     
 }
 
-/// A resource type, linked to the type of the data that the resources of that type contain.
-public class ResourceType<T> {}
-
-/// Common resource types
-public enum ResourceTypes {
-    
-    /// Black & White Icons
-    public static let icon = ResourceType<Image>()
-    
-    /// Fonts
-    public static let fontFamily = ResourceType<FontFamily>()
-    
-    /// AddColor card colors
-    public static let cardColor = ResourceType<[AddColorElement]>()
-    
-    /// AddColor background colors
-    public static let backgroundColor = ResourceType<[AddColorElement]>()
-    
-    /// Pictures
-    public static let picture = ResourceType<NSImage>()
+/// Black & White Icons without mask, formerly named 'PICT'
+public struct IconResourceType: ResourceType {
+    public typealias ContentType = Icon
 }
+public typealias IconResource = Resource<IconResourceType>
+
+/// Fonts, formerly named 'FOND'
+public struct FontFamilyResourceType: ResourceType {
+    public typealias ContentType = FontFamily
+}
+public typealias FontFamilyResource = Resource<FontFamilyResourceType>
+
+/// Bitmap Fonts, naformerly namedmed 'NFNT' or 'FONT'
+public struct BitmapFontResourceType: ResourceType {
+    public typealias ContentType = BitmapFont
+}
+public typealias BitmapFontResource = Resource<BitmapFontResourceType>
+
+/// Vector Fonts, formerly named 'sfnt'
+public struct VectorFontResourceType: ResourceType {
+    public typealias ContentType = VectorFont
+}
+public typealias VectorFontResource = Resource<VectorFontResourceType>
+
+/// AddColor card colors, formerly named 'HCcd'
+public struct CardColorResourceType: ResourceType {
+    public typealias ContentType = LayerColor
+}
+public typealias CardColorResource = Resource<CardColorResourceType>
+
+/// AddColor background colors, formerly named 'HCbg'
+public struct BackgroundColorResourceType: ResourceType {
+    public typealias ContentType = LayerColor
+}
+public typealias BackgroundColorResource = Resource<BackgroundColorResourceType>
+
+/// Color Pictures, formerly named 'PICT'
+public struct PictureResourceType: ResourceType {
+    public typealias ContentType = Picture
+}
+public typealias PictureResource = Resource<PictureResourceType>

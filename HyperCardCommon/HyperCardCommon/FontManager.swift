@@ -7,10 +7,8 @@
 //
 
 
-/// Associates font descriptor, with user-friendly font names and variations, to low-level
+/// Associates font descriptors, with font names and variations, to low-level
 /// bitmap fonts that can be directly drawn.
-/// <p>
-/// It needs a stack of resource forks to look for font resources in it.
 public class FontManager {
     
     private let resources: ResourceSystem
@@ -20,6 +18,7 @@ public class FontManager {
     private var cachedFonts: [FontDescriptor: BitmapFont]
     
     /// Builds a manager. A stack of resource forks must be provided, the fonts are searched in it.
+    /// Font names can be provided to make the fonts more accurate.
     public init(resources: ResourceSystem, fontNameReferences: [FontNameReference]) {
         self.resources = resources
         self.fontNameReferences = fontNameReferences
@@ -58,22 +57,22 @@ public class FontManager {
             
             /* Check if a bitmap font with the right parameters is available */
             if let existingFamilyFont = family.bitmapFonts.first(where: { $0.size == descriptor.size && $0.style == descriptor.style }) {
-                return existingFamilyFont.font
+                return existingFamilyFont.resource.content
             }
             
             /* Look for a vector font (during tests, it appeared that it is only loaded for plain fonts) */
             if descriptor.style == PlainTextStyle {
                 if let vectorFont = family.vectorFonts.first(where: { $0.style == descriptor.style }) {
-                    return VectorFontConverting.convertVectorFont(CTFontCreateWithGraphicsFont(vectorFont.font, CGFloat(descriptor.size), nil, nil))
+                    let ctfont = CTFontCreateWithGraphicsFont(vectorFont.resource.content.cgfont, CGFloat(descriptor.size), nil, nil)
+                    return BitmapFont(fromVectorFont: ctfont)
                 }
             }
         }
         
         /* If the style is not plain, look for a plain version on which to apply the style */
         if descriptor.style != PlainTextStyle {
-            let plainDescriptor = FontDescriptor(identifier: descriptor.identifier, size: descriptor.size, style: PlainTextStyle)
-            let plainFont = retrieveFont(forDescriptor: plainDescriptor)
-            return FontDecorating.decorateFont(from: plainFont, with: descriptor.style, in: possibleFamily, size: descriptor.size)
+            let plainFont = findFont(withIdentifier: descriptor.identifier, size: descriptor.size, style: PlainTextStyle)
+            return BitmapFont(decorate: plainFont, with: descriptor.style, in: possibleFamily, size: descriptor.size)
         }
         
         /* Look for a Mac OS X font */
@@ -89,7 +88,7 @@ public class FontManager {
     private func findFontFamily(withIdentifier identifier: Int) -> FontFamily? {
         
         /* Look for the resource */
-        let possibleFamilyResource = resources.findResource(ofType: ResourceTypes.fontFamily, withIdentifier: identifier)
+        let possibleFamilyResource = resources.findResource(ofType: \ResourceRepository.fontFamilies, withIdentifier: identifier)
         let possibleFamily = possibleFamilyResource?.content
         
         /* Get the expected name of the font */
@@ -99,12 +98,12 @@ public class FontManager {
         let fontName = fontNameReference.name
         
         /* If the name is right, we're good */
-        if let familyResource = possibleFamilyResource, familyResource.name == fontName {
+        if let familyResource = possibleFamilyResource, compareCase(familyResource.name, fontName) == .equal {
             return possibleFamily
         }
         
         /* If the name doesn't match, try searching by name */
-        guard let familyResourceByName = resources.findResource(ofType: ResourceTypes.fontFamily, withName: fontName) else {
+        guard let familyResourceByName = resources.findResource(ofType: \ResourceRepository.fontFamilies, withName: fontName) else {
             return possibleFamily
         }
         
@@ -141,7 +140,7 @@ public class FontManager {
             return nil
         }
         
-        return VectorFontConverting.convertVectorFont(font)
+        return BitmapFont(fromVectorFont: font)
     
     }
     

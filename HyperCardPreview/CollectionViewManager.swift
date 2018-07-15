@@ -32,11 +32,12 @@ class CollectionViewManager: NSObject, NSCollectionViewDataSource, NSCollectionV
     
     private static let itemIdentifier = "item"
     
-    init(collectionView: NSCollectionView, stack: Stack, document: Document) {
+    init(collectionView: NSCollectionView, hyperCardFile: HyperCardFile, document: Document) {
         self.collectionView = collectionView
-        self.browser = Browser(stack: stack)
+        self.browser = Browser(hyperCardFile: hyperCardFile)
         self.thumbnailSize = CollectionViewManager.computeThumbnailSize(cardWidth: browser.image.width, cardHeight: browser.image.height, thumbnailSize: (collectionView.collectionViewLayout! as! NSCollectionViewFlowLayout).itemSize)
         self.document = document
+        let stack = hyperCardFile.stack
         self.thumbnails = [CGImage?](repeating: nil, count: stack.cards.count)
         self.renderingQueue = DispatchQueue(label: "CollectionViewManager Rendering Queue")
         self.renderingPriorities = [Int](repeating: 0, count: stack.cards.count)
@@ -48,6 +49,28 @@ class CollectionViewManager: NSObject, NSCollectionViewDataSource, NSCollectionV
         collectionView.register(nib, forItemWithIdentifier: NSUserInterfaceItemIdentifier(rawValue: CollectionViewManager.itemIdentifier))
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        /* When the collection view scrolls, update the thumbnail priorities */
+        collectionView.postsBoundsChangedNotifications = true
+        var observerToRemove: NSObjectProtocol? = nil
+        let observer = NotificationCenter.default.addObserver(forName: NSView.boundsDidChangeNotification, object: collectionView.superview!, queue: nil, using: { [weak self] _ in
+            
+            guard let slf = self else {
+                if let observer = observerToRemove {
+                    NotificationCenter.default.removeObserver(observer)
+                }
+                return
+            }
+            
+            let visibleIndexPaths = collectionView.indexPathsForVisibleItems()
+            for path in visibleIndexPaths {
+                if slf.renderingPriorities[path.item] != 0 {
+                    slf.currentPriority += 1
+                    slf.renderingPriorities[path.item] = slf.currentPriority + (collectionView.frameForItem(at: path.item).intersects(collectionView.visibleRect) ? 10000 : 0)
+                }
+            }
+        })
+        observerToRemove = observer
     }
     
     private static func computeThumbnailSize(cardWidth: Int, cardHeight: Int, thumbnailSize: NSSize) -> Size {
@@ -86,7 +109,7 @@ class CollectionViewManager: NSObject, NSCollectionViewDataSource, NSCollectionV
             /* Ask to draw the item. If the item is selected, make it draw first because
              it smoothes the animation when displaying the card list */
             currentPriority += 1
-            self.renderingPriorities[indexPath.item] = currentPriority + (item.isSelected ? 10000 : 0)
+            self.renderingPriorities[indexPath.item] = currentPriority + (item.isSelected ? 100000 : 0)
             
             self.renderingQueue.async {
                 [weak self] in
@@ -102,7 +125,7 @@ class CollectionViewManager: NSObject, NSCollectionViewDataSource, NSCollectionV
                 
                 slf.browser.cardIndex = cardIndex
                 slf.browser.refresh()
-                let thumbnail = slf.createThumbnail(from: slf.browser.cgimage)
+                let thumbnail = slf.createThumbnail(from: slf.browser.buildImage())
                 slf.thumbnails[cardIndex] = thumbnail
                 let indexPathUpdated = IndexPath(item: cardIndex, section: 0)
                 let indexSet = Set<IndexPath>([indexPathUpdated])

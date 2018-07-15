@@ -7,107 +7,105 @@
 //
 
 
-private let FieldShadowShift = 3
-private let FieldShadowThickness = 2
+private let fieldShadowShift = 3
+private let fieldShadowThickness = 2
 
 private let carriageReturn = HChar(13)
 private let space = HChar(32)
 
-private let FieldLineComposition: ImageComposition = { (a: inout UInt32, b: UInt32, integerIndex: Int, y: Int) in
+/// Ints representing an gray image
+private let gray1: UInt = 0xAAAA_AAAA_AAAA_AAAA
+private let gray2: UInt = 0x5555_5555_5555_5555
+private let grays = [ Image.Integer(truncatingIfNeeded: gray1), Image.Integer(truncatingIfNeeded: gray2) ]
+
+private let fieldLineComposition: ImageComposition = { (a: inout Image.Integer, b: Image.Integer, integerIndex: Int, y: Int) in
     
-    let gray = Grays[0]
-    let inverseGray = Grays[1]
+    let gray = grays[0]
+    let inverseGray = grays[1]
     a |= (b & gray)
     a &= ~(b & inverseGray)
     
 }
 
-private let ScrollWidth = 17
-private let ScrollButtonHeight = 16
-private let ScrollKnobHeight = 16
+private let scrollWidth = 17
+private let scrollButtonHeight = 16
+private let scrollKnobHeight = 16
 
-private let ScrollUpButtonImage = MaskedImage(named: "scroll up arrow")!
-private let ScrollDownButtonImage = MaskedImage(named: "scroll down arrow")!
+private let scrollUpButtonImage = MaskedImage(named: "scroll up arrow")!
+private let scrollDownButtonImage = MaskedImage(named: "scroll down arrow")!
 
-private let ScrollUpButtonClickedImage = MaskedImage(named: "scroll up arrow clicked")!
-private let ScrollDownButtonClickedImage = MaskedImage(named: "scroll down arrow clicked")!
+private let scrollUpButtonClickedImage = MaskedImage(named: "scroll up arrow clicked")!
+private let scrollDownButtonClickedImage = MaskedImage(named: "scroll down arrow clicked")!
 
-private let ScrollPatternImage = Image(named: "scroll pattern")!
-
-private struct LineLayout {
-    var textRange: CountableRange<Int>
-    var width: Int
-    var baseLineY: Int
-    var ascent: Int
-    var descent: Int
-    var leading: Int
-    var bottom: Int
-    var initialAttributeIndex: Int
-}
+private let scrollPatternImage = Image(named: "scroll pattern")!
 
 
 
+/// The view of a field.
 public class FieldView: View, MouseResponder {
     
     private let field: Field
     
     private var richText: RichText {
-        get { return self.richTextProperty.value }
+        get { return self.richTextComputation.value }
     }
-    private let richTextProperty: Property<RichText>
+    private let richTextComputation: Computation<RichText>
     
-    private var lineLayouts: [LineLayout] {
-        get { return self.lineLayoutsProperty.value }
+    private var textLayout: TextLayout {
+        get { return self.textLayoutComputation.value }
     }
-    private let lineLayoutsProperty: Property<[LineLayout]>
+    private let textLayoutComputation: Computation<TextLayout>
     
     private var isUpArrowClicked: Bool {
         get { return self.isUpArrowClickedProperty.value }
         set { self.isUpArrowClickedProperty.value = newValue }
     }
-    private let isUpArrowClickedProperty = Property<Bool>(false)
+    private var isUpArrowClickedProperty = Property<Bool>(false)
     
     private var isDownArrowClicked: Bool {
         get { return self.isDownArrowClickedProperty.value }
         set { self.isDownArrowClickedProperty.value = newValue }
     }
-    private let isDownArrowClickedProperty = Property<Bool>(false)
+    private var isDownArrowClickedProperty = Property<Bool>(false)
     
     private var ghostKnobOffset: Int? {
         get { return self.ghostKnobOffsetProperty.value }
         set { self.ghostKnobOffsetProperty.value = newValue }
     }
-    private let ghostKnobOffsetProperty = Property<Int?>(nil)
+    private var ghostKnobOffsetProperty = Property<Int?>(nil)
     
     /// The timer sending scroll updates while the user is clicking on an scroll arrow
     private var scrollingTimer: Timer? = nil
     
-    public init(field: Field, contentProperty: Property<PartContent>, fontManager: FontManager) {
+    public init(field: Field, contentComputation: Computation<PartContent>, fontManager: FontManager) {
         
         self.field = field
         
         /* rich text */
-        self.richTextProperty = Property<RichText>(compute: {
-            return FieldView.buildRichText(from: contentProperty.value, withDefaultFontIdentifier: field.textFontIdentifier, defaultSize: field.textFontSize, defaultStyle: field.textStyle, fontManager: fontManager)
-        })
+        let richTextComputation = Computation<RichText> {
+            return FieldView.buildRichText(from: contentComputation.value, withDefaultFontIdentifier: field.textFontIdentifier, defaultSize: field.textFontSize, defaultStyle: field.textStyle, fontManager: fontManager)
+        }
+        self.richTextComputation = richTextComputation
         
         /* line layouts */
-        let richTextProperty = self.richTextProperty
-        self.lineLayoutsProperty = Property<[LineLayout]>(compute: {
-            return FieldView.layout(field: field, content: richTextProperty.value)
-        })
+        self.textLayoutComputation = Computation<TextLayout> {
+            let text = richTextComputation.value
+            let textWidth = FieldView.computeTextRectangle(of: field).width
+            let lineHeight: Int? = field.fixedLineHeight ? field.textHeight : nil
+            return TextLayout(for: text, textWidth: textWidth, alignment: field.textAlign, dontWrap: field.dontWrap, lineHeight: lineHeight)
+        }
         
         super.init()
         
         /* Listen to content change */
-        richTextProperty.dependsOn(contentProperty)
-        lineLayoutsProperty.dependsOn(richTextProperty)
+        richTextComputation.dependsOn(contentComputation.valueProperty)
+        textLayoutComputation.dependsOn(richTextComputation.valueProperty)
         
         /* Listen to visual changes */
         field.scrollProperty.startNotifications(for: self, by: {
             [unowned self] in if self.field.style == .scrolling { self.refreshNeedProperty.value = .refresh }
         })
-        richTextProperty.startNotifications(for: self, by: {
+        richTextComputation.valueProperty.startNotifications(for: self, by: {
             [unowned self] in self.refreshNeedProperty.value = (self.field.style == .transparent) ? .refreshWithNewShape : .refresh
         })
         isUpArrowClickedProperty.startNotifications(for: self, by: {
@@ -143,107 +141,6 @@ public class FieldView: View, MouseResponder {
         
     }
     
-    private static func layout(field: Field, content: RichText) -> [LineLayout] {
-        
-        /* Init the lines */
-        var lineLayouts: [LineLayout] = []
-        
-        /* Compute the layout rectangles */
-        let textRectangle = FieldView.computeTextRectangle(of: field)
-        
-        /* State */
-        var index = 0
-        var attributeIndex = 0
-        var layout = buildEmptyLayout(atIndex: index, of: content, attributeIndex: attributeIndex)
-        
-        /* Space break monitoring */
-        var layoutAfterLastSpace: LineLayout? = nil
-        var indexAfterLastSpace = 0
-        var attributeIndexAfterLastSpace = 0
-        
-        /* Loop through the characters to find the returns */
-        while index <= content.string.length {
-            
-            /* Check if we must break because of a return or because we have reached the end */
-            if (index > 0 && content.string[index-1] == carriageReturn) || index == content.string.length {
-                
-                /* Break at the current character */
-                layout.textRange = layout.textRange.lowerBound..<index
-                finalizeLayout(&layout, field: field, content: content, previousLayout: lineLayouts.last)
-                lineLayouts.append(layout)
-                
-                if index < content.string.length {
-                    /* Stay to the same character */
-                    layout = buildEmptyLayout(atIndex: index, of: content, attributeIndex: attributeIndex)
-                    layoutAfterLastSpace = nil
-                }
-                else {
-                    break
-                }
-                
-            }
-            
-            /* Get the current character */
-            let character = content.string[index]
-            let width = computeCharacterLength(atIndex: index, of: content, attributeIndex: attributeIndex)
-            
-            /* Monitor spaces (we mustn't do it if we have just break at that space) */
-            if character != space && index > 0 && content.string[index-1] == space && layout.textRange.lowerBound != index {
-                layoutAfterLastSpace = layout
-                indexAfterLastSpace = index
-                attributeIndexAfterLastSpace = attributeIndex
-            }
-            
-            /* Check if we must break because the character is going over the line */
-            if !field.dontWrap && layout.width + width > textRectangle.width && character != space && character != carriageReturn && index != layout.textRange.lowerBound {
-                
-                /* Check if we can go back to the start of the word */
-                if var l = layoutAfterLastSpace {
-                    
-                    /* Append the layout as it was after the last space */
-                    l.textRange = l.textRange.lowerBound..<indexAfterLastSpace
-                    finalizeLayout(&l, field: field, content: content, previousLayout: lineLayouts.last)
-                    lineLayouts.append(l)
-                    
-                    /* Move to last space */
-                    index = indexAfterLastSpace
-                    attributeIndex = attributeIndexAfterLastSpace
-                    layout = buildEmptyLayout(atIndex: index, of: content, attributeIndex: attributeIndex)
-                    layoutAfterLastSpace = nil
-                    continue
-                }
-                
-                /* Break at the current character */
-                layout.textRange = layout.textRange.lowerBound..<index
-                finalizeLayout(&layout, field: field, content: content, previousLayout: lineLayouts.last)
-                lineLayouts.append(layout)
-                
-                /* Stay to the same character */
-                layout = buildEmptyLayout(atIndex: index, of: content, attributeIndex: attributeIndex)
-                layoutAfterLastSpace = nil
-                continue
-                
-            }
-            
-            /* Step to the end of the character */
-            if content.attributes[attributeIndex].index == index {
-                let font = content.attributes[attributeIndex].font
-                layout.ascent = max(layout.ascent, font.maximumAscent)
-                layout.descent = max(layout.descent, font.maximumDescent)
-                layout.leading = min(layout.leading, font.leading)
-            }
-            index += 1
-            if character != carriageReturn {
-                layout.width += width
-            }
-            if index != content.string.length && attributeIndex+1 < content.attributes.count && index == content.attributes[attributeIndex+1].index {
-                attributeIndex += 1
-            }
-        }
-        
-        return lineLayouts
-    }
-    
     private static func computeContentRectangle(of field: Field) -> Rectangle {
         
         let baseRectangle = Rectangle(top: field.rectangle.top + 1,
@@ -256,14 +153,14 @@ public class FieldView: View, MouseResponder {
         case .shadow:
             return Rectangle(top: baseRectangle.top,
                              left: baseRectangle.left,
-                             bottom: baseRectangle.bottom  - FieldShadowThickness,
-                             right: baseRectangle.right - FieldShadowThickness)
+                             bottom: baseRectangle.bottom  - fieldShadowThickness,
+                             right: baseRectangle.right - fieldShadowThickness)
             
         case .scrolling:
             return Rectangle(top: baseRectangle.top,
                              left: baseRectangle.left,
                              bottom: baseRectangle.bottom,
-                             right: baseRectangle.right - ScrollWidth + 1)
+                             right: baseRectangle.right - scrollWidth + 1)
             
         default:
             return baseRectangle
@@ -284,61 +181,6 @@ public class FieldView: View, MouseResponder {
         )
     }
     
-    private static func buildEmptyLayout(atIndex index: Int, of content: RichText, attributeIndex: Int) -> LineLayout {
-        
-        let font = content.attributes[attributeIndex].font
-        
-        return LineLayout(textRange: index..<(index+1),
-                          width: 0,
-                          baseLineY: 0,
-                          ascent: font.maximumAscent,
-                          descent: font.maximumDescent,
-                          leading: font.leading,
-                          bottom: 0,
-                          initialAttributeIndex: attributeIndex)
-        
-    }
-    
-    private static func computeCharacterLength(atIndex index: Int, of content: RichText, attributeIndex: Int) -> Int {
-        
-        var string = HString(stringLiteral: " ")
-        string[0] = content.string[index]
-        
-        let font = content.attributes[attributeIndex].font
-        return font.computeSizeOfString(string)
-        
-    }
-    
-    private static func finalizeLayout(_ layout: inout LineLayout, field: Field, content: RichText, previousLayout: LineLayout?) {
-        
-        /* Get the current height of the text */
-        let textBottom: Int
-        if let lastLayout = previousLayout {
-            textBottom = lastLayout.bottom
-        }
-        else {
-            textBottom = 0
-        }
-        
-        /* Compute the vertical position of the layout */
-        if field.fixedLineHeight {
-            layout.bottom = textBottom + field.textHeight
-            layout.baseLineY = textBottom + field.textHeight - (layout.leading + layout.descent) * field.textHeight / (layout.ascent + layout.descent + layout.leading)
-        }
-        else {
-            layout.bottom = textBottom + layout.ascent + layout.descent + layout.leading
-            layout.baseLineY = textBottom + layout.ascent
-        }
-        
-        /* Trim final whitespaces */
-        var lastIndex = layout.textRange.upperBound - 1
-        while lastIndex >= layout.textRange.lowerBound && (content.string[lastIndex] == space || content.string[lastIndex] == carriageReturn) {
-            lastIndex -= 1
-        }
-        layout.textRange = layout.textRange.lowerBound..<(lastIndex + 1)
-        
-    }
-    
     override public func draw(in drawing: Drawing) {
         
         guard field.visible else {
@@ -347,17 +189,17 @@ public class FieldView: View, MouseResponder {
         
         /* Get the visual properties as they are now */
         let richText = self.richText
-        let lineLayouts = self.lineLayouts
+        let textLayout = self.textLayout
         
         /* Draw the frame */
-        drawFieldFrame(in: drawing, lineLayouts: lineLayouts)
+        drawFieldFrame(in: drawing)
         
         /* Draw the text */
-        drawText(in: drawing, content: richText, lineLayouts: lineLayouts)
+        drawText(in: drawing, content: richText, textLayout: textLayout)
         
     }
     
-    private func drawFieldFrame(in drawing: Drawing, lineLayouts: [LineLayout]) {
+    private func drawFieldFrame(in drawing: Drawing) {
         
         switch field.style {
             
@@ -368,7 +210,7 @@ public class FieldView: View, MouseResponder {
             drawing.drawBorderedRectangle(field.rectangle)
             
         case .shadow:
-            drawing.drawShadowedRectangle(field.rectangle, thickness: FieldShadowThickness, shift: FieldShadowShift)
+            drawing.drawShadowedRectangle(field.rectangle, thickness: fieldShadowThickness, shift: fieldShadowShift)
             
         case .scrolling:
             FieldView.drawScrollFrame(in: drawing, rectangle: field.rectangle, isUpArrowClicked: self.isUpArrowClicked, isDownArrowClicked: self.isDownArrowClicked)
@@ -390,9 +232,8 @@ public class FieldView: View, MouseResponder {
         
         let textRectangle = FieldView.computeTextRectangle(of: field)
         
-        let lastLineLayout = lineLayouts[lineLayouts.count-1]
         let contentHeight = field.rectangle.height - 2
-        let totalTextHeight = textRectangle.top - field.rectangle.top + lastLineLayout.bottom
+        let totalTextHeight = textRectangle.top - field.rectangle.top + self.textLayout.height
         
         return max(0, totalTextHeight - contentHeight)
         
@@ -406,27 +247,27 @@ public class FieldView: View, MouseResponder {
         /* Draw the scroll borders */
         
         /* Left scroll border */
-        drawing.drawRectangle(Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.top, width: 1, height: rectangle.height))
+        drawing.drawRectangle(Rectangle(x: rectangle.right - scrollWidth, y: rectangle.top, width: 1, height: rectangle.height))
         
         /* Don't draw the arrows if the field is too short (minus one because it is until the borders merge) */
-        guard rectangle.height >= 2 * ScrollButtonHeight - 1 else {
+        guard rectangle.height >= 2 * scrollButtonHeight - 1 else {
             return
         }
         
         /* Up arrow scroll border */
-        drawing.drawRectangle(Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.top + ScrollButtonHeight - 1, width: ScrollWidth, height: 1))
+        drawing.drawRectangle(Rectangle(x: rectangle.right - scrollWidth, y: rectangle.top + scrollButtonHeight - 1, width: scrollWidth, height: 1))
         
         /* Down arrow scroll border */
-        drawing.drawRectangle(Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.bottom - ScrollButtonHeight, width: ScrollWidth, height: 1))
+        drawing.drawRectangle(Rectangle(x: rectangle.right - scrollWidth, y: rectangle.bottom - scrollButtonHeight, width: scrollWidth, height: 1))
         
         /* Up arrow icon (draw inside the borders of the button) */
         let upArrowRectangle = computeUpArrowPosition(inFieldWithRectangle: rectangle)
-        let upArrowImage = isUpArrowClicked ? ScrollUpButtonClickedImage : ScrollUpButtonImage
+        let upArrowImage = isUpArrowClicked ? scrollUpButtonClickedImage : scrollUpButtonImage
         drawing.drawMaskedImage(upArrowImage, position: Point(x: upArrowRectangle.x + 1, y: upArrowRectangle.y + 1))
         
         /* Down arrow icon (draw inside the borders of the button) */
         let downArrowRectangle = computeDownArrowPosition(inFieldWithRectangle: rectangle)
-        let downArrowImage = isDownArrowClicked ? ScrollDownButtonClickedImage : ScrollDownButtonImage
+        let downArrowImage = isDownArrowClicked ? scrollDownButtonClickedImage : scrollDownButtonImage
         drawing.drawMaskedImage(downArrowImage, position: Point(x: downArrowRectangle.x + 1, y: downArrowRectangle.y + 1))
         
     }
@@ -434,21 +275,21 @@ public class FieldView: View, MouseResponder {
     private static func computeUpArrowPosition(inFieldWithRectangle rectangle: Rectangle) -> Rectangle {
         
         /* If the field is too short to draw the arrows, it can still be clicked */
-        guard rectangle.height >= 2 * ScrollButtonHeight else {
-            return Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.top, width: ScrollWidth, height: (rectangle.height + 1) / 2)
+        guard rectangle.height >= 2 * scrollButtonHeight else {
+            return Rectangle(x: rectangle.right - scrollWidth, y: rectangle.top, width: scrollWidth, height: (rectangle.height + 1) / 2)
         }
         
-        return Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.top, width: ScrollWidth, height: ScrollButtonHeight)
+        return Rectangle(x: rectangle.right - scrollWidth, y: rectangle.top, width: scrollWidth, height: scrollButtonHeight)
     }
     
     private static func computeDownArrowPosition(inFieldWithRectangle rectangle: Rectangle) -> Rectangle {
         
         /* If the field is too short to draw the arrows, it can still be clicked */
-        guard rectangle.height >= 2 * ScrollButtonHeight else {
-            return Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.bottom - ScrollButtonHeight, width: ScrollWidth, height: rectangle.height / 2)
+        guard rectangle.height >= 2 * scrollButtonHeight else {
+            return Rectangle(x: rectangle.right - scrollWidth, y: rectangle.bottom - scrollButtonHeight, width: scrollWidth, height: rectangle.height / 2)
         }
         
-        return Rectangle(x: rectangle.right - ScrollWidth, y: rectangle.bottom - ScrollButtonHeight, width: ScrollWidth, height: ScrollButtonHeight)
+        return Rectangle(x: rectangle.right - scrollWidth, y: rectangle.bottom - scrollButtonHeight, width: scrollWidth, height: scrollButtonHeight)
     }
     
     private static func drawActiveScroll(in drawing: Drawing, rectangle: Rectangle, scroll: Int, scrollRange: Int, ghostKnobOffset: Int?) {
@@ -460,7 +301,7 @@ public class FieldView: View, MouseResponder {
         }
         
         /* Draw the background */
-        drawing.drawPattern(ScrollPatternImage, rectangle: scrollBarRectangle, offset: Point(x: -(scrollBarRectangle.x % 2), y: 0))
+        drawing.drawPattern(scrollPatternImage, rectangle: scrollBarRectangle, offset: Point(x: -(scrollBarRectangle.x % 2), y: 0))
         
         /* Draw the knob */
         if let knobRectangle = computeKnobRectangle(forScrollBarRectangle: scrollBarRectangle, scroll: scroll, scrollRange: scrollRange) {
@@ -469,7 +310,7 @@ public class FieldView: View, MouseResponder {
         
         /* Draw the ghost knob if it exists */
         if let offset = ghostKnobOffset {
-            let ghostKnobRectangle = Rectangle(x: scrollBarRectangle.left, y: scrollBarRectangle.top + offset, width: scrollBarRectangle.width, height: ScrollKnobHeight)
+            let ghostKnobRectangle = Rectangle(x: scrollBarRectangle.left, y: scrollBarRectangle.top + offset, width: scrollBarRectangle.width, height: scrollKnobHeight)
             drawing.drawBorderedRectangle(ghostKnobRectangle, composition: Drawing.NoComposition, borderComposition: Drawing.XorComposition)
         }
         
@@ -477,123 +318,75 @@ public class FieldView: View, MouseResponder {
     
     private static func computeScrollBarRectangle(forRectangle rectangle: Rectangle) -> Rectangle {
         
-        return Rectangle(top: rectangle.top + ScrollButtonHeight, left: rectangle.right - ScrollWidth + 1, bottom: rectangle.bottom - ScrollButtonHeight, right: rectangle.right - 1)
+        return Rectangle(top: rectangle.top + scrollButtonHeight, left: rectangle.right - scrollWidth + 1, bottom: rectangle.bottom - scrollButtonHeight, right: rectangle.right - 1)
     }
     
     private static func computeKnobRectangle(forScrollBarRectangle scrollBarRectangle: Rectangle, scroll: Int, scrollRange: Int) -> Rectangle? {
         
         /* If the knob doesn't fit in the scoll bar, it is not drawn */
-        guard scrollBarRectangle.height >= ScrollKnobHeight else {
+        guard scrollBarRectangle.height >= scrollKnobHeight else {
             return nil
         }
         
         /* Compute the position of the knob */
-        let knobRange = scrollBarRectangle.height - ScrollKnobHeight
+        let knobRange = scrollBarRectangle.height - scrollKnobHeight
         let knobOffset = knobRange * scroll / scrollRange
-        return Rectangle(x: scrollBarRectangle.x, y: scrollBarRectangle.y + knobOffset, width: scrollBarRectangle.width, height: ScrollKnobHeight)
+        return Rectangle(x: scrollBarRectangle.x, y: scrollBarRectangle.y + knobOffset, width: scrollBarRectangle.width, height: scrollKnobHeight)
     }
     
-    private func drawText(in drawing: Drawing, content: RichText, lineLayouts: [LineLayout]) {
+    private func drawText(in drawing: Drawing, content: RichText, textLayout: TextLayout) {
         
         let textRectangle = FieldView.computeTextRectangle(of: field)
         let contentRectangle = FieldView.computeContentRectangle(of: field)
-        let showLines = field.showLines && field.style != .scrolling
         
         if textRectangle.width == 0 || textRectangle.height == 0  {
             return
         }
         
-        var baseLineY = 0
-        var descent = 0
-        var ascent = 0
+        /* Draw the lines if necessary */
+        let showLines = field.showLines && field.style != .scrolling
+        if showLines {
+            self.drawLines(drawing: drawing, layout: textLayout, textRectangle: textRectangle, contentRectangle: contentRectangle, scroll: field.scroll)
+        }
         
+        /* Draw the text */
+        textLayout.draw(in: drawing, at: Point(x: textRectangle.left, y: textRectangle.top - field.scroll), clipRectangle: contentRectangle)
+        
+    }
+    
+    private func drawLines(drawing: Drawing, layout: TextLayout, textRectangle: Rectangle, contentRectangle: Rectangle, scroll: Int) {
+        
+        /* Init the baseline where it should be if there is no text */
+        var baseLineY = textRectangle.top - field.scroll - field.textHeight/4
         var lineIndex = 0
         
         while true {
             
-            if lineIndex < lineLayouts.count {
-                let layout = lineLayouts[lineIndex]
-                baseLineY = textRectangle.top + layout.baseLineY - field.scroll
-                ascent = layout.ascent
-                descent = showLines ? max(layout.descent, 2) : layout.descent
-            }
-            else if showLines {
-                baseLineY += field.textHeight
-                descent = 2
-                ascent = 0
+            /* While there is text, stick to the baselines, elsewhere, continue till the bottom of the field */
+            if lineIndex < layout.lines.count {
+                let layout = layout.lines[lineIndex]
+                baseLineY = textRectangle.top + layout.origin.y - field.scroll
+                lineIndex += 1
             }
             else {
-                break
+                baseLineY += field.textHeight
             }
             
             /* Check if the lines start being visible */
-            if baseLineY + descent <= contentRectangle.top {
-                lineIndex += 1
+            guard baseLineY + 1 >= contentRectangle.top else {
                 continue
             }
             
             /* Check if the lines stop being visible */
-            if baseLineY - ascent >= contentRectangle.bottom {
+            guard baseLineY + 2 <= contentRectangle.bottom else {
                 break
             }
             
             /* Draw the line */
-            if showLines {
-                drawing.drawRectangle(Rectangle(top: baseLineY + 1, left: contentRectangle.left, bottom: baseLineY+2, right: contentRectangle.right), clipRectangle: contentRectangle, composition: FieldLineComposition)
-            }
-            
-            /* Draw the line */
-            if lineIndex < lineLayouts.count {
-                drawLine(atIndex: lineIndex, atLineBaseY: baseLineY, in: drawing, lineLayouts: lineLayouts, contentRectangle: contentRectangle, textRectangle: textRectangle, content: content)
-                lineIndex += 1
-            }
+            let lineRectangle = Rectangle(top: baseLineY + 1, left: contentRectangle.left, bottom: baseLineY+2, right: contentRectangle.right)
+            drawing.drawRectangle(lineRectangle, clipRectangle: contentRectangle, composition: fieldLineComposition)
             
         }
-        
-    }
-    
-    private func drawLine(atIndex lineIndex: Int, atLineBaseY lineY: Int, in drawing: Drawing, lineLayouts: [LineLayout], contentRectangle: Rectangle, textRectangle: Rectangle, content: RichText) {
-        
-        /* Get the layout for that line */
-        let layout = lineLayouts[lineIndex]
-        
-        /* Apply alignment */
-        let lineX = computeLineStartX(lineWidth: layout.width, textRectangle: textRectangle)
-        var point = Point(x: lineX, y: lineY)
-        
-        /* Initialize the state */
-        var characterIndex = layout.textRange.lowerBound
-        var attributeIndex = layout.initialAttributeIndex
-        
-        while characterIndex < layout.textRange.upperBound {
-            
-            /* Get the extent of the current run */
-            let runCharacterEndIndex = (attributeIndex == content.attributes.count-1) ? layout.textRange.upperBound : min(layout.textRange.upperBound,content.attributes[attributeIndex+1].index)
-            let runFont = content.attributes[attributeIndex].font
-            let runWidth = runFont.computeSizeOfString(content.string, index: characterIndex, length: runCharacterEndIndex - characterIndex)
-            
-            drawing.drawString(content.string, index: characterIndex, length: runCharacterEndIndex - characterIndex, position: point, font: runFont, clip: contentRectangle)
-            
-            characterIndex = runCharacterEndIndex
-            point.x += runWidth
-            attributeIndex += 1
-            
-        }
-        
-        
-    }
-    
-    private func computeLineStartX(lineWidth: Int, textRectangle: Rectangle) -> Int {
-        
-        switch field.textAlign {
-        case .left:
-            return textRectangle.left
-        case .center:
-            return textRectangle.left + textRectangle.width/2 - lineWidth/2
-        case .right:
-            return textRectangle.right - lineWidth
-        }
-        
     }
     
     public override var rectangle: Rectangle? {
@@ -660,7 +453,7 @@ public class FieldView: View, MouseResponder {
         }
         
         /* The position must be in the scroll area */
-        guard position.x > field.rectangle.right - ScrollWidth else {
+        guard position.x > field.rectangle.right - scrollWidth else {
             return
         }
         
@@ -691,8 +484,8 @@ public class FieldView: View, MouseResponder {
         let possibleKnobRectangle = FieldView.computeKnobRectangle(forScrollBarRectangle: scrollBarRectangle, scroll: field.scroll, scrollRange: self.scrollRange)
         if let knobRectangle = possibleKnobRectangle, knobRectangle.containsPosition(position) {
             
-            let knobOffset = knobRectangle.top - field.rectangle.top - ScrollButtonHeight
-            let knobRange = scrollBarRectangle.height - ScrollKnobHeight
+            let knobOffset = knobRectangle.top - field.rectangle.top - scrollButtonHeight
+            let knobRange = scrollBarRectangle.height - scrollKnobHeight
             self.startMovingGhostKnob(fromOffset: knobOffset, knobRange: knobRange)
             return
         }
@@ -794,7 +587,7 @@ public class FieldView: View, MouseResponder {
             
             /* Update the scroll */
             let scrollBarRectangle = FieldView.computeScrollBarRectangle(forRectangle: field.rectangle)
-            let knobRange = scrollBarRectangle.height - ScrollKnobHeight
+            let knobRange = scrollBarRectangle.height - scrollKnobHeight
             let scrollRange = self.scrollRange
             field.scroll = scrollRange * offset / knobRange
             

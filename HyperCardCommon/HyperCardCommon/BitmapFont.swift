@@ -41,7 +41,11 @@ public class BitmapFont {
     public var leading = 0
     
     /// The glyphs. The indexes range from 0 to 255
-    public var glyphs: [Glyph] = []
+    public var glyphs: [Glyph] {
+        get { return self.glyphsProperty.value }
+        set { self.glyphsProperty.value = newValue }
+    }
+    public var glyphsProperty = Property<[Glyph]>([])
     
     /// Compute the width of a string in that font, in pixels, from the origin of the first
     /// glyph to the origin of the glyph after the last glyph
@@ -57,3 +61,37 @@ public class BitmapFont {
     }
     
 }
+
+/// A glyph in a bitmap font.
+/// <p>
+/// It is a class, not a struct, so it can be lazily loaded and shared (the missing glyph in a font is
+/// always used for several characters).
+public class Glyph {
+    
+    /// The width of a character is the distance from the origin of the character to the origin of the next one.
+    public var width = 0
+    
+    ///  The offset is the position of the character bitmap relative to the character origin. Positive towards the right.
+    public var imageOffset = 0
+    
+    /// Top of image, from the baseline
+    public var imageTop = 0
+    
+    /// Width of the image
+    public var imageWidth: Int = 0
+    
+    /// Height of the image
+    public var imageHeight: Int = 0
+    
+    /// If there is an image
+    public var isThereImage: Bool = false
+    
+    /// The image of the character
+    public var image: MaskedImage? {
+        get { return imageProperty.value }
+        set { imageProperty.value = newValue }
+    }
+    public var imageProperty = Property<MaskedImage?>(nil)
+    
+}
+
