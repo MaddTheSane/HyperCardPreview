@@ -32,7 +32,7 @@ public struct StackReader {
     
     private static func readMasterRecords(in data: DataRange) -> [MasterRecord] {
         
-        let stackLength = data.readUInt32(at: 0x0)
+        let stackLength: Int = data.readUInt32(at: 0x0)
         
         /* In the "Stack Templates" stack in 2.4.1, there is a flag in the 2nd higher bit */
         let masterLength = data.readUInt32(at: stackLength) & 0x0FFF_FFFF
@@ -44,7 +44,7 @@ public struct StackReader {
     
     /// Extracts the STAK data block
     public func extractStackBlock() -> DataRange {
-        let stackLength = data.readUInt32(at: 0x0)
+        let stackLength: Int = data.readUInt32(at: 0x0)
         return DataRange(sharedData: self.data.sharedData, offset: self.data.offset, length: stackLength)
     }
     
@@ -71,19 +71,19 @@ public struct StackReader {
             }
             
             /* Check the full name */
-            let recordName = data.readUInt32(at: record.offset + 4)
+            let recordName: UInt32 = data.readUInt32(at: record.offset + 4)
             guard recordName == name.value else {
                 continue
             }
             
             /* Check the full identifier */
-            let recordIdentifier = data.readUInt32(at: record.offset + 8)
+            let recordIdentifier: Int = data.readUInt32(at: record.offset + 8)
             guard recordIdentifier == identifier else {
                 continue
             }
             
             /* Return the data range pointed by the record */
-            let recordLength = data.readUInt32(at: record.offset)
+            let recordLength: Int = data.readUInt32(at: record.offset)
             return DataRange(sharedData: data.sharedData, offset: data.offset + record.offset, length: recordLength)
         }
         

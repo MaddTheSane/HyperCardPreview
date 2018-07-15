@@ -31,7 +31,7 @@ public struct LayerBlockCommonReader: LayerBlockReader {
     }
     
     public func readBitmapIdentifier() -> Int? {
-        let value = data.readSInt32(at: 0x10 + self.computeVersionOffset())
+        let value: Int = data.readSInt32(at: 0x10 + self.computeVersionOffset())
         guard value != 0 else {
             return nil
         }
@@ -84,7 +84,7 @@ public struct LayerBlockCommonReader: LayerBlockReader {
         for _ in 0..<partCount {
             
             /* Read the size of the part block */
-            let size = data.readUInt16(at: offset)
+            let size: Int = data.readUInt16(at: offset)
             
             /* Build the part block */
             let dataRange = DataRange(sharedData: self.data.sharedData, offset: self.data.offset + offset, length: size)
@@ -112,7 +112,7 @@ public struct LayerBlockCommonReader: LayerBlockReader {
         for _ in 0..<contentCount {
             
             /* Read the identifier and size */
-            let size = data.readUInt16(at: offset + 2)
+            let size: Int = data.readUInt16(at: offset + 2)
             
             /* Build the content block */
             let dataRange = DataRange(sharedData: self.data.sharedData, offset: self.data.offset + offset, length: size + 4)

@@ -22,7 +22,7 @@ public struct MasterBlockReader {
         var entries: [MasterRecord] = []
         let blockLength = self.data.length
         for offset in stride(from: 0x20, to: blockLength, by: 4) {
-            let entryData = data.readUInt32(at: offset)
+            let entryData: Int = data.readUInt32(at: offset)
             guard entryData != 0 else {
                 continue
             }

@@ -64,7 +64,7 @@ public struct PageBlockReader {
         var references = [CardReference]()
         var offset = 0x18
         for _ in 0..<self.cardCount {
-            let identifier = data.readSInt32(at: offset)
+            let identifier: Int = data.readSInt32(at: offset)
             let marked = data.readFlag(at: offset + 4, bitOffset: 12)
             let hasTextContent = data.readFlag(at: offset + 4, bitOffset: 13)
             let isStartOfBackground = data.readFlag(at: offset + 4, bitOffset: 14)
@@ -88,7 +88,7 @@ private extension SearchHash {
         var ints = [UInt32]()
         let count = length / 4
         for i in 0..<count {
-            ints.append(UInt32(truncatingIfNeeded: data.readUInt32(at: i*4)))
+            ints.append(data.readUInt32(at: i*4))
         }
         self.init(ints: ints, valueCount: valueCount)
     }

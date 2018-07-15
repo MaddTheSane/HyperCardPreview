@@ -49,7 +49,7 @@ public struct ResourceRepositoryReader {
     public func extractResourceData(at dataOffset: Int) -> DataRange {
         
         let offset = dataOffset + self.dataOffset
-        let length = data.readUInt32(at: offset)
+        let length: Int = data.readUInt32(at: offset)
         return DataRange(sharedData: self.data.sharedData, offset: self.data.offset + offset + 4, length: length)
     }
     

@@ -86,8 +86,8 @@ public struct ListBlockReader {
         var references = [PageReference]()
         var offset = 0x30
         for _ in 0..<count {
-            let identifier = data.readSInt32(at: offset)
-            let cardCount = data.readUInt16(at: offset + 4)
+            let identifier: Int = data.readSInt32(at: offset)
+            let cardCount: Int = data.readUInt16(at: offset + 4)
             references.append(PageReference(identifier: identifier, cardCount: cardCount))
             offset += 6
         }

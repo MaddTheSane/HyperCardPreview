@@ -28,7 +28,7 @@ public struct ResourceMapReader {
     
     /// Number of resource types in the map
     public func readTypeCount() -> Int {
-        let countMinusOne = data.readSInt16(at: 0x1C)
+        let countMinusOne: Int = data.readSInt16(at: 0x1C)
         return countMinusOne + 1
     }
     
@@ -48,9 +48,9 @@ public struct ResourceMapReader {
         for _ in 0..<typeCount {
             
             /* Read the type */
-            let type = data.readUInt32(at: typeOffset)
-            let referenceCountMinusOne = data.readUInt16(at: typeOffset+0x4)
-            let referenceListOffset = data.readUInt16(at: typeOffset+0x6)
+            let type: UInt32 = data.readUInt32(at: typeOffset)
+            let referenceCountMinusOne: Int = data.readUInt16(at: typeOffset+0x4)
+            let referenceListOffset: Int = data.readUInt16(at: typeOffset+0x6)
             
             /* Define the offset in the reference list, to read the references for this type */
             var referenceOffset = referenceListOffset + ResourceMapReader.headerLength - 2
@@ -59,9 +59,9 @@ public struct ResourceMapReader {
             for _ in 0...referenceCountMinusOne {
                 
                 /* Read the reference */
-                let identifier = data.readSInt16(at: referenceOffset)
-                let nameOffsetInList = data.readSInt16(at: referenceOffset + 0x2)
-                let dataOffsetWithFlags = data.readUInt32(at: referenceOffset + 0x4)
+                let identifier: Int = data.readSInt16(at: referenceOffset)
+                let nameOffsetInList: Int = data.readSInt16(at: referenceOffset + 0x2)
+                let dataOffsetWithFlags: Int = data.readUInt32(at: referenceOffset + 0x4)
                 let dataOffset = dataOffsetWithFlags & 0xFF_FFFF
                 
                 /* Read the name */
@@ -90,7 +90,7 @@ public struct ResourceMapReader {
         let offset = nameListOffset + nameOffsetInList
         
         /* Read the length */
-        let length = data.readUInt8(at: offset)
+        let length: Int = data.readUInt8(at: offset)
         
         /* Read the string */
         return data.readString(at: offset+1, length: length)

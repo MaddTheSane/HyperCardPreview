@@ -39,7 +39,7 @@ public struct StackBlockDecrypter {
         let passwordHash = hashPassword(firstHashString)
         
         /* The decoded header, if correct, contains the password hash */
-        let decodedPasswordHash = decodedData.readUInt32(at: 0x2C)
+        let decodedPasswordHash: Int = decodedData.readUInt32(at: 0x2C)
         guard passwordHash == decodedPasswordHash else {
             return nil
         }
@@ -120,6 +120,16 @@ public struct StackBlockDecrypter {
         return result
     }
     
+    private func hashNumber(_ x: UInt32) -> UInt32 {
+        
+        /* This function replicates the Random function of old Mac OS. It was used to make hashes. */
+        var result = x * 0x41A7
+        result += result >> 31
+        result &= 0x7fff_ffff
+        return result
+    }
+
+    
     private func convertIntegerTo4CharString(_ x: Int) -> HString {
         
         /* Init a 4-char string */
@@ -168,14 +178,14 @@ public struct StackBlockDecrypter {
         
     }
     
-    private func hackFirstXor() -> Int? {
+    private func hackFirstXor() -> UInt32? {
         
         /* Get the first XORed integer */
-        let xoredInteger = self.stackBlockData.readUInt32(at: 0x18)
+        let xoredInteger: UInt32 = self.stackBlockData.readUInt32(at: 0x18)
         
         /* The initial value of the integer is the STAK size. XOR it with the STAK size so we have
          the value used to XOR the integer */
-        let stackBlockSize = self.stackBlockData.readUInt32(at: 0x0)
+        let stackBlockSize: UInt32 = self.stackBlockData.readUInt32(at: 0x0)
         let xor = xoredInteger ^ stackBlockSize
         
         /* The XOR is equal to a result x = x ^ (hashNumber(x) >> 16). We have to find x. As the
@@ -183,7 +193,7 @@ public struct StackBlockDecrypter {
          are the first 16 bits of x. We have to try all possibilities for the last 16 bits. */
         let first16Bits = xor & 0xFFFF_0000
         
-        for i in 0..<Int(UInt16.max) {
+        for i in 0..<UInt32(UInt16.max) {
             
             /* Build x */
             let value = first16Bits | i
@@ -214,10 +224,30 @@ public struct StackBlockDecrypter {
         }
         
         /* Check the user level */
-        let xoredUserLevel = self.stackBlockData.readUInt16(at: 0x48)
-        let userLevel = xoredUserLevel ^ (hash & 0xFFFF)
+        let xoredUserLevel: UInt16 = self.stackBlockData.readUInt16(at: 0x48)
+        let userLevel = Int(xoredUserLevel) ^ (hash & 0xFFFF)
         
         return (userLevel >= 0 && userLevel <= 5)
     }
+    
+    private func isFirstXorGood(_ value: UInt32) -> Bool {
+        
+        /* We have to check one field in the decrypted header to see if it is "expected". The
+         most restricted value in the decrypted header is the userLevel. */
+        
+        var hash = value
+        
+        /* Apply the hash as many times as it would be applied for a decryption of the user level */
+        for _ in 0..<23 {
+            hash = hashNumber(hash)
+        }
+        
+        /* Check the user level */
+        let xoredUserLevel: UInt16 = self.stackBlockData.readUInt16(at: 0x48)
+        let userLevel = UInt32(xoredUserLevel) ^ (hash & 0xFFFF)
+        
+        return (userLevel >= 0 && userLevel <= 5)
+    }
+
     
 }

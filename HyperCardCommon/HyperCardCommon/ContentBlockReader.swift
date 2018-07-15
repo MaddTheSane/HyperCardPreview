@@ -26,13 +26,13 @@ public struct ContentBlockReader {
     
     /// The identifier of the part
     public func readIdentifier() -> Int {
-        let storedIdentifier = data.readSInt16(at: 0)
+        let storedIdentifier: Int = data.readSInt16(at: 0)
         return abs(storedIdentifier)
     }
     
     /// Whether the part is in the background or the card
     public func readLayerType() -> LayerType {
-        let storedIdentifier = data.readSInt16(at: 0)
+        let storedIdentifier: Int = data.readSInt16(at: 0)
         return (storedIdentifier < 0) ? .card : .background
     }
     
@@ -45,14 +45,14 @@ public struct ContentBlockReader {
         }
         
         /* Check if we're a raw string or a formatted text */
-        let plainTextMarker = data.readUInt8(at: 4)
+        let plainTextMarker: Int = data.readUInt8(at: 4)
         
         /* Plain text */
         if plainTextMarker == 0 {
             return data.readString(at: 5, length:data.length - 5)
         }
         else {
-            let formattingLengthValue = data.readUInt16(at: 4)
+            let formattingLengthValue: Int = data.readUInt16(at: 4)
             let formattingLength = formattingLengthValue - 0x8000
             let stringOffset = 4 + formattingLength
             return data.readString(at: stringOffset, length:data.length - 4 - formattingLength)
@@ -68,20 +68,20 @@ public struct ContentBlockReader {
         }
         
         /* Check if we're a raw string or a formatted text */
-        let plainTextMarker = data.readUInt8(at: 4)
+        let plainTextMarker: Int = data.readUInt8(at: 4)
         guard plainTextMarker != 0 else {
             return nil
         }
         
         /* Plain text */
         var changes: [IndexedTextFormatting] = []
-        let formattingLengthValue = data.readUInt16(at: 4)
+        let formattingLengthValue: Int = data.readUInt16(at: 4)
         let formattingLength = formattingLengthValue ^ 0x8000
         let formattingCount = (formattingLength - 2) / 4
         var offset = 6
         for _ in 0..<formattingCount {
-            let changeOffset = data.readUInt16(at: offset)
-            let styleIdentifier = data.readUInt16(at: offset + 2)
+            let changeOffset: Int = data.readUInt16(at: offset)
+            let styleIdentifier: Int = data.readUInt16(at: offset + 2)
             changes.append(IndexedTextFormatting(offset: changeOffset, styleIdentifier: styleIdentifier))
             offset += 4
         }
