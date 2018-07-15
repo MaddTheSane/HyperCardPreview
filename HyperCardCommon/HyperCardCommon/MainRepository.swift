@@ -95,7 +95,7 @@ private func listIconIdentifiers() -> [Int] {
 private func loadIcon(withIdentifier identifier: Int) -> Icon {
     
     /* Load the icon */
-    let iconName = IconFilePrefix + identifier.description
+    let iconName = "\(IconPath)/\(identifier)"
     if let maskedImage = MaskedImage(named: iconName) {
         if case MaskedImage.Layer.bitmap(let image, _, _) = maskedImage.image {
             return Icon(image: image)

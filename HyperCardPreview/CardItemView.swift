@@ -71,11 +71,11 @@ class CardItemView: NSView {
         titleLayer.autoresizingMask = [.layerWidthSizable, .layerMaxYMargin]
         
         /* Give the title an appearance */
-        titleLayer.alignmentMode = kCAAlignmentCenter
+        titleLayer.alignmentMode = .center
         titleLayer.font = NSFont.systemFont(ofSize: 10.0)
         titleLayer.fontSize = 10.0
         titleLayer.foregroundColor = CGColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 1.0)
-        titleLayer.truncationMode = kCATruncationEnd
+        titleLayer.truncationMode = .end
         
     }
     
@@ -196,3 +196,23 @@ class CardItemView: NSView {
     
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToCATextLayerAlignmentMode(_ input: String) -> CATextLayerAlignmentMode {
+	return CATextLayerAlignmentMode(rawValue: input)
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromCATextLayerAlignmentMode(_ input: CATextLayerAlignmentMode) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToCATextLayerTruncationMode(_ input: String) -> CATextLayerTruncationMode {
+	return CATextLayerTruncationMode(rawValue: input)
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromCATextLayerTruncationMode(_ input: CATextLayerTruncationMode) -> String {
+	return input.rawValue
+}

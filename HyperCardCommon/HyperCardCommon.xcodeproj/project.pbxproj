@@ -774,7 +774,7 @@
 					6C9E6A8A1E75BCCD00BBF925 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 4635GNGBF8;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					6CB025441F4ED75700B57D87 = {
@@ -1124,7 +1124,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = fr.pierrelorenzi.HyperCardCommon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -1145,7 +1145,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = fr.pierrelorenzi.HyperCardCommon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
