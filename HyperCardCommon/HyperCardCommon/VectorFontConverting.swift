@@ -58,7 +58,7 @@ public extension BitmapFont {
         }
         
         /* Get the font sizes present in the table */
-        let data = cfdata as NSData as Data
+        let data = cfdata as Data
         let header = HdmxTableReader.readHeader(inData: data)
         let fontSizes = HdmxTableReader.listFontSizes(recordCount: header.recordCount, recordSize: header.recordSize, inData: data)
         

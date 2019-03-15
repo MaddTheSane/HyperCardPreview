@@ -18,7 +18,7 @@
 				<string>com.apple.hypercard.stack</string>
 			</array>
 			<key>LSTypeIsPackage</key>
-			<integer>0</integer>
+			<false/>
 			<key>NSDocumentClass</key>
 			<string>$(PRODUCT_MODULE_NAME).Document</string>
 		</dict>

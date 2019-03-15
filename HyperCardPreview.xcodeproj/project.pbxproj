@@ -23,8 +23,6 @@
 		6C3FF056215CEC6300BCEC81 /* ExportAccessoryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C3FF055215CEC6300BCEC81 /* ExportAccessoryView.xib */; };
 		6C3FF05A215CEF0200BCEC81 /* ImageExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3FF059215CEF0200BCEC81 /* ImageExporter.swift */; };
 		6C3FF05C215CF73400BCEC81 /* ExportProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6C3FF05B215CF73400BCEC81 /* ExportProgress.xib */; };
-		6C4FE2571E75849700E2BF12 /* Stack.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6C4FE2561E75849700E2BF12 /* Stack.icns */; };
-		6C4FE2671E75A4CE00E2BF12 /* Application.icns in Resources */ = {isa = PBXBuildFile; fileRef = 6C4FE2661E75A4CE00E2BF12 /* Application.icns */; };
 		6C6064031F5B14CC00988560 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6064021F5B14CC00988560 /* CollectionView.swift */; };
 		6C9E6D401E75C02700BBF925 /* HyperCardCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C9E6A9B1E75BCCE00BBF925 /* HyperCardCommon.framework */; };
 		6CA554A61F602852005914E2 /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6CA554A51F602852005914E2 /* Help.xib */; };
@@ -317,8 +315,6 @@
 				6CCFE626215E3D14000ED882 /* ResourceImageWindow.xib in Resources */,
 				6CCFE62C215E41FE000ED882 /* ResourceBinaryWindow.xib in Resources */,
 				6CB8B98D1F4B16BC0070116D /* CardItem.xib in Resources */,
-				6C4FE2671E75A4CE00E2BF12 /* Application.icns in Resources */,
-				6C4FE2571E75849700E2BF12 /* Stack.icns in Resources */,
 				6C2E0621215E61830071DE26 /* EmptySound.wav in Resources */,
 				6C26B8D01E6D7520006C314B /* MainMenu.xib in Resources */,
 				554760771F78493C00C867C6 /* InfoPlist.strings in Resources */,
@@ -491,7 +487,7 @@
 		6C26B8D51E6D7520006C314B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Application;
 				CODE_SIGN_ENTITLEMENTS = HyperCardPreview/HyperCardPreview.entitlements;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
@@ -510,7 +506,7 @@
 		6C26B8D61E6D7520006C314B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Application;
 				CODE_SIGN_ENTITLEMENTS = HyperCardPreview/HyperCardPreview.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
