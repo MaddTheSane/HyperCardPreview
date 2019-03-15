@@ -133,7 +133,7 @@ public enum UserLevel: Int {
 }
 
 /// All the variants that can be applied to a font
-public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
+public struct TextStyle: Equatable, CustomStringConvertible, OptionSet, Hashable {
     public var rawValue: UInt8
     public init(rawValue: UInt8) {
         self.rawValue = rawValue
@@ -178,7 +178,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
     public static var group: TextStyle {
         return TextStyle(rawValue: 1 << 7)
     }
-    
+	
     /// Characters are drawn thicker
     public var bold: Bool {
         get {
@@ -192,7 +192,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// Characters are drawn slanted
     public var italic: Bool {
         get {
@@ -206,7 +206,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// Characters are drawn with an under-line
     public var underline: Bool {
         get {
@@ -220,7 +220,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// The borders of the characters are drawn in black and the interiors in white
     public var outline: Bool {
         get {
@@ -234,7 +234,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// Characters are drawn outlined and with a shadow
     public var shadow: Bool {
         get {
@@ -248,7 +248,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// Characters are drawn closer to each other
     public var condense: Bool {
         get {
@@ -262,7 +262,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// Characters are drawn further from each other
     public var extend: Bool {
         get {
@@ -276,7 +276,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     /// Specific HyperCard type used to mark the hyperlinks
     public var group: Bool {
         get {
@@ -290,7 +290,7 @@ public struct TextStyle: Equatable, CustomStringConvertible, OptionSet {
             }
         }
     }
-    
+	
     public init(bold: Bool = false, italic: Bool = false, underline: Bool = false, outline: Bool = false, shadow: Bool = false, condense: Bool = false, extend: Bool = false, group: Bool = false) {
         rawValue = 0
         self.bold = bold
@@ -345,6 +345,19 @@ public extension TextStyle {
     public init(flags: UInt8) {
         self.init(rawValue: flags)
         
+    }
+    
+    /// Init a text style from a 8 bit flag
+    public init(flags: Int) {
+		rawValue = 0
+        bold = (flags & (1 << 0)) != 0
+        italic = (flags & (1 << 1)) != 0
+        underline = (flags & (1 << 2)) != 0
+        outline = (flags & (1 << 3)) != 0
+        shadow = (flags & (1 << 4)) != 0
+        condense = (flags & (1 << 5)) != 0
+        extend = (flags & (1 << 6)) != 0
+        group = (flags & (1 << 7)) != 0
     }
     
 }
