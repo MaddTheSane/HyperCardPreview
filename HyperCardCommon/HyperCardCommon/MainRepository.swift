@@ -140,14 +140,11 @@ private func loadClassicFontResources() -> ResourceRepository {
 private func loadClassicFontResources(withName name: String) -> ResourceRepository? {
     
     /* Get the path to file */
-    guard let path = HyperCardBundle.path(forResource: name, ofType: "dfont") else {
+    guard let data = NSDataAsset(name: name, bundle: HyperCardBundle)?.data else {
         return nil
     }
     
-    /* Load the file */
-    let file = ClassicFile(path: path)
-    
-    return ResourceRepository(loadFromData: file.dataFork!)
+    return ResourceRepository(loadFromData: data)
     
 }
 
