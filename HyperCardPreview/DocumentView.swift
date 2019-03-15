@@ -51,28 +51,28 @@ class DocumentView: NSView, NSMenuDelegate {
             }
             
             /* Page Down */
-            if character == NSPageDownFunctionKey {
+            if character == NSEvent.SpecialKey.pageDown.rawValue {
                 
                 document.goToNextPage(self)
                 return
             }
             
             /* Page Up */
-            if character == NSPageUpFunctionKey {
+            if character == NSEvent.SpecialKey.pageUp.rawValue {
                 
                 document.goToPreviousPage(self)
                 return
             }
             
             /* Begin */
-            if character == NSBeginFunctionKey || character == NSHomeFunctionKey {
+            if character == NSEvent.SpecialKey.begin.rawValue || character == NSEvent.SpecialKey.home.rawValue {
                 
                 document.goToFirstPage(self)
                 return
             }
             
             /* End */
-            if character == NSEndFunctionKey {
+            if character == NSEvent.SpecialKey.end.rawValue {
                 
                 document.goToLastPage(self)
                 return
@@ -94,9 +94,9 @@ class DocumentView: NSView, NSMenuDelegate {
             let character = Int(characters.utf16[String.UTF16View.Index(encodedOffset: 0)])
             
             switch character {
-            case NSRightArrowFunctionKey:
+            case NSEvent.SpecialKey.rightArrow.rawValue:
                 NSApp.sendAction(#selector(Document.goToNextPage), to: nil, from: nil)
-            case NSLeftArrowFunctionKey:
+            case NSEvent.SpecialKey.leftArrow.rawValue:
                 NSApp.sendAction(#selector(Document.goToPreviousPage), to: nil, from: nil)
             default:
                 break;
@@ -144,6 +144,13 @@ class DocumentView: NSView, NSMenuDelegate {
     var mouseDownResponder: MouseResponder? = nil
     
     override func mouseDown(with event: NSEvent) {
+        
+        /* If the user hold the control key, act like for a right click */
+        guard !event.modifierFlags.contains(NSEvent.ModifierFlags.control) else {
+            
+            self.handleRightClick(with: event)
+            return
+        }
         
         /* Find the stack part responding to the event */
         let browserPosition = extractPosition(from: event)
@@ -232,7 +239,12 @@ class DocumentView: NSView, NSMenuDelegate {
         let number: Int
     }
     
-    override func rightMouseUp(with event: NSEvent) {
+    override func rightMouseDown(with event: NSEvent) {
+        
+        self.handleRightClick(with: event)
+    }
+    
+    private func handleRightClick(with event: NSEvent) {
         
         /* List the parts where the mouse clicks */
         let position = extractPosition(from: event)
@@ -245,7 +257,6 @@ class DocumentView: NSView, NSMenuDelegate {
         let menu = buildContextualMenu(forParts: partsAtClickPosition)
         menu.delegate = self
         NSMenu.popUpContextMenu(menu, with: event, for: self)
-        
     }
     
     private func listParts(atPoint point: Point) -> [PartInMenu] {

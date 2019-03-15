@@ -16,8 +16,7 @@ import QuickLook
 class Document: NSDocument, NSAnimationDelegate {
     
     var browser: Browser!
-    
-    var panels: [InfoPanelController] = []
+    var resourceFork: Data?
     
     @IBOutlet weak var view: DocumentView!
     
@@ -26,9 +25,10 @@ class Document: NSDocument, NSAnimationDelegate {
     @IBOutlet weak var imageView: NSImageView!
     
     private var collectionViewManager: CollectionViewManager? = nil
+    private var resourceController: ResourceController? = nil
     
     override var windowNibName: NSNib.Name? {
-        return NSNib.Name("Document")
+        return "Document"
     }
     
     override func read(from url: URL, ofType typeName: String) throws {
@@ -42,6 +42,7 @@ class Document: NSDocument, NSAnimationDelegate {
             let file = ClassicFile(path: path)
             let hyperCardFile = try HyperCardFile(file: file, password: password)
             self.browser = Browser(hyperCardFile: hyperCardFile)
+            self.resourceFork = file.resourceFork
         }
         catch OpeningError.notStack {
             
@@ -114,6 +115,8 @@ class Document: NSDocument, NSAnimationDelegate {
     override func windowControllerDidLoadNib(_ windowController: NSWindowController) {
         super.windowControllerDidLoadNib(windowController)
         
+        windowController.shouldCloseDocument = true
+        
         let window = self.windowControllers[0].window!
         let currentFrame = window.frame
         let newFrame = window.frameRect(forContentRect: NSMakeRect(currentFrame.origin.x, currentFrame.origin.y, CGFloat(browser.stack.size.width), CGFloat(browser.stack.size.height)))
@@ -144,7 +147,12 @@ class Document: NSDocument, NSAnimationDelegate {
         })
         
         view.document = self
-        collectionView.document = self
+        collectionView.mainAction =  {
+            [unowned self] in
+            
+            /* Display the selected card */
+            self.warnCardWasSelected(atIndex: self.collectionView.selectionIndexPaths.first!.item)
+        }
         
         goToCard(at: 0, transition: .none)
     }
@@ -630,11 +638,95 @@ class Document: NSDocument, NSAnimationDelegate {
     func displayInfo() -> InfoPanelController {
         removeScriptBorders()
         
-        let controller = InfoPanelController()
-        Bundle.main.loadNibNamed(NSNib.Name("InfoPanel"), owner: controller, topLevelObjects: nil)
+        let controller = InfoPanelController(windowNibName: "InfoPanel")
+        _ = controller.window // Load the nib
         controller.setup()
-        controller.window.makeKeyAndOrderFront(nil)
-        panels.append(controller)
+        controller.showWindow(nil)
+        self.addWindowController(controller)
+        return controller
+    }
+    
+    @objc func exportStackAsText(_ sender: AnyObject) {
+        
+        /* Choose a file */
+        let savePanel = NSSavePanel()
+        savePanel.title = "Export stack"
+        savePanel.message = "Export to JSON (learn about it in the ReadMe):"
+        savePanel.isExtensionHidden = false
+        savePanel.allowedFileTypes = ["public.json"]
+        savePanel.allowsOtherFileTypes = false
+        savePanel.nameFieldStringValue = "\(self.fileURL!.lastPathComponent).json"
+        
+        savePanel.begin { (response: NSApplication.ModalResponse) in
+            
+            /* Check the user clicked "OK" */
+            guard response == NSApplication.ModalResponse.OK else {
+                return
+            }
+            
+            /* Get the requested url */
+            guard let url = savePanel.url else {
+                return
+            }
+            
+            /* Prepare the JSON encoder */
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            encoder.keyEncodingStrategy = JSONEncoder.KeyEncodingStrategy.convertToSnakeCase
+            
+            do {
+                
+                /* Export to JSON */
+                let data = try encoder.encode(self.browser.stack)
+                try data.write(to: url)
+            }
+            catch let error {
+                
+                /* Show the alert to the user */
+                let alert = NSAlert(error: error)
+                alert.messageText = "Can't export stack as text"
+                alert.runModal()
+            }
+        }
+    }
+    
+    @objc func exportCardImages(_ sender: AnyObject) {
+        
+        ImageExporter.export(stack: self.browser.stack, layerType: LayerType.card)
+    }
+    
+    @objc func exportBackgroundImages(_ sender: AnyObject) {
+        
+        ImageExporter.export(stack: self.browser.stack, layerType: LayerType.background)
+    }
+    
+    @objc func displayResources(_ sender: AnyObject) {
+        
+        /* Get the controller */
+        let controller: ResourceController
+        if let existingController = self.resourceController {
+            controller = existingController
+        }
+        else {
+            controller = self.buildResourceController()
+            self.resourceController = controller
+        }
+        
+        /* Display the window */
+        controller.showWindow(nil)
+        
+        /* Append the window to the document hierarchy if necessary */
+        if controller.document == nil {
+            self.addWindowController(controller)
+        }
+    }
+    
+    private func buildResourceController() -> ResourceController {
+        
+        let controller = ResourceController(windowNibName: "ResourceWindow")
+        _ = controller.window // Load the nib
+        controller.setup(resourceFork: self.resourceFork)
+        
         return controller
     }
     

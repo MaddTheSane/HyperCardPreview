@@ -56,12 +56,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if helpPanel == nil {
             
             /* Load the nib */
-            let nib = NSNib(nibNamed: NSNib.Name("Help"), bundle: nil)
+            let nib = NSNib(nibNamed: "Help", bundle: nil)
             nib!.instantiate(withOwner: self, topLevelObjects: nil)
-            
-            /* Load the HTML content into the WebView */
-            let helpUrl = Bundle.main.url(forResource: "Shortcuts", withExtension: "html")
-            self.helpView.loadFileURL(helpUrl!, allowingReadAccessTo: helpUrl!)
         }
         
         /* Open the panel */
