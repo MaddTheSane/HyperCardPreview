@@ -97,7 +97,7 @@ class ResourceController: NSWindowController, NSCollectionViewDataSource, NSColl
              out of a snd resource. It is the fastest way I've found to play an old sound. */
             
             /* There are two format of sdn resources, the data is not in the same place */
-            let format = data.readUInt16(at: 0x0)
+            let format: UInt16 = data.readUInt16(at: 0x0)
             let commandOffset: Int
             switch format {
             case 1:
@@ -114,7 +114,7 @@ class ResourceController: NSWindowController, NSCollectionViewDataSource, NSColl
             }
             
             /* Get the offset of the sampled sound */
-            let soundOffset = data.readUInt32(at: commandOffset + 0x4)
+            let soundOffset: Int = data.readUInt32(at: commandOffset + 0x4)
             
             /* Check that the sampled sound is in the data */
             guard data.readUInt32(at: soundOffset + 0x0) == 0 else {
@@ -122,8 +122,8 @@ class ResourceController: NSWindowController, NSCollectionViewDataSource, NSColl
             }
             
             /* Read the header of the sampled sound, which contain the parameters */
-            let byteCount = data.readUInt32(at: soundOffset + 0x4)
-            let sampleRateValue = data.readUInt32(at: soundOffset + 0x8)
+            let byteCount: Int = data.readUInt32(at: soundOffset + 0x4)
+            let sampleRateValue: UInt32 = data.readUInt32(at: soundOffset + 0x8)
             let sampleRate = Double(sampleRateValue) / 65536.0
             guard data.readUInt8(at: soundOffset + 0x14) == 0 else {
                 return nil
