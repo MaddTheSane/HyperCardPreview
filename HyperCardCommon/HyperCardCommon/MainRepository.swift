@@ -139,12 +139,22 @@ private func loadClassicFontResources() -> ResourceRepository {
 
 private func loadClassicFontResources(withName name: String) -> ResourceRepository? {
     
+    /* Get the Xcode asset data */
+    if let data = NSDataAsset(name: name, bundle: HyperCardBundle)?.data,
+        data.count > 0 {
+        return ResourceRepository(loadFromData: data)
+    }
+    
+    /* Fallback */
     /* Get the path to file */
-    guard let data = NSDataAsset(name: name, bundle: HyperCardBundle)?.data else {
+    guard let path = HyperCardBundle.path(forResource: name, ofType: "dfont") else {
         return nil
     }
     
-    return ResourceRepository(loadFromData: data)
+    /* Load the file */
+    let file = ClassicFile(path: path)
+    
+    return ResourceRepository(loadFromData: file.dataFork!)
     
 }
 
