@@ -60,7 +60,7 @@ public extension ClassicFile {
             return nil
         }
         
-        return data as Data
+        return data
     }
     
     private static func loadDataFork(_ path: String) -> Data? {
