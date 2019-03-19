@@ -32,8 +32,7 @@ public extension BitmapFont {
         /* Glyphs */
         var glyphs = [Glyph]()
         
-        for i in 0..<256 {
-            let unicodeCharacter = UnicharMacOSRoman[i]
+        for unicodeCharacter in UnicharMacOSRoman {
             let singletonCharacter = [unicodeCharacter]
             var vectorGlyphSingleton: [CGGlyph] = [CGGlyph(0)]
             let result = CTFontGetGlyphsForCharacters(vectorFont, singletonCharacter, &vectorGlyphSingleton, 1)
@@ -53,12 +52,11 @@ public extension BitmapFont {
     private func findIntegerWidths(inVectorFont vectorFont: CTFont) -> HdmxTableRecord? {
         
         /* Get the integer width table */
-        guard let cfdata = CTFontCopyTable(vectorFont, CTFontTableTag(kCTFontTableHdmx), CTFontTableOptions(rawValue: 0)) else {
+        guard let data = CTFontCopyTable(vectorFont, CTFontTableTag(kCTFontTableHdmx), CTFontTableOptions(rawValue: 0)) as Data? else {
             return nil
         }
         
         /* Get the font sizes present in the table */
-        let data = cfdata as Data
         let header = HdmxTableReader.readHeader(inData: data)
         let fontSizes = HdmxTableReader.listFontSizes(recordCount: header.recordCount, recordSize: header.recordSize, inData: data)
         
@@ -114,7 +112,7 @@ private extension Glyph {
         
         /* Draw the glyph */
         var glyphs = [vectorGlyph]
-        var positions = [CGPoint(x: Double(-self.imageOffset), y: Double(self.imageHeight-self.imageTop))]
+        var positions = [CGPoint(x: CGFloat(-self.imageOffset), y: CGFloat(self.imageHeight-self.imageTop))]
         CTFontDrawGlyphs(vectorFont, &glyphs, &positions, 1, context)
         
         /* Convert the image to 1-bit */

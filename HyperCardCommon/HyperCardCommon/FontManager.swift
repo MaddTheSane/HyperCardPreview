@@ -148,7 +148,7 @@ public class FontManager {
 
 
 
-private struct FontDescriptor: Equatable, Hashable {
+private struct FontDescriptor: Hashable {
     public var identifier: Int
     public var size: Int
     public var style: TextStyle
@@ -157,16 +157,6 @@ private struct FontDescriptor: Equatable, Hashable {
         self.identifier = identifier
         self.size = size
         self.style = style
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        identifier.hash(into: &hasher)
-        size.hash(into: &hasher)
-        style.hash(into: &hasher)
-    }
-    
-    public static func ==(f1: FontDescriptor, f2: FontDescriptor) -> Bool {
-        return f1.identifier == f2.identifier && f1.size == f2.size && f1.style == f2.style
     }
 }
 
