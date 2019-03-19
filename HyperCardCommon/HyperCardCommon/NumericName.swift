@@ -8,7 +8,7 @@
 
 
 /// A 4-byte identifier, printed as a 4-char string. It was commonly used in old Mac OS.
-public struct NumericName: Equatable, CustomStringConvertible {
+public struct NumericName: Hashable, CustomStringConvertible {
     public let value: OSType
     
     public init(value: OSType) {
@@ -29,6 +29,10 @@ public struct NumericName: Equatable, CustomStringConvertible {
     
     public static func ==(i1: NumericName, i2: NumericName) -> Bool {
         return i1.value == i2.value
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        value.hash(into: &hasher)
     }
 
 }
