@@ -93,14 +93,14 @@ public struct DataRange {
 public extension DataRange {
     
     /// Reads a bit inside a big-endian 2-byte integer in the pointed data
-    public func readFlag(at offset: Int, bitOffset: UInt16) -> Bool {
+    func readFlag(at offset: Int, bitOffset: Int) -> Bool {
         
         let flags: UInt16 = readUInt16(at: offset)
         return (flags & (1 << bitOffset)) != 0
     }
     
     /// Reads a 2D rectangle in the pointed data
-    public func readRectangle(at offset: Int) -> Rectangle {
+    func readRectangle(at offset: Int) -> Rectangle {
         /* Sometimes a flag is added to top bit, so remove it */
         let top = self.readCoordinate(at: offset)
         let left = self.readCoordinate(at: offset + 2)
@@ -129,12 +129,12 @@ public extension DataRange {
     }
     
     /// Reads a null-terminated Mac OS Roman string in the pointed data
-    public func readString(at offset: Int) -> HString {
+    func readString(at offset: Int) -> HString {
         return HString(copyNullTerminatedFrom: sharedData, at: self.offset + offset)
     }
     
     /// Reads a Mac OS Roman string in the pointed data
-    public func readString(at offset: Int, length: Int) -> HString {
+    func readString(at offset: Int, length: Int) -> HString {
         return HString(copyFrom: sharedData, at: self.offset + offset, length: length)
     }
     
@@ -143,7 +143,7 @@ public extension DataRange {
 public extension Data {
     
     /// Reads a unsigned byte
-    public func readUInt8(at offset: Int) -> Int {
+    func readUInt8(at offset: Int) -> Int {
         let value: UInt8 = readUInt8(at: offset)
         return Int(value)
     }
@@ -160,13 +160,13 @@ public extension Data {
     }
     
     /// Reads a signed byte
-    public func readSInt8(at offset: Int) -> Int {
+    func readSInt8(at offset: Int) -> Int {
         let value: Int8 = readSInt8(at: offset)
         return Int(value)
     }
     
     /// Reads a big-endian unsigned 2-byte integer
-    public func readUInt16(at offset: Int) -> Int {
+    func readUInt16(at offset: Int) -> Int {
         let value: UInt16 = readUInt16(at: offset)
         return Int(value)
     }
@@ -177,7 +177,7 @@ public extension Data {
     }
     
     /// Reads a big-endian signed 2-byte integer
-    public func readSInt16(at offset: Int) -> Int {
+    func readSInt16(at offset: Int) -> Int {
         let value: Int16 = readSInt16(at: offset)
         return Int(value)
     }
@@ -189,7 +189,7 @@ public extension Data {
     }
     
     /// Reads a big-endian unsigned 4-byte integer
-    public func readUInt32(at offset: Int) -> Int {
+    func readUInt32(at offset: Int) -> Int {
         let value: UInt32 = readUInt32(at: offset)
         return Int(value)
     }
@@ -207,7 +207,7 @@ public extension Data {
     }
     
     /// Reads a big-endian signed 4-byte integer
-    public func readSInt32(at offset: Int) -> Int {
+    func readSInt32(at offset: Int) -> Int {
         let value: Int32 = readSInt32(at: offset)
         return Int(value)
     }
@@ -217,7 +217,7 @@ public extension Data {
 public extension Image {
     
     /// Reads an uncompressed 1-bit image in a data
-    public init(data: Data, offset: Int, width: Int, height: Int) {
+    init(data: Data, offset: Int, width: Int, height: Int) {
         
         /* Create the image */
         self.init(width: width, height: height)
@@ -253,7 +253,7 @@ public extension Image {
 public extension HString {
     
     /// Init with null-terminated data
-    public init(copyNullTerminatedFrom data: Data, at offset: Int) {
+    init(copyNullTerminatedFrom data: Data, at offset: Int) {
         
         /* Find the null termination */
         let dataFromOffset = data.suffix(from: offset)
@@ -267,7 +267,7 @@ public extension HString {
     }
     
     /// Init with data
-    public init(copyFrom data: Data, at offset: Int, length: Int) {
+    init(copyFrom data: Data, at offset: Int, length: Int) {
         
         /* Extract the data for the string */
         let stringSlice = data[offset..<offset + length]

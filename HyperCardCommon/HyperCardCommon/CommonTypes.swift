@@ -348,7 +348,7 @@ public extension TextStyle {
     }
     
     /// Init a text style from a 8 bit flag
-    public init(flags: Int) {
+    init(flags: Int) {
 		rawValue = 0
         bold = (flags & (1 << 0)) != 0
         italic = (flags & (1 << 1)) != 0
@@ -615,7 +615,7 @@ public struct Version: CustomStringConvertible, Equatable {
 public extension Version {
     
     /// Init the version from its encoded form in the resources
-    public init(code: Int) {
+    init(code: Int) {
         self.major = UInt8(code >> 24)
         self.minor = UInt8((code >> 16) & 0xFF)
         self.release = UInt8(code & 0xFF)
