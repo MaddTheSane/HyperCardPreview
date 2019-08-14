@@ -62,7 +62,7 @@ public extension BitmapFont {
         
         /* Check if the right font size is present */
         let vectorFontSize = Int(CTFontGetSize(vectorFont))
-        guard let index = fontSizes.index(where: { $0 == vectorFontSize }) else {
+        guard let index = fontSizes.firstIndex(where: { $0 == vectorFontSize }) else {
             return nil
         }
         

@@ -257,7 +257,7 @@ public extension HString {
         
         /* Find the null termination */
         let dataFromOffset = data.suffix(from: offset)
-        let nullIndex = dataFromOffset.index(of: UInt8(0))!
+        let nullIndex = dataFromOffset.firstIndex(of: UInt8(0))!
         
         /* Extract the data for the string */
         let stringSlice = data[offset..<nullIndex]
