@@ -342,7 +342,7 @@ public let PlainTextStyle = TextStyle()
 public extension TextStyle {
     
     /// Init a text style from a 8 bit flag
-    public init(flags: UInt8) {
+    init(flags: UInt8) {
         self.init(rawValue: flags)
         
     }
@@ -636,7 +636,7 @@ public extension Version {
     }
     
     /// Init the version from its encoded form in the resources
-    public init(code: UInt32) {
+    init(code: UInt32) {
         self.major = UInt8(code >> 24)
         self.minor = UInt8((code >> 16) & 0xFF)
         self.release = UInt8(code & 0xFF)

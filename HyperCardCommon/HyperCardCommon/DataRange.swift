@@ -149,12 +149,12 @@ public extension Data {
     }
     
     /// Reads a unsigned byte
-    public func readUInt8(at offset: Int) -> UInt8 {
+    func readUInt8(at offset: Int) -> UInt8 {
         return self[offset]
     }
     
     /// Reads a signed byte
-    public func readSInt8(at offset: Int) -> Int8 {
+    func readSInt8(at offset: Int) -> Int8 {
         let value: UInt8 = readUInt8(at: offset)
         return Int8(bitPattern: value)
     }
@@ -172,7 +172,7 @@ public extension Data {
     }
     
     /// Reads a big-endian unsigned 2-byte integer
-    public func readUInt16(at offset: Int) -> UInt16 {
+    func readUInt16(at offset: Int) -> UInt16 {
         return UInt16(self[offset]) << 8 | UInt16(self[offset+1])
     }
     
@@ -183,7 +183,7 @@ public extension Data {
     }
     
     /// Reads a big-endian signed 2-byte integer
-    public func readSInt16(at offset: Int) -> Int16 {
+    func readSInt16(at offset: Int) -> Int16 {
         let value: UInt16 = readUInt16(at: offset)
         return Int16(bitPattern: value)
     }
@@ -195,13 +195,13 @@ public extension Data {
     }
     
     /// Reads a big-endian unsigned 4-byte integer
-    public func readUInt32(at offset: Int) -> UInt32 {
+    func readUInt32(at offset: Int) -> UInt32 {
         /* If use multiplications because Swift tells "Expression too complex" when I use bit shifts */
         return UInt32(self[offset])*16777216 | UInt32(self[offset+1])*65536 | UInt32(self[offset+2])*256 | UInt32(self[offset+3])
     }
     
     /// Reads a big-endian signed 4-byte integer
-    public func readSInt32(at offset: Int) -> Int32 {
+    func readSInt32(at offset: Int) -> Int32 {
         let value: UInt32 = readUInt32(at: offset)
         return Int32(bitPattern: value)
     }

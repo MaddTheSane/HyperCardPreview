@@ -52,8 +52,8 @@ public extension ClassicFile {
         /* Read the fork */
         var data = Data(count: size)
         let readSize = urlPath.withUnsafeFileSystemRepresentation { (cPath) -> Int in
-            return data.withUnsafeMutableBytes({ (bytes: UnsafeMutablePointer<Int8>) -> Int in
-                getxattr(cPath, XATTR_RESOURCEFORK_NAME, bytes, size, 0, 0)
+            return data.withUnsafeMutableBytes({ (bytes: UnsafeMutableRawBufferPointer) -> Int in
+                getxattr(cPath, XATTR_RESOURCEFORK_NAME, bytes.baseAddress!, bytes.count, 0, 0)
             })
         }
         guard readSize == size else {
