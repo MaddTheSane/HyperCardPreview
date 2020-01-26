@@ -9,68 +9,127 @@
 
 public extension ResourceRepository {
     
-    private static let iconTypeName = NumericName(string: "ICON")!
-    private static let fontFamilyTypeName = NumericName(string: "FOND")!
-    private static let bitmapFontTypeName = NumericName(string: "NFNT")!
-    private static let bitmapFontOldTypeName = NumericName(string: "FONT")!
-    private static let vectorFontTypeName = NumericName(string: "sfnt")!
-    private static let cardColorTypeName = NumericName(string: "HCcd")!
-    private static let backgroundColorTypeName = NumericName(string: "HCbg")!
-    private static let pictureTypeName = NumericName(string: "PICT")!
+    private static let mapHeaderLength = 30
+    private static let mapTypeLength = 8
+    private static let mapReferenceLength = 12
+    
+    private struct ResourceReference {
+        
+        /// Type of the resource
+        public var type: Int
+        
+        /// ID of the resource
+        public var identifier: Int
+        
+        /// Name of the resource
+        public var name: HString
+        
+        /// Offset of the resource in the data section of the resource fork
+        public var dataOffset: Int
+    }
     
     /// Loads a resource repository from the content of a resource fork
     init(loadFromData resourceData: Data) {
         
-        /* Build a resource extractor */
-        let dataRange = DataRange(sharedData: resourceData, offset: 0, length: resourceData.count)
-        let forkReader = ResourceRepositoryReader(data: dataRange)
-        let extractor = ResourceExtractor(resourceForkReader: forkReader)
+        let data = DataRange(wholeData: resourceData)
         
-        /* List the icons */
-        let icons = extractor.listResources(withType: IconResourceType.self, typeName: ResourceRepository.iconTypeName, parse: { (data: DataRange) -> Icon in
-            return Icon(loadFromData: data)
-            })
+        /* Extract the resource map */
+        let mapOffset: Int = data.readUInt32(at: 0x4)
+        let mapLength: Int = data.readUInt32(at: 0xC)
+        let mapData = DataRange(fromData: data, offset: mapOffset, length: mapLength)
         
-        /* List the bitmap fonts */
-        let bitmapFontsNew = extractor.listResources(withType: BitmapFontResourceType.self, typeName: ResourceRepository.bitmapFontTypeName, parse: { (data: DataRange) -> BitmapFont in
-            return BitmapFont(loadFromData: data)
-        })
+        /* List the resource references */
+        let references = ResourceRepository.readReferences(in: mapData)
         
-        /* List the bitmap fonts from old format */
-        let bitmapFontsOld = extractor.listResources(withType: BitmapFontResourceType.self, typeName: ResourceRepository.bitmapFontOldTypeName, parse: { (data: DataRange) -> BitmapFont in
-            return BitmapFont(loadFromData: data)
-        })
+        /* Load the offset of the resource data table */
+        let globalDataOffset: Int = data.readUInt32(at: 0x0)
         
-        /* List all the bitmap fonts */
-        let bitmapFonts: [BitmapFontResource] = bitmapFontsNew + bitmapFontsOld
-        
-        /* List the vector fonts */
-        let vectorFonts = extractor.listResources(withType: VectorFontResourceType.self, typeName: ResourceRepository.vectorFontTypeName, parse: { (data: DataRange) -> VectorFont in
-            return VectorFont(loadFromData: data)
-        })
-        
-        /* List the font familes */
-        let fontFamilies = extractor.listResources(withType: FontFamilyResourceType.self, typeName: ResourceRepository.fontFamilyTypeName, parse: { (data: DataRange) -> FontFamily in
-            return FontFamily(loadFromData: data, bitmapFonts: bitmapFonts, vectorFonts: vectorFonts)
-        })
-        
-        /* List the card colors */
-        let cardColors = extractor.listResources(withType: CardColorResourceType.self, typeName: ResourceRepository.cardColorTypeName, parse: { (data: DataRange) -> LayerColor in
-            return LayerColor(loadFromData: data)
-        })
-        
-        /* List the background colors */
-        let backgroundColors = extractor.listResources(withType: BackgroundColorResourceType.self, typeName: ResourceRepository.backgroundColorTypeName, parse: { (data: DataRange) -> LayerColor in
-            return LayerColor(loadFromData: data)
-        })
-        
-        /* List the background colors */
-        let pictures = extractor.listResources(withType: PictureResourceType.self, typeName: ResourceRepository.pictureTypeName, parse: { (data: DataRange) -> Picture in
-            return Picture(loadFromData: data)
+        /* List the resources */
+        let resources: [Resource] = references.map({
+            ResourceRepository.buildReferencedResource($0, data: data, globalDataOffset: globalDataOffset)
         })
         
         /* Init */
-        self.init(icons: icons, fontFamilies: fontFamilies, cardColors: cardColors, backgroundColors: backgroundColors, pictures: pictures)
+        self.init(resources: resources)
+    }
+    
+    private static func readReferences(in data: DataRange) -> [ResourceReference] {
+        
+        /* Define the list to return */
+        var references = [ResourceReference]()
+        
+        /* Define the offset in the type list */
+        var typeOffset = ResourceRepository.mapHeaderLength
+        
+        let typeCount = 1 + data.readSInt16(at: 0x1C)
+        let nameListOffset: Int = data.readUInt16(at: 0x1A)
+        
+        /* Loop on the types */
+        for _ in 0..<typeCount {
+            
+            /* Read the type */
+            let type: Int = data.readUInt32(at: typeOffset)
+            let referenceCountMinusOne: Int = data.readUInt16(at: typeOffset+0x4)
+            let referenceListOffset: Int = data.readUInt16(at: typeOffset+0x6)
+            
+            /* Define the offset in the reference list, to read the references for this type */
+            var referenceOffset = referenceListOffset + ResourceRepository.mapHeaderLength - 2
+            
+            /* Read the references */
+            for _ in 0...referenceCountMinusOne {
+                
+                /* Read the reference */
+                let identifier: Int = data.readSInt16(at: referenceOffset)
+                let nameOffsetInList: Int = data.readSInt16(at: referenceOffset + 0x2)
+                let dataOffsetWithFlags: Int = data.readUInt32(at: referenceOffset + 0x4)
+                let dataOffset = dataOffsetWithFlags & 0xFF_FFFF
+                
+                /* Read the name */
+                let name = (nameOffsetInList == -1) ? "" : readName(data: data, nameListOffset: nameListOffset, nameOffsetInList: nameOffsetInList)
+                
+                /* Build the reference */
+                let reference = ResourceReference(type: type, identifier: identifier, name: name, dataOffset: dataOffset)
+                references.append(reference)
+                
+                /* Increment */
+                referenceOffset += ResourceRepository.mapReferenceLength
+                
+            }
+            
+            /* Increment the type */
+            typeOffset += ResourceRepository.mapTypeLength
+            
+        }
+        
+        return references
+    }
+    
+    private static func readName(data: DataRange, nameListOffset: Int, nameOffsetInList: Int) -> HString {
+        
+        /* Locate the name */
+        let offset = nameListOffset + nameOffsetInList
+        
+        /* Read the length */
+        let length: Int = data.readUInt8(at: offset)
+        
+        /* Read the string */
+        return data.readString(at: offset+1, length: length)
+        
+    }
+    
+    private static func buildReferencedResource(_ reference: ResourceReference, data: DataRange, globalDataOffset: Int) -> Resource {
+        
+        let resourceData = extractResourceData(at: reference.dataOffset, globalDataOffset: globalDataOffset, data: data)
+        let typeIdentifier = reference.type
+        
+        return Resource(identifier: reference.identifier, name: reference.name, typeIdentifier: typeIdentifier, data: resourceData)
+    }
+    
+    private static func extractResourceData(at dataOffset: Int, globalDataOffset: Int, data: DataRange) -> DataRange {
+        
+        let offset = dataOffset + globalDataOffset
+        let length: Int = data.readUInt32(at: offset)
+        return DataRange(fromData: data, offset: offset + 4, length: length)
     }
     
 }

@@ -7,77 +7,142 @@
 //
 
 
-/// Represents a resource type, symbolized in Mac OS by a four-letter name like
-/// 'ICON' for icons or 'NFNT' for fonts.
-/// <p>
-/// ContentType is the type used in the code to represent its data content.
-public protocol ResourceType {
-    associatedtype ContentType
-}
-
-/// The content of a resource in a resource fork.
-public class Resource<T: ResourceType> {
+/// A resource in a resource fork.
+public class Resource {
     
     /// The identifier
-    public var identifier: Int
+    public let identifier: Int
     
     /// The name
-    public var name: HString
+    public let name: HString
+    
+    /// The type identifier, read in the content
+    public let typeIdentifier: Int
     
     /// The data contained in the resource
-    public var content: T.ContentType {
-        get { return self.contentProperty.value }
-        set { self.contentProperty.value = newValue }
-    }
-    public let contentProperty: Property<T.ContentType>
+    private var content: Content
     
-    /// Main constructor, explicit so it is public
-    public init(identifier: Int, name: HString, contentProperty: Property<T.ContentType>) {
+    private enum Content {
+        
+        case value(Any)
+        case notDecoded(DataRange)
+        case notLoaded(() -> Any)
+    }
+    
+    public init(identifier: Int, name: HString, typeIdentifier: Int, data: DataRange) {
         self.identifier = identifier
         self.name = name
-        self.contentProperty = contentProperty
+        self.typeIdentifier = typeIdentifier
+        self.content = Content.notDecoded(data)
+    }
+    
+    public init(identifier: Int, name: HString, typeIdentifier: Int, value: Any) {
+        self.identifier = identifier
+        self.name = name
+        self.typeIdentifier = typeIdentifier
+        self.content = Content.value(value)
+    }
+    
+    public init<T>(identifier: Int, name: HString, typeIdentifier: Int, lazyLoad: @escaping () -> T) {
+        self.identifier = identifier
+        self.name = name
+        self.typeIdentifier = typeIdentifier
+        self.content = Content.notLoaded(lazyLoad)
+    }
+    
+    public func isDecoded() -> Bool {
+        
+        switch self.content {
+            
+        case .value:
+            return true
+            
+        case .notLoaded:
+            return true
+            
+        case .notDecoded:
+            return false
+        }
+    }
+    
+    public func getData() -> DataRange {
+        
+        guard case Content.notDecoded(let data) = self.content else {
+            fatalError()
+        }
+        
+        return data
+    }
+    
+    public func getContent<T: ResourceContent>() -> T {
+        
+        switch self.content {
+            
+        case .value(let value):
+            return value as! T
+            
+        case .notDecoded(let data):
+            let value = T(loadFromData: data)
+            self.content = Content.value(value)
+            return value
+            
+        case .notLoaded(let loadAction):
+            let value = loadAction()
+            self.content = Content.value(value)
+            return value as! T
+        }
+        
+    }
+}
+
+public protocol ResourceContent {
+    
+    init(loadFromData: DataRange)
+}
+
+public enum ResourceTypes {
+    
+    public static let icon = Int(classicType: "ICON")
+    public static let fontFamily = Int(classicType: "FOND")
+    public static let bitmapFont = Int(classicType: "NFNT")
+    public static let bitmapFontOld = Int(classicType: "FONT")
+    public static let vectorFont = Int(classicType: "sfnt")
+    public static let cardColor = Int(classicType: "HCcd")
+    public static let backgroundColor = Int(classicType: "HCbg")
+    public static let picture = Int(classicType: "PICT")
+}
+
+/* The shortcut functions */
+public extension Resource {
+    
+    func getIcon() -> Icon {
+        
+        return getContent()
+    }
+    
+    func getFontFamily() -> FontFamily {
+        
+        return getContent()
+    }
+    
+    func getBitmapFont() -> BitmapFont {
+        
+        return getContent()
+    }
+    
+    func getVectorFont() -> VectorFont {
+        
+        return getContent()
+    }
+    
+    func getColor() -> LayerColor {
+        
+        return getContent()
+    }
+    
+    func getPicture() -> Picture {
+        
+        return getContent()
     }
     
 }
-
-/// Black & White Icons without mask, formerly named 'PICT'
-public struct IconResourceType: ResourceType {
-    public typealias ContentType = Icon
-}
-public typealias IconResource = Resource<IconResourceType>
-
-/// Fonts, formerly named 'FOND'
-public struct FontFamilyResourceType: ResourceType {
-    public typealias ContentType = FontFamily
-}
-public typealias FontFamilyResource = Resource<FontFamilyResourceType>
-
-/// Bitmap Fonts, formerly named 'NFNT' or 'FONT'
-public struct BitmapFontResourceType: ResourceType {
-    public typealias ContentType = BitmapFont
-}
-public typealias BitmapFontResource = Resource<BitmapFontResourceType>
-
-/// Vector Fonts, formerly named 'sfnt'
-public struct VectorFontResourceType: ResourceType {
-    public typealias ContentType = VectorFont
-}
-public typealias VectorFontResource = Resource<VectorFontResourceType>
-
-/// AddColor card colors, formerly named 'HCcd'
-public struct CardColorResourceType: ResourceType {
-    public typealias ContentType = LayerColor
-}
-public typealias CardColorResource = Resource<CardColorResourceType>
-
-/// AddColor background colors, formerly named 'HCbg'
-public struct BackgroundColorResourceType: ResourceType {
-    public typealias ContentType = LayerColor
-}
-public typealias BackgroundColorResource = Resource<BackgroundColorResourceType>
-
-/// Color Pictures, formerly named 'PICT'
-public struct PictureResourceType: ResourceType {
-    public typealias ContentType = Picture
-}
-public typealias PictureResource = Resource<PictureResourceType>

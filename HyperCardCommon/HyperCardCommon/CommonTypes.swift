@@ -80,9 +80,15 @@ public struct Rectangle: Equatable {
         return position.x >= left && position.x < right && position.y >= top && position.y < bottom
     }
     
+    public func containsRectangle(_ rectangle: Rectangle) -> Bool {
+        return rectangle.top >= self.top &&
+        rectangle.left >= self.left &&
+        rectangle.bottom <= self.bottom &&
+        rectangle.right <= self.right
+    }
+    
     public func intersects(_ rectangle: Rectangle) -> Bool {
-        let intersection = computeRectangleIntersection(self, rectangle)
-        return intersection.width > 0 && intersection.height > 0
+        return computeRectangleIntersection(self, rectangle) != nil
     }
 }
 
@@ -92,9 +98,15 @@ public func ==(r1: Rectangle, r2: Rectangle) -> Bool {
 
 /// Computes the intersection rectangle of two rectangles.
 ///<p>
-/// If the intersection is empty, returns an empty rectangle with zero or negative width and height
-public func computeRectangleIntersection(_ r1: Rectangle, _ r2: Rectangle) -> Rectangle {
-    return Rectangle(top: max(r1.top, r2.top), left: max(r1.left, r2.left), bottom: min(r1.bottom, r2.bottom), right: min(r1.right, r2.right))
+/// If the intersection is empty, returns nil
+public func computeRectangleIntersection(_ r1: Rectangle, _ r2: Rectangle) -> Rectangle? {
+    
+    let rectangle = Rectangle(top: max(r1.top, r2.top), left: max(r1.left, r2.left), bottom: min(r1.bottom, r2.bottom), right: min(r1.right, r2.right))
+    
+    guard rectangle.width > 0 && rectangle.height > 0 else {
+        return nil
+    }
+    return rectangle
 }
 
 /// Computes the rectangle directly enclosing two rectangles. Any of the rectangle can be absent
@@ -432,7 +444,7 @@ public enum PartType {
 /// Visual style of a part
 ///<p>
 /// The styles of buttons and fields are all mixed
-public enum PartStyle {
+public enum PartStyle: Equatable, Hashable {
     
     /// The part has no frame, only a title
     ///<p>
@@ -714,6 +726,46 @@ public enum FileVersion {
     
     public func isTwo() -> Bool {
         return self == FileVersion.v2
+    }
+}
+
+public extension Int {
+    
+    /// Inits an OSType value from a string representation, in C it would
+    /// convert "STAK" to 'STAK'
+    init(classicType: String) {
+        
+        var shift = 24
+        
+        var identifier = 0
+        
+        for code in classicType.unicodeScalars {
+            
+            /* There must not be more than 4 chars */
+            if shift < 0 {
+                fatalError()
+            }
+            
+            /* The code must be ASCII */
+            if !code.isASCII {
+                fatalError()
+            }
+            
+            /* Append the code to the identifier */
+            let codeValue = Int(code.value)
+            identifier |= codeValue << shift
+            
+            /* Move to the next bits */
+            shift -= 8
+            
+        }
+        
+        /* There must not be less that 4 chars */
+        if shift != -8 {
+            fatalError()
+        }
+        
+        self = identifier
     }
 }
 

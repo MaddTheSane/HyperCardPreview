@@ -10,18 +10,6 @@
 /// The content of a resource fork
 public struct ResourceRepository {
     
-    /// The icons
-    public var icons: [IconResource]
-    
-    /// The font families
-    public var fontFamilies: [FontFamilyResource]
-    
-    /// The AddColor resources for the cards
-    public var cardColors: [CardColorResource]
-    
-    /// The AddColor resources for the backgrounds
-    public var backgroundColors: [BackgroundColorResource]
-    
-    /// The color pictures
-    public var pictures: [PictureResource]
+    /// The resources
+    public var resources: [Resource]
 }

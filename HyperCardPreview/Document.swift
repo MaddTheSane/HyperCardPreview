@@ -17,6 +17,8 @@ class Document: NSDocument, NSAnimationDelegate {
     
     var browser: Browser!
     var resourceFork: Data?
+    var imageBuffer: ImageBuffer!
+    var visualEffectImageBuffer: ImageBuffer!
     
     @IBOutlet weak var view: DocumentView!
     
@@ -41,30 +43,32 @@ class Document: NSDocument, NSAnimationDelegate {
         do {
             let file = ClassicFile(path: path)
             let hyperCardFile = try HyperCardFile(file: file, password: password)
-            self.browser = Browser(hyperCardFile: hyperCardFile)
+            let imageBuffer = ImageBuffer(width: hyperCardFile.stack.size.width, height: hyperCardFile.stack.size.height)
+            self.browser = Browser(hyperCardFile: hyperCardFile, imageBuffer: imageBuffer)
             self.resourceFork = file.resourceFork
+            self.imageBuffer = imageBuffer
         }
-        catch OpeningError.notStack {
+        catch Stack.OpeningError.notStack {
             
             /* Tell the user we can't open the file */
-            let alert = NSAlert(error: OpeningError.notStack)
+            let alert = NSAlert(error: Stack.OpeningError.notStack)
             alert.messageText = "The file is not a stack"
             alert.informativeText = "The file can't be opened because it is not recognized as a stack"
             alert.runModal()
-            throw OpeningError.notStack
+            throw Stack.OpeningError.notStack
             
         }
-        catch OpeningError.corrupted {
+        catch Stack.OpeningError.corrupted {
             
             /* Tell the user we can't open the file */
-            let alert = NSAlert(error: OpeningError.notStack)
+            let alert = NSAlert(error: Stack.OpeningError.notStack)
             alert.messageText = "The stack is corrupted"
             alert.informativeText = "The stack can't be opened because the data is corrupted"
             alert.runModal()
-            throw OpeningError.notStack
+            throw Stack.OpeningError.notStack
             
         }
-        catch OpeningError.missingPassword {
+        catch Stack.OpeningError.missingPassword {
             
             /* Ask the user for a password */
             let alert = NSAlert()
@@ -78,13 +82,13 @@ class Document: NSDocument, NSAnimationDelegate {
             
             /* If cancel, stop */
             guard answer == NSApplication.ModalResponse.alertFirstButtonReturn else {
-                throw OpeningError.wrongPassword
+                throw Stack.OpeningError.wrongPassword
             }
             
             /* Get the password */
             let passwordString = textField.stringValue
             guard passwordString != "" else {
-                throw OpeningError.wrongPassword
+                throw Stack.OpeningError.wrongPassword
             }
             
             /* Convert it to Mac OS Roman encoding */
@@ -94,18 +98,18 @@ class Document: NSDocument, NSAnimationDelegate {
                 let alert = NSAlert()
                 alert.messageText = "Wrong Password"
                 alert.runModal()
-                throw OpeningError.wrongPassword
+                throw Stack.OpeningError.wrongPassword
             }
             
             /* Try again to open the file, this time with the password */
             try self.readStack(atPath: path, password: password)
             
         }
-        catch OpeningError.wrongPassword {
+        catch Stack.OpeningError.wrongPassword {
             let alert = NSAlert()
             alert.messageText = "Wrong Password"
             alert.runModal()
-            throw OpeningError.wrongPassword
+            throw Stack.OpeningError.wrongPassword
         }
         
     }
@@ -122,6 +126,9 @@ class Document: NSDocument, NSAnimationDelegate {
         let newFrame = window.frameRect(forContentRect: NSMakeRect(currentFrame.origin.x, currentFrame.origin.y, CGFloat(browser.stack.size.width), CGFloat(browser.stack.size.height)))
         window.setFrame(newFrame, display: false)
         view.frame = NSMakeRect(0, 0, CGFloat(browser.stack.size.width), CGFloat(browser.stack.size.height))
+        browser.cursorRectanglesProperty.startNotifications(for: self) {
+            window.invalidateCursorRects(for: self.view)
+        }
         
         browser.needsDisplayProperty.startNotifications(for: self, by: {
             [weak self] in
@@ -153,6 +160,12 @@ class Document: NSDocument, NSAnimationDelegate {
             /* Display the selected card */
             self.warnCardWasSelected(atIndex: self.collectionView.selectionIndexPaths.first!.item)
         }
+        collectionView.cancelAction =  {
+            [unowned self] in
+            
+            /* Move back to the current card */
+            self.warnCardWasSelected(atIndex: self.browser.cardIndex)
+        }
         
         goToCard(at: 0, transition: .none)
     }
@@ -169,8 +182,7 @@ class Document: NSDocument, NSAnimationDelegate {
             }
             
             /* Animate the card view appearing */
-            let imageSize = NSSize(width: browser.image.width, height: browser.image.height)
-            let image = NSImage(cgImage: createScreenImage(from: browser.buildImage()), size: imageSize)
+            let image = NSImage(cgImage: self.imageBuffer.context.makeImage()!, size: NSZeroSize)
             animateCardAppearing(atIndex: browser.cardIndex, withImage: image)
             
             return
@@ -210,8 +222,7 @@ class Document: NSDocument, NSAnimationDelegate {
     
     private func animateCardAppearing(atIndex cardIndex: Int, withImage image: NSImage?) {
         
-        let initialFrame = self.computeAnimationFrameInList(ofCardAtIndex: cardIndex)
-        self.animateImageView(fromFrame: initialFrame, toFrame: self.view.frame, withImage: image, onCompletion: {
+        self.animateImageView(isAppearing: true, cardIndex: cardIndex, image: image, onCompletion: {
             
             /* At the end, hide the card list */
             [unowned self] in
@@ -222,14 +233,10 @@ class Document: NSDocument, NSAnimationDelegate {
     
     private func animateCardDisappearing() {
         
-        /* Show the card list */
-        self.collectionViewSuperview.isHidden = false
-        
         /* Animate the image becoming the thumbnail */
         let imageSize = NSSize(width: browser.image.width, height: browser.image.height)
-        let image = NSImage(cgImage: createScreenImage(from: browser.buildImage()), size: imageSize)
-        let finalFrame = self.computeAnimationFrameInList(ofCardAtIndex: browser.cardIndex)
-        self.animateImageView(fromFrame: self.view.frame, toFrame: finalFrame, withImage: image, onCompletion: {
+        let image = NSImage(cgImage: self.imageBuffer.context.makeImage()!, size: imageSize)
+        self.animateImageView(isAppearing: false, cardIndex: browser.cardIndex, image: image, onCompletion: {
             [unowned self] in
             self.collectionView.window!.makeFirstResponder(self.collectionView)
         })
@@ -255,23 +262,45 @@ class Document: NSDocument, NSAnimationDelegate {
         
     }
     
-    private func animateImageView(fromFrame initialFrame: NSRect, toFrame finalFrame: NSRect, withImage image: NSImage?, onCompletion: @escaping () -> Void) {
+    private func animateImageView(isAppearing: Bool, cardIndex: Int, image: NSImage?, onCompletion: @escaping () -> Void) {
         
-        /* Show the image view at the initial frame */
-        self.imageView.frame = initialFrame
+        /* Parameters for the card animation */
+        let cardSmallFrame = self.computeAnimationFrameInList(ofCardAtIndex: cardIndex)
+        let cardBigFrame = self.view.frame
+        let cardInitialFrame: NSRect = isAppearing ? cardSmallFrame : cardBigFrame
+        let cardFinalFrame: NSRect = isAppearing ? cardBigFrame : cardSmallFrame
+        
+        /* Parameters for the card list animation */
+        let listSmallFrame = self.computeRectangleFrame(of: Rectangle(x: 0, y: 0, width: browser.stack.size.width, height: browser.stack.size.height))
+        let listBigFrame = self.view.frame
+        let listInitialFrame: NSRect = isAppearing ? listBigFrame : listSmallFrame
+        let listFinalFrame: NSRect = isAppearing ? listSmallFrame : listBigFrame
+        
+        self.imageView.frame = cardInitialFrame
         self.imageView.image = image
         self.imageView.isHidden = false
         
+        self.collectionViewSuperview.frame = listInitialFrame
+        if !isAppearing {
+            self.collectionViewSuperview.isHidden = false
+        }
+        
         /* Store the end block */
         self.actionAfterAnimation = onCompletion
+        self.hideListAfterAnimation = isAppearing
         
         /* Launch the animation */
-        let animationInfo: [NSViewAnimation.Key: Any] = [
+        let cardAnimationInfo: [NSViewAnimation.Key: Any] = [
             NSViewAnimation.Key.target: self.imageView!,
-            NSViewAnimation.Key.startFrame: NSValue(rect: initialFrame),
-            NSViewAnimation.Key.endFrame: NSValue(rect: finalFrame)
+            NSViewAnimation.Key.startFrame: NSValue(rect: cardInitialFrame),
+            NSViewAnimation.Key.endFrame: NSValue(rect: cardFinalFrame)
         ]
-        let animation = NSViewAnimation(viewAnimations: [animationInfo])
+        let listAnimationInfo: [NSViewAnimation.Key: Any] = [
+            NSViewAnimation.Key.target: self.collectionViewSuperview!,
+            NSViewAnimation.Key.startFrame: NSValue(rect: listInitialFrame),
+            NSViewAnimation.Key.endFrame: NSValue(rect: listFinalFrame)
+        ]
+        let animation = NSViewAnimation(viewAnimations: [cardAnimationInfo, listAnimationInfo])
         animation.delegate = self
         animation.duration = 0.2
         animation.start()
@@ -279,50 +308,44 @@ class Document: NSDocument, NSAnimationDelegate {
     }
     
     private var actionAfterAnimation: (() -> Void)? = nil
+    private var hideListAfterAnimation = false
     
     func animationDidEnd(_ animation: NSAnimation) {
         
+        self.imageView.isHidden = true
+        if self.hideListAfterAnimation {
+            self.collectionViewSuperview.isHidden = true
+        }
         if let onCompletion = self.actionAfterAnimation {
             onCompletion()
             self.actionAfterAnimation = nil
         }
-        self.imageView.isHidden = true
         
+    }
+    
+    private func computeRectangleFrame(of rectangle: Rectangle) -> NSRect {
+        
+        let rectangleOrigin = CGPoint(x: rectangle.left, y: rectangle.top)
+        let rectangleEnd = CGPoint(x: rectangle.right, y: rectangle.bottom)
+        
+        let transform = self.view.transform
+        let transformedOrigin = transform.transform(rectangleOrigin)
+        let transformedEnd = transform.transform(rectangleEnd)
+        
+        let frameOrigin = NSPoint(x: min(transformedOrigin.x, transformedEnd.x), y: min(transformedOrigin.y, transformedEnd.y))
+        let frameSize = NSSize(width: abs(transformedEnd.x - transformedOrigin.x), height: abs(transformedEnd.y - transformedOrigin.y))
+        
+        return NSRect(origin: frameOrigin, size: frameSize)
     }
     
     /// Redraws the HyperCard view
     func refresh() {
-        removeScriptBorders()
         
         /* Update the image */
         browser.refresh()
         
-        /* Create a copy of the image for the screen */
-        let screenImage = createScreenImage(from: browser.buildImage())
-        
         /* Display the image in the layer */
-        CATransaction.setDisableActions(true)
-        view.layer!.contents = screenImage
-    }
-    
-    private func createScreenImage(from image: CGImage) -> CGImage {
-        
-        /* Create a new bitmap with a context to draw on it. Make it pixel-accurate so we can
-         display a very aliased image */
-        let scale = Int(NSScreen.main!.backingScaleFactor)
-        let width = image.width * scale
-        let height = image.height  * scale
-        let data = RgbConverter.createRgbData(width: width, height: height)
-        let context = RgbConverter.createContext(forRgbData: data, width: width, height: height)
-        
-        /* Make the context aliased */
-        context.setShouldAntialias(false)
-        context.interpolationQuality = .none
-        
-        /* Fill the image */
-        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
-        
-        return RgbConverter.createImage(forRgbData: data, isOwner: true, width: width, height: height)
+        view.drawBuffer(self.imageBuffer)
     }
     
     func applyVisualEffect(from image: Image, advance: Bool) {
@@ -412,13 +435,15 @@ class Document: NSDocument, NSAnimationDelegate {
     
     private func displayImage(_ image: Image) {
         
+        if self.visualEffectImageBuffer == nil {
+            self.visualEffectImageBuffer = ImageBuffer(width: self.imageBuffer.width, height: self.imageBuffer.height)
+        }
+        
         /* Convert the image to screen */
-        let rgbImage = RgbConverter.convertImage(image)
-        let screenImage = self.createScreenImage(from: rgbImage)
+        self.visualEffectImageBuffer.drawImage(image)
         
         /* Display the image */
-        CATransaction.setDisableActions(true)
-        view.layer!.contents = screenImage
+        self.view.drawBuffer(self.visualEffectImageBuffer)
     }
     
     func applyContinuousVisualEffect(_ effect: VisualEffects.ContinuousVisualEffect, from image: Image) {
@@ -472,6 +497,8 @@ class Document: NSDocument, NSAnimationDelegate {
     /// Move to a card with a visual effect
     func goToCard(at index: Int, transition: Transition) {
         let possibleOldImage = (transition != .none) ? browser.image : nil
+        
+        removeScriptBorders()
         
         /* Stop refresh */
         self.willRefreshBrowser = true
@@ -532,6 +559,9 @@ class Document: NSDocument, NSAnimationDelegate {
     }
     
     @objc func displayOnlyBackground(_ sender: AnyObject) {
+        
+        removeScriptBorders()
+        
         browser.displayOnlyBackground = !browser.displayOnlyBackground
         
         if let menuItem = sender as? NSMenuItem {
@@ -565,27 +595,42 @@ class Document: NSDocument, NSAnimationDelegate {
     
     func createScriptBorders(in layer: Layer, includingFields: Bool, layerType: LayerType) {
         
+        var buttonNumber = 1
+        var fieldNumber = 1
+        var partNumber = 0
+        
         for part in layer.parts {
+            
+            /* Update the part numbers */
+            let number: Int
+            switch part {
+            case .button(_):
+                number = buttonNumber
+                buttonNumber += 1
+            case .field(_):
+                number = fieldNumber
+                fieldNumber += 1
+            }
+            partNumber += 1
             
             /* Exclude fields if necessary */
             if case LayerPart.field(_) = part, !includingFields {
                 continue
             }
             
-            createScriptBorder(forPart: part, inLayerType: layerType)
-            
+            createScriptBorder(forPart: part, inLayerType: layerType, number: number, partNumber: partNumber)
         }
         
     }
     
-    func createScriptBorder(forPart part: LayerPart, inLayerType layerType: LayerType) {
+    func createScriptBorder(forPart part: LayerPart, inLayerType layerType: LayerType, number: Int, partNumber: Int) {
         
         /* Convert the rectangle into current coordinates */
         let rectangle = part.part.rectangle
-        let frame = NSMakeRect(CGFloat(rectangle.x), CGFloat(browser.stack.size.height - rectangle.bottom), CGFloat(rectangle.width), CGFloat(rectangle.height))
+        let frame = self.computeRectangleFrame(of: rectangle)
         
         /* Create a view */
-        let view = ScriptBorderView(frame: frame, part: part, content: retrieveContent(part: part, inLayerType: layerType), document: self)
+        let view = ScriptBorderView(frame: frame, part: part, content: retrieveContent(part: part, inLayerType: layerType), layerType: layerType, number: number, partNumber: partNumber, document: self)
         view.wantsLayer = true
         view.layer!.borderColor = NSColor.blue.cgColor
         view.layer!.borderWidth = 1
@@ -628,11 +673,15 @@ class Document: NSDocument, NSAnimationDelegate {
     }
     
     @objc func displayBackgroundInfo(_ sender: AnyObject) {
-        displayInfo().displayBackground(browser.currentBackground)
+        let background = browser.currentBackground
+        let index = browser.stack.backgrounds.firstIndex(where: { $0 === background })!
+        displayInfo().displayBackground(background, number: index+1)
     }
     
     @objc func displayCardInfo(_ sender: AnyObject) {
-        displayInfo().displayCard(browser.currentCard)
+        let card = browser.currentCard
+        let index = browser.stack.cards.firstIndex(where: { $0 === card })!
+        displayInfo().displayCard(card, number: index+1)
     }
     
     func displayInfo() -> InfoPanelController {
@@ -726,6 +775,87 @@ class Document: NSDocument, NSAnimationDelegate {
         let controller = ResourceController(windowNibName: "ResourceWindow")
         _ = controller.window // Load the nib
         controller.setup(resourceFork: self.resourceFork)
+        
+        return controller
+    }
+    
+    var searchController: SearchController!
+    
+    @objc func performFindPanelAction(_ possibleSender: Any?) {
+        
+        /* The precise action to do is in the sender's tag. We must get it the Objective-C's way */
+        guard let sender = possibleSender, let tag = (sender as AnyObject).tag else {
+            return
+        }
+        let findAction = NSFindPanelAction(rawValue: UInt(tag))!
+        
+        switch findAction {
+            
+        case .showFindPanel:
+            self.search()
+            
+        case .next:
+            self.searchDirection(.forward)
+            
+        case .previous:
+            self.searchDirection(.backward)
+            
+        default:
+            return
+        }
+    }
+    
+    private func search() {
+        
+        if self.searchController == nil {
+            self.searchController = self.buildSearchController()
+        }
+        
+        searchController.showWindow(nil)
+    }
+    
+    private func searchDirection(_ direction: Stack.SearchDirection) {
+        
+        guard let controller = self.searchController else {
+            return
+        }
+        let request = controller.currentRequest
+        guard request.length > 0 else {
+            return
+        }
+        
+        let selectedField = self.browser.selectedField
+        let selectedRange = selectedField?.selectedRange
+        
+        guard let position = self.browser.stack.find(request, direction: direction, fromCardIndex: self.browser.cardIndex, field: selectedField?.field, range: selectedRange) else {
+            return
+        }
+        
+        if position.cardIndex != self.browser.cardIndex {
+            self.goToCard(at: position.cardIndex, transition: Document.Transition.none)
+        }
+        
+        let layer: Layer = (position.partLayer == .card) ? self.browser.currentCard : self.browser.currentCard.background
+        let layerPart = layer.parts[position.partIndex!]
+        let field = layerPart.part as! Field
+        let fieldView = self.browser.getFieldView(of: field)
+        fieldView.selectedRange = position.characterRange!
+        fieldView.scrollToSelection()
+        let number = layer.parts[0...position.partIndex!].filter({ $0.part is Field }).count
+        
+        if !field.visible {
+            self.removeScriptBorders()
+            self.createScriptBorder(forPart: layerPart, inLayerType: position.partLayer, number: number, partNumber: position.partIndex!+1)
+        }
+    }
+    
+    private func buildSearchController() -> SearchController {
+        
+        let controller = SearchController(windowNibName: "search")
+        controller.stackDocument = self
+        _ = controller.window // Load the nib
+        controller.showWindow(nil)
+        self.addWindowController(controller)
         
         return controller
     }

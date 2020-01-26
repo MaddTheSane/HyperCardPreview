@@ -96,75 +96,46 @@ class ResourceController: NSWindowController, NSCollectionViewDataSource, NSColl
             /* This is a very limited and messy function to make an AIFF
              out of a snd resource. It is the fastest way I've found to play an old sound. */
             
-            /* There are two format of sdn resources, the data is not in the same place */
-            let format: UInt16 = data.readUInt16(at: 0x0)
-            let commandOffset: Int
-            switch format {
-            case 1:
-                commandOffset = 0xC
-            case 2:
-                commandOffset = 0x6
-            default:
-                return nil
-            }
-            
-            /* The first command of a format 2 resource should be bufferCmd or soundCmd */
-            guard data.readUInt16(at: commandOffset) == 0x8050 || data.readUInt16(at: commandOffset) == 0x8051 else {
-                return nil
-            }
-            
-            /* Get the offset of the sampled sound */
-            let soundOffset: Int = data.readUInt32(at: commandOffset + 0x4)
-            
-            /* Check that the sampled sound is in the data */
-            guard data.readUInt32(at: soundOffset + 0x0) == 0 else {
-                return nil
-            }
-            
-            /* Read the header of the sampled sound, which contain the parameters */
-            let byteCount: Int = data.readUInt32(at: soundOffset + 0x4)
-            let sampleRateValue: UInt32 = data.readUInt32(at: soundOffset + 0x8)
-            let sampleRate = Double(sampleRateValue) / 65536.0
-            guard data.readUInt8(at: soundOffset + 0x14) == 0 else {
+            /* Parse the sound data */
+            guard let sound = Sound(fromResourceData: data) else {
                 return nil
             }
             
             /* Build the buffer */
-            let fileLength = 2*byteCount + 0x36
+            let fileLength = 2*sound.samples.count + 0x36
             let aiffData = UnsafeMutableRawPointer.allocate(byteCount: fileLength, alignment: 4)
             
             /* Fill the AIFF fields in the data */
-            aiffData.advanced(by: 0x0).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x464F524D).bigEndian
-            aiffData.advanced(by: 0x4).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: fileLength - 4).bigEndian
-            aiffData.advanced(by: 0x8).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x41494646).bigEndian
-            aiffData.advanced(by: 0xC).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x434F4D4D).bigEndian
-            aiffData.advanced(by: 0x10).assumingMemoryBound(to: UInt32.self).pointee = UInt32(18).bigEndian
-            aiffData.advanced(by: 0x14).assumingMemoryBound(to: UInt16.self).pointee = UInt16(1).bigEndian
-            aiffData.advanced(by: 0x16).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: byteCount).bigEndian
-            aiffData.advanced(by: 0x1A).assumingMemoryBound(to: UInt16.self).pointee = UInt16(16).bigEndian
-            aiffData.advanced(by: 0x1C).assumingMemoryBound(to: Float80.self).pointee = Float80(sampleRate)
+            aiffData.advanced(by: 0x0).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x464F524D).byteSwapped
+            aiffData.advanced(by: 0x4).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: fileLength - 4).byteSwapped
+            aiffData.advanced(by: 0x8).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x41494646).byteSwapped
+            aiffData.advanced(by: 0xC).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x434F4D4D).byteSwapped
+            aiffData.advanced(by: 0x10).assumingMemoryBound(to: UInt32.self).pointee = UInt32(18).byteSwapped
+            aiffData.advanced(by: 0x14).assumingMemoryBound(to: UInt16.self).pointee = UInt16(1).byteSwapped
+            aiffData.advanced(by: 0x16).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: sound.samples.count).byteSwapped
+            aiffData.advanced(by: 0x1A).assumingMemoryBound(to: UInt16.self).pointee = UInt16(16).byteSwapped
+            aiffData.advanced(by: 0x1C).assumingMemoryBound(to: Float80.self).pointee = Float80(sound.sampleRate)
             for i in 0..<5 {
                 let x = aiffData.advanced(by: 0x1C + i).assumingMemoryBound(to: UInt8.self).pointee
                 aiffData.advanced(by: 0x1C + i).assumingMemoryBound(to: UInt8.self).pointee = aiffData.advanced(by: 0x26 - 1 - i).assumingMemoryBound(to: UInt8.self).pointee
                 aiffData.advanced(by: 0x26 - 1 - i).assumingMemoryBound(to: UInt8.self).pointee = x
             }
-            aiffData.advanced(by: 0x26).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x53534E44).bigEndian
-            aiffData.advanced(by: 0x2A).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: 2*byteCount + 8).bigEndian
-            aiffData.advanced(by: 0x2E).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0).bigEndian
-            aiffData.advanced(by: 0x32).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0).bigEndian
+            aiffData.advanced(by: 0x26).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0x53534E44).byteSwapped
+            aiffData.advanced(by: 0x2A).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: 2*sound.samples.count + 8).byteSwapped
+            aiffData.advanced(by: 0x2E).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0).byteSwapped
+            aiffData.advanced(by: 0x32).assumingMemoryBound(to: UInt32.self).pointee = UInt32(0).byteSwapped
             
             /* Fill the sound data (convert from 8-bit PCM to 16-bit PCM) */
-            for i in 0..<byteCount {
-                let byte = data.sharedData[data.offset + soundOffset + 0x16 + i]
-                let shiftedByte = byte &+ UInt8(128)
-                aiffData.advanced(by: 0x36 + 2*i).assumingMemoryBound(to: UInt8.self).pointee = shiftedByte
+            let sampleBuffer: UnsafeMutablePointer<Int16> = aiffData.advanced(by: 0x36).assumingMemoryBound(to: Int16.self)
+            for i in 0..<sound.samples.count {
+                sampleBuffer[i] = sound.samples[i].byteSwapped
             }
             
             /* Use the data */
             let finalData = Data(bytesNoCopy: aiffData, count: fileLength, deallocator: Data.Deallocator.free)
             return finalData
         }
-        
+    
         func readSearchString() -> String {
             
             if let searchString = self.cachedSearchString {
@@ -204,15 +175,11 @@ class ResourceController: NSWindowController, NSCollectionViewDataSource, NSColl
             return
         }
         
-        let dataRange = DataRange(sharedData: resourceFork, offset: 0, length: resourceFork.count)
-        let forkReader = ResourceRepositoryReader(data: dataRange)
-        let mapReader = forkReader.extractResourceMapReader()
-        let references = mapReader.readReferences()
+        let repository = ResourceRepository(loadFromData: resourceFork)
         
-        self.resources = references.map({ (reference: ResourceReference) -> ResourceElement in
+        self.resources = repository.resources.map({ (resource: Resource) -> ResourceElement in
             
-            let dataRange = forkReader.extractResourceData(at: reference.dataOffset)
-            return ResourceElement(type: reference.type.description, identifier: reference.identifier, name: reference.name.description, data: dataRange)
+            return ResourceElement(type: describeResourceType(resource.typeIdentifier), identifier: resource.identifier, name: resource.name.description, data: resource.getData())
         })
         self.listedResources = self.resources
         self.refreshFooterLabel()
@@ -223,6 +190,24 @@ class ResourceController: NSWindowController, NSCollectionViewDataSource, NSColl
             self.refreshSizeLabel()
             self.refreshToolbar()
         }
+    }
+    
+    private func describeResourceType(_ value: Int) -> String {
+        
+        /* Build the string char per char */
+        var string = ""
+        
+        for i in 0..<4 {
+            
+            let value = (value >> ((3-i) * 8)) & 0xFF
+            
+            /* Append the character to the string */
+            let scalar = UnicodeScalar(value)
+            let character = Character(scalar!)
+            string.append(character)
+        }
+        
+        return string
     }
     
     override func windowTitle(forDocumentDisplayName displayName: String) -> String {

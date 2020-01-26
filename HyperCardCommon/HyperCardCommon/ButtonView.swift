@@ -107,8 +107,16 @@ private let grays = [ Image.Integer(truncatingIfNeeded: gray1), Image.Integer(tr
 /// The view of a button.
 public class ButtonView: View, MouseResponder {
     
-    private let button: Button
+    public let button: Button
     
+    public var hilite: Bool {
+        get {
+            return hiliteComputation.value
+        }
+        set {
+            hiliteComputation.value = newValue
+        }
+    }
     private let hiliteComputation: Computation<Bool>
     
     /// the font for the texts
@@ -135,10 +143,14 @@ public class ButtonView: View, MouseResponder {
     }
     private let condensedFontComputation: Computation<BitmapFont>
     
-    public init(button: Button, hiliteComputation: Computation<Bool>, fontManager: FontManager, resources: ResourceSystem) {
+    private var clicked = false
+    private let familyCallback: (ButtonView) -> ()
+    
+    public init(button: Button, hiliteComputation: Computation<Bool>, fontManager: FontManager, resources: ResourceSystem, familyCallback: @escaping (ButtonView) -> ()) {
         
         self.button = button
         self.hiliteComputation = hiliteComputation
+        self.familyCallback = familyCallback
         
         /* font */
         fontComputation = Computation<BitmapFont> {
@@ -167,8 +179,8 @@ public class ButtonView: View, MouseResponder {
                 return nil
             }
             
-            if let iconResource = resources.findResource(ofType: \ResourceRepository.icons, withIdentifier: iconIdentifier) {
-                return iconResource.content.buildMaskedRepresentation()
+            if let iconResource = resources.findResource(ofType: ResourceTypes.icon, withIdentifier: iconIdentifier) {
+                return iconResource.getIcon().buildMaskedRepresentation()
             }
             
             return nil
@@ -325,13 +337,13 @@ public class ButtonView: View, MouseResponder {
         
         let transparent = button.style == .transparent || button.style == .oval
         
-        if hiliteComputation.value && transparent {
+        if self.hilite && transparent {
             return Drawing.XorComposition
         }
         
         /* Special case: hilited
          Even if the button is disabled, the text must be drawn in white on the gray background */
-        if hiliteComputation.value {
+        if self.hilite {
             return Drawing.MaskComposition
         }
         
@@ -343,12 +355,12 @@ public class ButtonView: View, MouseResponder {
     private func findBackgroundComposition() -> ImageComposition {
         
         /* Special case: disabled */
-        if !button.enabled && hiliteComputation.value {
+        if !button.enabled && self.hilite {
             return disabledComposition
         }
         
         /* Second special case: hilited */
-        if hiliteComputation.value {
+        if self.hilite {
             return Drawing.DirectComposition
         }
         
@@ -365,7 +377,7 @@ public class ButtonView: View, MouseResponder {
         switch button.style {
         case .transparent:
             if icon == nil {
-                if hiliteComputation.value {
+                if self.hilite {
                     drawing.drawRectangle(rectangle, composition: Drawing.XorComposition)
                 }
                 if !button.enabled {
@@ -388,7 +400,7 @@ public class ButtonView: View, MouseResponder {
             let borderComposition = button.enabled ? Drawing.DirectComposition : disabledComposition
             drawCornerImage(defaultCornerImage, rectangle: rectangle, drawing: drawing, borderThickness: defaultBorderThickness, borderComposition: borderComposition, composition:Drawing.MaskComposition)
         case .oval:
-            if hiliteComputation.value && icon == nil && rectangle.width > 0 && rectangle.height > 0 {
+            if self.hilite && icon == nil && rectangle.width > 0 && rectangle.height > 0 {
                 /* draw background oval */
                 let radiusX2 = Double(rectangle.width * rectangle.width) / 4
                 let factor2 = Double(rectangle.width * rectangle.width) / Double(rectangle.height * rectangle.height)
@@ -420,7 +432,7 @@ public class ButtonView: View, MouseResponder {
         let transparent = button.style == .transparent || button.style == .oval
         
         if transparent {
-            if hiliteComputation.value {
+            if self.hilite {
                 return (button.enabled ? Drawing.MaskComposition : disabledComposition, Drawing.DirectComposition)
             }
             else {
@@ -492,14 +504,17 @@ public class ButtonView: View, MouseResponder {
     private func drawCheckBoxButton(in drawing: Drawing) {
         
         /* Get the interface elements to draw the part */
-        let (frameImage, hiliteImage, _) = findCheckBoxImages()
+        let (frameImage, hiliteImage, clickedImage) = findCheckBoxImages()
         
         let rectangle = button.rectangle
         
         /* Draw the image */
         let imagePosition = Point(x: rectangle.x + 3, y: rectangle.y + rectangle.height / 2 - frameImage.height / 2)
         drawing.drawMaskedImage(frameImage, position: imagePosition)
-        if hiliteComputation.value {
+        if self.clicked {
+            drawing.drawMaskedImage(clickedImage, position: imagePosition)
+        }
+        if self.hilite {
             let composition = (button.style == .radio && !button.enabled) ? disabledComposition : Drawing.DirectComposition
             drawing.drawMaskedImage(hiliteImage, position: imagePosition, imageComposition: composition)
         }
@@ -644,6 +659,47 @@ public class ButtonView: View, MouseResponder {
     
     public func respondToMouseEvent(_ mouseEvent: MouseEvent, at position: Point) {
         
+        guard button.enabled else {
+            return
+        }
+        
+        switch mouseEvent {
+        case .mouseDown:
+            self.handleAutoHilite(clicked: true)
+            
+        case .mouseUp:
+            self.handleAutoHilite(clicked: false)
+            
+        default:
+            break
+        }
+    }
+    
+    private func handleAutoHilite(clicked: Bool) {
+        
+        guard button.autoHilite || button.family > 0 else {
+            return
+        }
+        
+        if !clicked && button.family > 0 {
+            self.familyCallback(self)
+        }
+        
+        switch button.style {
+            
+        case .transparent, .opaque, .rectangle, .shadow, .roundRect, .standard, .`default`, .oval:
+            self.hilite = clicked || button.family > 0
+            
+        case .checkBox, .radio:
+            self.clicked = clicked
+            self.refreshNeed = .refresh
+            if !clicked {
+                self.hilite = !self.hilite || button.family > 0
+            }
+            
+        default:
+            break
+        }
     }
     
     /// Little hack to allow the Cocoa view to display a contextual menu for us

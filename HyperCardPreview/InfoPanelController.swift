@@ -10,12 +10,42 @@ import AppKit
 import HyperCardCommon
 
 
-class InfoPanelController: NSWindowController {
+class InfoPanelController: NSWindowController, NSTableViewDataSource {
     
-    @IBOutlet weak var infoView: NSTextView!
+    private var infos: [(String, String)] = []
+    
+    @IBOutlet weak var infoTable: NSTableView!
     @IBOutlet weak var contentView: NSTextView!
     @IBOutlet weak var scriptView: NSTextView!
     @IBOutlet weak var tabView: NSTabView!
+    @IBOutlet weak var pictureView: NSImageView!
+    @IBOutlet weak var noImageLabel: NSTextField!
+    
+    private static let textStyleNames: [(KeyPath<TextStyle,Bool>,String)] = [
+        (\TextStyle.bold, "bold"),
+        (\TextStyle.italic, "italic"),
+        (\TextStyle.underline, "underline"),
+        (\TextStyle.outline, "outline"),
+        (\TextStyle.shadow, "shadow"),
+        (\TextStyle.condense, "condense"),
+        (\TextStyle.extend, "extend"),
+        (\TextStyle.group, "group"),
+    ]
+    
+    private static let partStyleNames: [PartStyle: String] = [
+        PartStyle.transparent: "transparent",
+        PartStyle.opaque: "opaque",
+        PartStyle.rectangle: "rectangle",
+        PartStyle.shadow: "shadow",
+        PartStyle.scrolling: "scrolling",
+        PartStyle.checkBox: "check box",
+        PartStyle.radio: "radio",
+        PartStyle.standard: "standard",
+        PartStyle.`default`: "default",
+        PartStyle.oval: "oval",
+        PartStyle.popup: "pop-up",
+        PartStyle.roundRect: "round rect",
+    ]
     
     func setup() {
         
@@ -32,90 +62,266 @@ class InfoPanelController: NSWindowController {
     }
     
     func displayStack(_ hyperCardFile: HyperCardFile) {
-        self.window!.title = "Stack Info"
+        self.window!.title = "Stack"
         let stack = hyperCardFile.stack
         displayScript(stack.script)
-        tabView.removeTabViewItem(tabView.tabViewItem(at: 1))
+        self.deleteContentTab()
+        self.deletePictureTab()
         
         let versionAtCreation: String = stack.versionAtCreation?.description ?? "unknown"
         let version: String = stack.versionAtLastModification?.description ?? "unknown"
         
-        infoView.string = ["Number of Cards: \(stack.cards.count)",
-            "Number of Backgrounds: \(stack.backgrounds.count)",
-            "Resources: \(hyperCardFile.resources != nil)\n",
-            "Password: \(stack.passwordHash != nil)",
-            "User Level: \(stack.userLevel.rawValue)",
-            "Can't Abort: \(stack.cantAbort)",
-            "Can't Delete: \(stack.cantDelete)",
-            "Can't Modify: \(stack.cantModify)",
-            "Can't Peek: \(stack.cantPeek)",
-            "Private Access: \(stack.privateAccess)\n",
-            "HyperCard Version at creation: \(versionAtCreation)",
-            "HyperCard Version at last edition: \(version)\n",
-            "Size: \(stack.size.width) x \(stack.size.height)"].joined(separator: "\n")
+        self.infos = [("Number of Cards", "\(stack.cards.count)"),
+            ("Number of Backgrounds", "\(stack.backgrounds.count)"),
+            ("Size", "\(stack.size.width) x \(stack.size.height)"),
+            ("Resource Fork", "\(hyperCardFile.resources != nil ? "yes (\(hyperCardFile.resources!.resources.count) resources)" : "no")"),
+            ("Password", "\(stack.passwordHash != nil ? "yes" : "no")"),
+            ("User Level", "\(stack.userLevel.rawValue) (\(stack.userLevel))"),
+            ("Can't Abort", "\(stack.cantAbort ? "yes" : "no")"),
+            ("Can't Delete", "\(stack.cantDelete ? "yes" : "no")"),
+            ("Can't Modify", "\(stack.cantModify ? "yes" : "no")"),
+            ("Can't Peek", "\(stack.cantPeek ? "yes" : "no")"),
+            ("Private Access", "\(stack.privateAccess ? "yes" : "no")"),
+            ("Stack Format", (stack.fileVersion == .v1) ? "version 1.x.x" : "version 2.x.x"),
+            ("Version when created", "\(versionAtCreation)"),
+            ("Version when last edited", "\(version)")]
+        
+        self.infoTable.reloadData()
     }
     
-    func displayBackground(_ background: Background) {
-        self.window!.title = "Background ID \(background.identifier)"
+    private func deleteContentTab() {
+        
+        let tabIndex = tabView.indexOfTabViewItem(withIdentifier: "content")
+        let tab = tabView.tabViewItem(at: tabIndex)
+        tabView.removeTabViewItem(tab)
+    }
+    
+    private func deletePictureTab() {
+        
+        let tabIndex = tabView.indexOfTabViewItem(withIdentifier: "picture")
+        let tab = tabView.tabViewItem(at: tabIndex)
+        tabView.removeTabViewItem(tab)
+    }
+    
+    func displayBackground(_ background: Background, number: Int) {
+        self.window!.title = self.describeLayer(background, layerType: .background, number: number)
         displayScript(background.script)
-        tabView.removeTabViewItem(tabView.tabViewItem(at: 1))
+        self.deleteContentTab()
+        self.displayLayerImage(of: background)
         
-        infoView.string = ["Name: \"\(background.name)\"",
-            "Number of parts: \(background.parts.count)\n",
-            "Show Pict: \(background.showPict)\n",
-            "Don't Search: \(background.dontSearch)",
-            "Can't Delete: \(background.cantDelete)"].joined(separator: "\n")
+        self.infos = [("Name", "\"\(background.name)\""),
+            ("Number","\(number)"),
+            ("ID","\(background.identifier)"),
+            ("Number of parts", "\(background.parts.count)"),
+            ("Show Pict", "\(background.showPict ? "yes" : "no")"),
+            ("Don't Search", "\(background.dontSearch ? "yes" : "no")"),
+            ("Can't Delete", "\(background.cantDelete ? "yes" : "no")")]
+        
+        self.infoTable.reloadData()
     }
     
-    func displayCard(_ card: Card) {
-        self.window!.title = "Card ID \(card.identifier)"
+    private func describeLayer(_ layer: Layer, layerType: LayerType, number: Int) -> String {
+        
+        let layerTypeName: String = (layerType == .background) ? "Background" : "Card"
+        
+        if layer.name.length > 0 {
+            return "\(layerTypeName) \"\(layer.name)\""
+        }
+        return "\(layerTypeName) \(number)"
+    }
+    
+    func displayCard(_ card: Card, number: Int) {
+        self.window!.title = self.describeLayer(card, layerType: .card, number: number)
         displayScript(card.script)
-        tabView.removeTabViewItem(tabView.tabViewItem(at: 1))
+        self.deleteContentTab()
+        self.displayLayerImage(of: card)
         
-        infoView.string = ["Name: \"\(card.name)\"",
-            "Number of parts: \(card.parts.count)\n",
-            "Marked: \(card.marked)",
-            "Show Pict: \(card.showPict)\n",
-            "Don't Search: \(card.dontSearch)",
-            "Can't Delete: \(card.cantDelete)"].joined(separator: "\n")
+        self.infos = [("Name", "\"\(card.name)\""),
+            ("Number","\(number)"),
+            ("ID","\(card.identifier)"),
+            ("Number of parts", "\(card.parts.count)"),
+            ("Marked", "\(card.marked ? "yes" : "no")"),
+            ("Show Pict", "\(card.showPict ? "yes" : "no")"),
+            ("Don't Search", "\(card.dontSearch ? "yes" : "no")"),
+            ("Can't Delete", "\(card.cantDelete ? "yes" : "no")")]
+        
+        self.infoTable.reloadData()
     }
     
-    func displayButton(_ button: Button, withContent content: HString) {
-        self.window!.title = "Button ID \(button.identifier)"
+    func displayLayerImage(of layer: Layer) {
+        
+        guard let image = layer.image else {
+            self.noImageLabel.stringValue = "No Picture"
+            return
+        }
+        
+        let cgImage = RgbConverter.convertMaskedImage(image)
+        self.pictureView.image = NSImage(cgImage: cgImage, size: NSZeroSize)
+        
+        /* Set-up the image view. We make it editable because it is the only way
+         the image can be copied */
+        self.pictureView.isEditable = true
+        self.pictureView.allowsCutCopyPaste = true
+    }
+    
+    func displayButton(_ button: Button, withContent content: HString, layerType: LayerType, number: Int, partNumber: Int, stack: Stack) {
+        self.window!.title = self.describePart(part: button, type: .button, layer: layerType, number: number)
         displayScript(button.script)
         contentView.string = content.description.replacingOccurrences(of: "\r", with: "\n")
+        self.deletePictureTab()
         
-        infoView.string = ["Name: \"\(button.name)\"",
-            "Style: \(button.style)\n",
-            "Visible: \(button.visible)",
-            "Enabled: \(button.enabled)",
-            "Hilite: \(button.hilite)",
-            "Auto Hilite: \(button.autoHilite)",
-            "Shared Hilite: \(button.sharedHilite)",
-            "Show Name: \(button.showName)\n",
-            "Family: \(button.family)\n",
-            "Title Width: \(button.titleWidth)"].joined(separator: "\n")
+        self.infos = [("Name", "\"\(button.name)\""),
+            ("Number", "\(number)"),
+            ("Part Number", "\(partNumber)"),
+            ("ID", "\(button.identifier)"),
+            ("Style", "\(InfoPanelController.partStyleNames[button.style]!)"),
+            ("Rectangle", "\(button.rectangle.left),\(button.rectangle.top),\(button.rectangle.right),\(button.rectangle.bottom)"),
+            ("Visible", "\(button.visible ? "yes" : "no")"),
+            ("Show Name", "\(button.showName ? "yes" : "no")"),
+            ("Enabled", "\(button.enabled ? "yes" : "no")"),
+            ("Hilite", "\(button.hilite ? "yes" : "no")"),
+            ("Auto Hilite", "\(button.autoHilite ? "yes" : "no")"),
+            ("Shared Hilite", "\(button.sharedHilite ? "yes" : "no")"),
+            ("Icon ID", "\(button.iconIdentifier)"),
+            ("Family", "\(button.family)"),
+            ("Title Width", "\(button.titleWidth)"),
+            ("Text Font", describeTextFont(button.textFontIdentifier, stack: stack)),
+            ("Text Size", "\(button.textFontSize)"),
+            ("Text Style", "\(self.describeTextStyle(button.textStyle))"),
+            ("Text Alignment", "\(button.textAlign)")]
+        
+        self.infoTable.reloadData()
     }
     
-    func displayField(_ field: Field, withContent content: HString) {
-        self.window!.title = "Field ID \(field.identifier)"
+    private func describeTextFont(_ identifier: Int, stack: Stack) -> String {
+        
+        switch stack.fileVersion {
+            
+        case .v1:
+            /* If the stack is v1, and so doesn't have a font name table, guess the name */
+            if let standardName = self.getStandardFontName(identifier) {
+                return standardName
+            }
+            
+        case .v2:
+            /* Look the name in the font name table */
+            if let fontReference = stack.fontNameReferences.first(where: { $0.identifier == identifier }) {
+                return fontReference.name.description
+            }
+        }
+        
+        /* Last resort */
+        return "ID \(identifier)"
+    }
+    
+    private func getStandardFontName(_ identifier: Int) -> String? {
+        
+        switch identifier {
+            
+        case FontIdentifiers.chicago:
+            return "Chicago"
+        case FontIdentifiers.newYork:
+            return "New York"
+        case FontIdentifiers.geneva:
+            return "Geneva"
+        case FontIdentifiers.monaco:
+            return "Monaco"
+        case FontIdentifiers.venice:
+            return "Venice"
+        case FontIdentifiers.london:
+            return "London"
+        case FontIdentifiers.athens:
+            return "Athens"
+        case FontIdentifiers.sanFrancisco:
+            return "San Francisco"
+        case FontIdentifiers.toronto:
+            return "Toronto"
+        case FontIdentifiers.cairo:
+            return "Cairo"
+        case FontIdentifiers.losAngeles:
+            return "Los Angeles"
+        case FontIdentifiers.palatino:
+            return "Palatino"
+        case FontIdentifiers.times:
+            return "Times"
+        case FontIdentifiers.helvetica:
+            return "Helvetica"
+        case FontIdentifiers.courier:
+            return "Courier"
+        case FontIdentifiers.symbol:
+            return "Symbol"
+        case FontIdentifiers.taliesin:
+            return "Taliesin"
+        case FontIdentifiers.charcoal:
+            return "Charcoal"
+        default:
+            return nil
+        }
+    }
+    
+    private func describeTextStyle(_ textStyle: TextStyle) -> String {
+        
+        var string = ""
+        
+        for textStyleName in InfoPanelController.textStyleNames {
+            
+            if textStyle[keyPath: textStyleName.0] {
+                if string.isEmpty {
+                    string = textStyleName.1
+                }
+                else {
+                    string += ", \(textStyleName.1)"
+                }
+            }
+        }
+        if string.isEmpty {
+            return "plain"
+        }
+        return string
+    }
+    
+    private func describePart(part: Part, type: PartType, layer: LayerType, number: Int) -> String {
+        
+        let partTypeName = (type == .field) ? "Field" : "Button"
+        let layerTypeName = (layer == .background) ? "Background" : "Card"
+        let typeName = "\(layerTypeName) \(partTypeName)"
+        
+        if part.name.length > 0 {
+            return "\(typeName) \"\(part.name)\""
+        }
+        
+        return "\(typeName) \(number)"
+    }
+    
+    func displayField(_ field: Field, withContent content: HString, layerType: LayerType, number: Int, partNumber: Int, stack: Stack) {
+        self.window!.title = self.describePart(part: field, type: .field, layer: layerType, number: number)
         displayScript(field.script)
         contentView.string = content.description.replacingOccurrences(of: "\r", with: "\n")
+        self.deletePictureTab()
         
-        infoView.string = ["Name: \"\(field.name)\"",
-            "Style: \(field.style)\n",
-            "Visible: \(field.visible)",
-            "Lock Text: \(field.lockText)",
-            "Auto Tab: \(field.autoTab)",
-            "Fixed Line Height: \(field.fixedLineHeight)",
-            "Shared Text: \(field.sharedText)",
-            "Don't Search: \(field.dontSearch)",
-            "Don't Wrap: \(field.dontWrap)",
-            "Multiple Lines: \(field.multipleLines)",
-            "Wide Margins: \(field.wideMargins)",
-            "Show Lines: \(field.showLines)",
-            "Auto Select: \(field.autoSelect)"].joined(separator: "\n")
+        self.infos = [("Name", "\"\(field.name)\""),
+            ("Number", "\(number)"),
+            ("Part Number", "\(partNumber)"),
+            ("ID", "\(field.identifier)"),
+            ("Style", "\(InfoPanelController.partStyleNames[field.style]!)"),
+            ("Rectangle", "\(field.rectangle.left),\(field.rectangle.top),\(field.rectangle.right),\(field.rectangle.bottom)"),
+            ("Visible", "\(field.visible ? "yes" : "no")"),
+            ("Lock Text", "\(field.lockText ? "yes" : "no")"),
+            ("Auto Tab", "\(field.autoTab ? "yes" : "no")"),
+            ("Fixed Line Height", "\(field.fixedLineHeight ? "yes" : "no")"),
+            ("Shared Text", "\(field.sharedText ? "yes" : "no")"),
+            ("Don't Search", "\(field.dontSearch ? "yes" : "no")"),
+            ("Don't Wrap", "\(field.dontWrap ? "yes" : "no")"),
+            ("Multiple Lines", "\(field.multipleLines ? "yes" : "no")"),
+            ("Wide Margins", "\(field.wideMargins ? "yes" : "no")"),
+            ("Show Lines", "\(field.showLines ? "yes" : "no")"),
+            ("Auto Select", "\(field.autoSelect ? "yes" : "no")"),
+            ("Text Font", describeTextFont(field.textFontIdentifier, stack: stack)),
+            ("Text Size", "\(field.textFontSize)"),
+            ("Text Style", "\(self.describeTextStyle(field.textStyle))"),
+            ("Text Alignment", "\(field.textAlign)")]
         
+        self.infoTable.reloadData()
     }
     
     func displayScript(_ script: HString) {
@@ -150,7 +356,7 @@ class InfoPanelController: NSWindowController {
                 return false
             }
             let indexBefore = realIndex - string.length + 1
-            if indexBefore >= 0 && compareCaseDiacritics(script[indexBefore..<(realIndex + 1)], string) == .orderedSame {
+            if indexBefore >= 0 && script[indexBefore..<(realIndex + 1)] == string {
                 if indexBefore == 0 {
                     return true
                 }
@@ -165,7 +371,7 @@ class InfoPanelController: NSWindowController {
         
         func isWordAfterIndex(_ index: Int, _ string: HString) -> Bool {
             let indexAfter = index + string.length + 1
-            if indexAfter <= script.length && compareCaseDiacritics(script[(index + 1)..<indexAfter], string) == .orderedSame {
+            if indexAfter <= script.length && script[(index + 1)..<indexAfter] == string {
                 if indexAfter == script.length {
                    return true
                 }
@@ -293,6 +499,21 @@ class InfoPanelController: NSWindowController {
         }
         
         return HString(data: indentedData)
+    }
+    
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        return self.infos.count
+    }
+    
+    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
+        
+        let info = self.infos[row]
+        if tableColumn?.identifier.rawValue == "name" {
+            return info.0
+        }
+        else {
+            return info.1
+        }
     }
     
 }

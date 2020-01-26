@@ -10,53 +10,37 @@
 public extension ResourceRepository {
     
     /// The main resource repository, representing the resource forks of HyperCard and Mac OS.
-    static let mainRepository = buildMainRepository()
+    static let mainRepositories = buildMainRepositories()
 }
 
-
-private extension ResourceRepository {
+private func buildMainRepositories() -> [ResourceRepository] {
     
-    mutating func append(_ repository: ResourceRepository) {
-        self.icons.append(contentsOf: repository.icons)
-        self.fontFamilies.append(contentsOf: repository.fontFamilies)
-        self.cardColors.append(contentsOf: repository.cardColors)
-        self.backgroundColors.append(contentsOf: repository.backgroundColors)
-        self.pictures.append(contentsOf: repository.pictures)
-    }
-    
-}
-
-private func buildMainRepository() -> ResourceRepository {
-    
-    var repository = ResourceRepository(icons: [], fontFamilies: [], cardColors: [], backgroundColors: [], pictures: [])
+    var repositories: [ResourceRepository] = []
     
     /* Add the icons */
-    let icons = loadIcons()
-    repository.append(icons)
+    repositories.append(loadIcons())
     
     /* Add the fonts */
-    let fonts = loadClassicFontResources()
-    repository.append(fonts)
+    repositories.append(contentsOf: loadClassicFontResources())
     
-    return repository
+    return repositories
 }
 
 private func loadIcons() -> ResourceRepository {
     
     /* Create the repository */
-    var icons = [IconResource]()
+    var icons = [Resource]()
     
     /* Add the icons */
     let iconIdentifiers = listIconIdentifiers()
     for iconIdentifier in iconIdentifiers {
-        let contentProperty = Property<Icon> { () -> Icon in
+        let icon = Resource(identifier: iconIdentifier, name: "", typeIdentifier: ResourceTypes.icon) { () -> Icon in
             return loadIcon(withIdentifier: iconIdentifier)
         }
-        let icon = IconResource(identifier: iconIdentifier, name: "", contentProperty: contentProperty)
         icons.append(icon)
     }
     
-    return ResourceRepository(icons: icons, fontFamilies: [], cardColors: [], backgroundColors: [], pictures: [])
+    return ResourceRepository(resources: icons)
 }
 
 private let IconFilePrefix = "icon_"
@@ -125,16 +109,9 @@ private let classicFontRepositoryNames: [String] = [
     "Fonts"
 ]
 
-private func loadClassicFontResources() -> ResourceRepository {
+private func loadClassicFontResources() -> [ResourceRepository] {
     
-    var fontRepository = ResourceRepository(icons: [], fontFamilies: [], cardColors: [], backgroundColors: [], pictures: [])
-    let repositories = classicFontRepositoryNames.compactMap(loadClassicFontResources)
-    
-    for repository in repositories {
-        fontRepository.append(repository)
-    }
-    
-    return fontRepository
+    return classicFontRepositoryNames.compactMap(loadClassicFontResources)
 }
 
 private func loadClassicFontResources(withName name: String) -> ResourceRepository? {

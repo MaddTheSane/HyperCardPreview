@@ -8,11 +8,11 @@
 
 
 
-private let trueHiliteContent = "1"
+private let trueHiliteContent: HString = "1"
 
 
 /// Browses through a stack: maintains a current card and current background and draws them.
-public class Browser {
+public class Browser: MouseResponder {
     
     /// The stack being browsed
     public let hyperCardFile: HyperCardFile
@@ -35,6 +35,7 @@ public class Browser {
     public var displayOnlyBackgroundProperty = Property<Bool>(false)
     
     private let drawing: Drawing
+    private let imageBuffer: ImageBuffer
     
     private let resources: ResourceSystem
     private let fontManager: FontManager
@@ -54,7 +55,15 @@ public class Browser {
         return self.currentCard.background
     }
     
-    private var viewRecords: [ViewRecord] = []
+    private var views: [View] = []
+    
+    private var refreshNeeds: [RefreshNeed] = []
+    
+    private struct RefreshNeed {
+        var rectangle: Rectangle
+        var viewIndex: Int
+        var view: View
+    }
     
     public var needsDisplay: Bool {
         get { return needsDisplayProperty.value }
@@ -68,58 +77,39 @@ public class Browser {
     /// the view used to draw a white background on the window
     private var whiteView: WhiteView
     
-    /// if the white view is in the view stack
-    private var isShowingWhiteView = false
-    
-    private let cgdata: UnsafeMutableRawPointer
-    private let cgcontext: CGContext
-    
     private let areThereColors: Bool
     
-    private struct ViewRecord {
-        
-        /// the view
-        public let view: View
-        
-        /// if the view is marked for refresh
-        public var willRefresh: Bool
-        
-        /// if the views behind have been updateed when the view was marked for refresh
-        public var didUpdateBehind: Bool
-        
-        /// if the view accepts to draw sub-rectangles, the rectangles to draw.
-        public var rectanglesToRefresh: [Rectangle]?
-    }
+    private weak var _selectedField: FieldView? = nil
+    
+    public var cursorRectanglesProperty = Property<[Rectangle]>([])
+    private var doCursorRectanglesChange = false
     
     /// Builds a new browser from the given stack. A starting card index can be given.
-    public init(hyperCardFile: HyperCardFile, cardIndex: Int = 0) {
+    public init(hyperCardFile: HyperCardFile, cardIndex: Int = 0, imageBuffer: ImageBuffer) {
         self.hyperCardFile = hyperCardFile
         let stack = hyperCardFile.stack
         drawing = Drawing(width: stack.size.width, height: stack.size.height)
+        
+        self.imageBuffer = imageBuffer
+        imageBuffer.context.scaleBy(x: CGFloat(imageBuffer.width)/CGFloat(stack.size.width), y: CGFloat(imageBuffer.height)/CGFloat(stack.size.height))
+        imageBuffer.context.translateBy(x: 0, y: CGFloat(stack.size.height))
+        imageBuffer.context.scaleBy(x: 1, y: -1)
+        imageBuffer.context.setBlendMode(CGBlendMode.darken)
         
         var resources = ResourceSystem()
         if let stackResources = hyperCardFile.resources {
             resources.repositories.append(stackResources)
         }
-        resources.repositories.append(ResourceRepository.mainRepository)
+        resources.repositories.append(contentsOf: ResourceRepository.mainRepositories)
         self.resources = resources
         
         self.fontManager = FontManager(resources: resources, fontNameReferences: stack.fontNameReferences)
         
         self.cardIndexProperty = Property<Int>(cardIndex)
         
-        let width = stack.size.width
-        let height = stack.size.height
-        let cgdata = RgbConverter.createRgbData(width: width, height: height)
-        self.cgdata = cgdata
-        self.cgcontext = RgbConverter.createContext(forRgbData: cgdata, width: width, height: height)
-        self.whiteView = WhiteView(cardRectangle: Rectangle(x: 0, y: 0, width: width, height: height))
-        
         self.areThereColors = Browser.areThereColors(inFile: hyperCardFile)
         
-        /* Flip the contect */
-        cgcontext.translateBy(x: 0, y: CGFloat(height))
-        cgcontext.scaleBy(x: 1, y: -1)
+        self.whiteView = WhiteView(cardRectangle: Rectangle(x: 0, y: 0, width: stack.size.width, height: stack.size.height))
         
         /* Add a background view */
         self.appendView(self.whiteView)
@@ -137,37 +127,30 @@ public class Browser {
             return false
         }
         
-        return !repository.cardColors.isEmpty || !repository.backgroundColors.isEmpty
+        return repository.resources.first(where: { $0.typeIdentifier == ResourceTypes.cardColor || $0.typeIdentifier == ResourceTypes.backgroundColor }) != nil
     }
     
     private func rebuildViews() {
+        
+        self.doCursorRectanglesChange = false
+        
+        /* If there are colors, we must refresh all because there may be updated colors also that we don't track */
+        if areThereColors {
+            self.addRefreshNeed(in: Rectangle(x: 0, y: 0, width: stack.size.width, height: stack.size.height), at: 0)
+        }
         
         /* If we haven't changed background, keep the background parts */
         if currentBackground === backgroundBefore {
             
             /* Remove all the views except the background views, there are one view per part,
              plus one for the image, plus one for the white view */
-            let backgroundViewCount = 1 + currentBackground.parts.count + (isShowingWhiteView ? 1 : 0)
-            removeLastViews(count: self.viewRecords.count - backgroundViewCount)
-            
-            /* Set the scrolls of the background fields to zero, to avoid having a field
-             with a scroll higher than maximum */
-            for field in currentBackground.fields {
-                if field.style == .scrolling {
-                    field.scroll = 0
-                }
-            }
+            let backgroundViewCount = 1 + currentBackground.parts.count + 1
+            removeLastViews(count: self.views.count - backgroundViewCount)
         }
         else {
             
-            /* Remove all the views except the window background */
-            self.viewRecords.removeAll()
-            
-            /* If the background doesn't draw a white background, add the white view */
-            isShowingWhiteView = !doesBackgroundHaveWhiteMask(self.currentBackground)
-            if isShowingWhiteView {
-                appendView(self.whiteView)
-            }
+            /* Remove all the views except the white view */
+            self.removeLastViews(count: self.views.count - 1)
             
             /* Append background views */
             appendLayerViews(self.currentBackground)
@@ -182,9 +165,88 @@ public class Browser {
             appendLayerViews(self.currentCard)
         }
         
-        /* We must refresh */
-        self.needsDisplay = true
+        if self.doCursorRectanglesChange {
+            self.cursorRectanglesProperty.value = self.listCursorRectangles()
+        }
                 
+    }
+    
+    private func listCursorRectangles() -> [Rectangle] {
+        
+        var rectangles: [Rectangle] = []
+        
+        /* Function to loop on the cursor rectangles and break them so they
+         surround the argument rectangle */
+        func excludeRectangle(_ rectangle: Rectangle) {
+            
+            var i = rectangles.count - 1
+            while i >= 0 {
+                if let subRectangles = self.buildComplementSubRectangles(of: rectangles[i], around: rectangle) {
+                    rectangles.replaceSubrange(i..<(i+1), with: subRectangles)
+                }
+                i -= 1
+            }
+        }
+        
+        for view in self.views {
+            
+            /* If the view is a field, include it in the cursor rectangles */
+            if view is FieldView, let rectangle = view.rectangle {
+                rectangles.append(rectangle)
+            }
+            
+            /* If the view is a scrolling field, exclure the scroll from the cursor rectangles */
+            if let fieldView = view as? FieldView, fieldView.field.style == .scrolling, let wholeRectangle = view.rectangle {
+                let scrollRectangle = Rectangle(top: wholeRectangle.top, left: wholeRectangle.right - scrollWidth, bottom: wholeRectangle.bottom, right: wholeRectangle.right)
+                excludeRectangle(scrollRectangle)
+            }
+            
+            /* If the view is a button, exclude it from the cursor rectangles */
+            if view is ButtonView, let rectangle = view.rectangle {
+                excludeRectangle(rectangle)
+            }
+        }
+        
+        return rectangles
+    }
+    
+    private func buildComplementSubRectangles(of baseRectangle: Rectangle, around rectangle: Rectangle) -> [Rectangle]? {
+        
+        guard baseRectangle.intersects(rectangle) else {
+            return nil
+        }
+        
+        /* Build the four sub-rectangles around the rectangle */
+        var subRectangles: [Rectangle] = []
+        
+        /* Top */
+        let topSubRectangle = Rectangle(top: baseRectangle.top, left: baseRectangle.left, bottom: rectangle.top, right: baseRectangle.right)
+        if topSubRectangle.width > 0 && topSubRectangle.height > 0 {
+            subRectangles.append(topSubRectangle)
+        }
+        
+        /* Bottom */
+        let bottomSubRectangle = Rectangle(top: rectangle.bottom, left: baseRectangle.left, bottom: baseRectangle.bottom, right: baseRectangle.right)
+        if bottomSubRectangle.width > 0 && bottomSubRectangle.height > 0 {
+            subRectangles.append(bottomSubRectangle)
+        }
+        
+        let sideRectangleTop = max(rectangle.top, baseRectangle.top)
+        let sideRetangleBottom = min(rectangle.bottom, baseRectangle.bottom)
+        
+        /* Left */
+        let leftSubRectangle = Rectangle(top: sideRectangleTop, left: baseRectangle.left, bottom: sideRetangleBottom, right: rectangle.left)
+        if leftSubRectangle.width > 0 && leftSubRectangle.height > 0 {
+            subRectangles.append(leftSubRectangle)
+        }
+        
+        /* Right */
+        let rightSubRectangle = Rectangle(top: sideRectangleTop, left: rectangle.right, bottom: sideRetangleBottom, right: baseRectangle.right)
+        if rightSubRectangle.width > 0 && rightSubRectangle.height > 0 {
+            subRectangles.append(rightSubRectangle)
+        }
+        
+        return subRectangles
     }
     
     private func doesBackgroundHaveWhiteMask(_ background: Background) -> Bool {
@@ -211,88 +273,97 @@ public class Browser {
     private func removeLastViews(count: Int) {
         
         /* Check if the views to remove are visible */
-        let remainingViewCount = viewRecords.count - count
-        let needsUpdate = viewRecords[remainingViewCount ..< viewRecords.count].map({$0.view.rectangle != nil}).reduce(false, { (b1: Bool, b2: Bool) -> Bool in
-            return b1 || b2
-        })
+        let remainingViewCount = views.count - count
         
-        /* Remove the views */
-        self.viewRecords.removeLast(count)
-        
-        /* If the card was visible, refresh all the background views (don't loose time looping on all the card views) */
-        if needsUpdate {
-            for i in 0..<viewRecords.count {
-                if !viewRecords[i].willRefresh {
-                    markViewForRefresh(atIndex: i, redrawBehind: true)
-                }
-            }
+        for _ in remainingViewCount ..< views.count {
+            
+            let view = views.last!
+            self.removeView(view)
         }
         
     }
     
-    private func markViewForRefresh(atIndex index: Int, redrawBehind: Bool) {
+    private func removeView(_ view: View) {
         
-        /* Get the view rectangle */
-        guard let dirtyRectangle = viewRecords[index].view.rectangle else {
-            return
-        }
+        self.addRefreshNeed(under: view)
         
-        /* Mask the view for refresh */
-        viewRecords[index].willRefresh = true
-        viewRecords[index].didUpdateBehind = redrawBehind
+        let index = self.views.firstIndex(where: { $0 === view })!
+        self.views.remove(at: index)
         
-        /* Refresh all the views in front */
-        for i in (index+1) ..< viewRecords.count {
-            self.markViewForRefreshIfOverlapsRect(atIndex: i, dirtyRectangle: dirtyRectangle)
-        }
-        
-        /* Refresh the views behind if requested */
-        if redrawBehind {
-            for i in 0 ..< index {
-                self.markViewForRefreshIfOverlapsRect(atIndex: i, dirtyRectangle: dirtyRectangle)
-            }
-        }
-        
-        self.needsDisplay = true
+        self.doCursorRectanglesChange = true
     }
     
-    private func markViewForRefreshIfOverlapsRect(atIndex index: Int, dirtyRectangle: Rectangle) {
+    private func addRefreshNeed(under view: View) {
         
-        /* Get the view */
-        let view = viewRecords[index].view
-        
-        /* Get the rectangle */
         guard let rectangle = view.rectangle else {
             return
         }
         
-        /* The view must intersects the dirty rect */
-        guard rectangle.intersects(dirtyRectangle) else {
+        self.addRefreshNeed(in: rectangle, at: 0)
+    }
+    
+    private func addRefreshNeed(above view: View) {
+        
+        guard let rectangle = view.rectangle else {
             return
         }
         
-        /* Check if it not already marked for refresh */
-        guard !viewRecords[index].willRefresh else {
+        /* If we're changing card, the view may have disappeared */
+        guard let viewIndex = self.views.firstIndex(where: { $0 === view }) else {
             return
         }
         
-        /* If the view can draw sub-rectangles, mark the rectangle for refresh. Do not check the other
-         views because the rectangle is already dirty */
-        if view is ClipableView {
+        self.addRefreshNeed(in: rectangle, at: viewIndex)
+    }
+    
+    private func addRefreshNeed(in unclippedRectangle: Rectangle, at viewIndex: Int) {
+        
+        guard let rectangle = computeRectangleIntersection(unclippedRectangle, Rectangle(x: 0, y: 0, width: self.image.width, height: self.image.height)) else {
+            return
+        }
+        
+        /* Remove the refresh needs that are not valid anymore */
+        self.removeInvalidRefreshNeeds()
+        
+        /* Check it doesn't enclose or isn't enclosed by another one */
+        for i in 0..<self.refreshNeeds.count {
             
-            let rectangleToRefresh = computeRectangleIntersection(dirtyRectangle, rectangle)
-            var rectanglesToRefresh: [Rectangle] = viewRecords[index].rectanglesToRefresh ?? []
-            rectanglesToRefresh.append(rectangleToRefresh)
-            viewRecords[index].rectanglesToRefresh = rectanglesToRefresh
-            return
+            let refreshNeed = self.refreshNeeds[i]
+            
+            if rectangle.containsRectangle(refreshNeed.rectangle) {
+                
+                self.refreshNeeds[i].rectangle = rectangle
+                if viewIndex < refreshNeed.viewIndex {
+                    self.refreshNeeds[i].viewIndex = viewIndex
+                    self.refreshNeeds[i].view = self.views[viewIndex]
+                }
+                return
+            }
+            
+            if refreshNeed.rectangle.containsRectangle(rectangle) {
+                
+                if viewIndex < refreshNeed.viewIndex {
+                    self.refreshNeeds[i].viewIndex = viewIndex
+                    self.refreshNeeds[i].view = self.views[viewIndex]
+                }
+                return
+            }
         }
         
-        /* Mask the view for refresh. Do not draw behind because it still has the same shape */
-        self.markViewForRefresh(atIndex: index, redrawBehind: view.usesXorComposition)
+        let newRefreshNeed = RefreshNeed(rectangle: rectangle, viewIndex: viewIndex, view: self.views[viewIndex])
+        self.refreshNeeds.append(newRefreshNeed)
+        self.needsDisplay = true
+    }
+    
+    private func removeInvalidRefreshNeeds() {
         
+        self.refreshNeeds.removeAll(where: { $0.viewIndex >= self.views.count || $0.view !== self.views[$0.viewIndex] })
     }
     
     public func refresh() {
+        
+        /* Remove the refresh needs that are not valid anymore */
+        self.removeInvalidRefreshNeeds()
         
         /* If there are colors, it is a separate process */
         guard !self.areThereColors else {
@@ -302,76 +373,66 @@ public class Browser {
         }
         
         /* Refresh the drawing */
-        if let dirtyRectangle  = self.refreshDrawing() {
-            
-            /* Refresh the CGImage */
-            RgbConverter.fillRgbData(self.cgdata, withImage: self.image, rectangle: dirtyRectangle)
+        let refreshNeeds = self.refreshNeeds
+        self.refreshDrawing()
+        
+        /* Update the image buffer */
+        for refreshNeed in refreshNeeds {
+            self.imageBuffer.drawImage(self.image, onlyRectangle: refreshNeed.rectangle)
         }
         
     }
     
     private func refreshWithColors() {
         
-        /* Draw a white background */
-        cgcontext.setFillColor(CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0))
-        cgcontext.fill(CGRect(x: 0, y: 0, width: image.width, height: image.height))
-        
-        /* Draw the colors */
-        AddColorPainter.paintAddColor(ofFile: hyperCardFile, atCardIndex: cardIndex, excludeCardParts: self.displayOnlyBackground, onContext: cgcontext)
-        
-        /* Update data */
-        cgcontext.flush()
-        
-        /* Update the black&white image */
-        let _  = self.refreshDrawing()
-        
-        /* Draw the black&white image (only the black pixels, to keep the colors behind) */
-        RgbConverter.fillRgbDataWithBlackPixels(self.cgdata, withImage: self.image)
-        
-    }
-    
-    private func refreshDrawing() -> Rectangle? {
-        
-        var index = -1
-        var dirtyRectangle: Rectangle? = nil
-        
-        /* Draw the views */
-        for viewRecord in viewRecords {
+        for refreshNeed in self.refreshNeeds {
             
-            let view = viewRecord.view
-            index += 1
+            let rectangle = refreshNeed.rectangle
+        
+            let cgRect = CGRect(x: rectangle.x, y: rectangle.y, width: rectangle.width, height: rectangle.height)
             
-            /* The view may be not for refresh but have rectangles to draw */
-            if let clipableView = view as? ClipableView,
-                let rectanglesToRefresh = viewRecord.rectanglesToRefresh, !viewRecord.willRefresh {
-                for rectangle in rectanglesToRefresh {
-                    clipableView.draw(in: drawing, rectangle: rectangle)
-                    dirtyRectangle = computeEnclosingRectangle(dirtyRectangle, rectangle)
+            /* Update all the views in the rectangle */
+            drawing.clipRectangle = rectangle
+            for view in self.views {
+                
+                guard let viewRectangle = view.rectangle,
+                    viewRectangle.intersects(refreshNeed.rectangle) else {
+                        continue
                 }
-                view.refreshNeed = .none
-                viewRecords[index].rectanglesToRefresh = nil
-                viewRecords[index].didUpdateBehind = false
-                continue
+                
+                view.draw(in: drawing)
             }
             
-            /* Check if the view is programmed for refresh */
-            guard viewRecord.willRefresh else {
-                continue
-            }
+            self.imageBuffer.drawImage(self.image, onlyRectangle: rectangle)
             
-            /* Draw the view */
-            view.draw(in: drawing)
-            view.refreshNeed = .none
-            viewRecords[index].willRefresh = false
-            viewRecords[index].didUpdateBehind = false
-            viewRecords[index].rectanglesToRefresh = nil
-            dirtyRectangle = computeEnclosingRectangle(dirtyRectangle, view.rectangle)
+            /* Draw the colors */
+            imageBuffer.context.resetClip()
+            imageBuffer.context.clip(to: cgRect)
+            AddColorPainter.paintAddColor(ofFile: hyperCardFile, atCardIndex: cardIndex, excludeCardParts: self.displayOnlyBackground, onContext: imageBuffer.context)
         }
         
-        /* Restrain the rectangle to the card, in case there are parts outside the card rectangle */
-        dirtyRectangle = (dirtyRectangle == nil) ? nil : computeRectangleIntersection(dirtyRectangle!, Rectangle(x: 0, y: 0, width: image.width, height: image.height))
+        self.refreshNeeds.removeAll()
+    }
+    
+    private func refreshDrawing() {
         
-        return dirtyRectangle
+        for refreshNeed in self.refreshNeeds {
+            
+            self.drawing.clipRectangle = refreshNeed.rectangle
+            
+            for i in refreshNeed.viewIndex ..< self.views.count {
+                
+                let view = self.views[i]
+                guard let rectangle = view.rectangle,
+                    rectangle.intersects(refreshNeed.rectangle) else {
+                    continue
+                }
+                
+                view.draw(in: drawing)
+            }
+        }
+        
+        self.refreshNeeds.removeAll()
     }
     
     private func appendLayerViews(_ layer: Layer) {
@@ -402,22 +463,18 @@ public class Browser {
             /* Check if the view has changed shape, in that case the views behind must be refreshed */
             let hasChangedShape = (view.refreshNeed == .refreshWithNewShape)
             
-            /* Find the record */
-            let index = self.viewRecords.firstIndex(where: { $0.view === view })!
-            let record = self.viewRecords[index]
-            if (!hasChangedShape && record.willRefresh) || (hasChangedShape && record.didUpdateBehind) {
-                return
+            if hasChangedShape || view.usesXorComposition {
+                self.addRefreshNeed(under: view)
             }
-            
-            /* Refresh */
-            self.markViewForRefresh(atIndex: index, redrawBehind: hasChangedShape)
+            else {
+                self.addRefreshNeed(above: view)
+            }
         })
         
-        /* Build a view record. Do not mark it as refresh because we're just adding a view on top, just set willRefresh to true  */
-        let viewRecord = ViewRecord(view: view, willRefresh: true, didUpdateBehind: false, rectanglesToRefresh: nil)
-        self.viewRecords.append(viewRecord)
-        self.needsDisplay = true
+        self.views.append(view)
+        self.addRefreshNeed(above: view)
         
+        self.doCursorRectanglesChange = true
     }
     
     private func buildPartView(for part: LayerPart) -> View {
@@ -437,6 +494,11 @@ public class Browser {
         let contentComputation = retrieveContent(of: field)
         
         let view = FieldView(field: field, contentComputation: contentComputation, fontManager: self.fontManager)
+        
+        /* Manage the selection */
+        view.selectedRangeProperty.startNotifications(for: self) { [unowned self, unowned view] in
+            self.respondToViewSelection(view)
+        }
         
         return view
         
@@ -482,11 +544,55 @@ public class Browser {
         return computation
     }
     
+    private func respondToViewSelection(_ view: FieldView) {
+        
+        guard self.selectedField !== view else {
+            return
+        }
+        guard view.selectedRange != nil else {
+            return
+        }
+        
+        /* If there was a selected field (and still valid), deselect it */
+        if let field = self.selectedField {
+            field.selectedRange = nil
+        }
+        
+        self.selectedField = view
+    }
+    
+    public var selectedField: FieldView? {
+        
+        get {
+            guard let field = self._selectedField else {
+                return nil
+            }
+            
+            /* If the field doesn't exist anymore because we have changed card,
+             forget it */
+            guard views.contains(where: { $0 === field }) else {
+                self._selectedField = nil
+                return nil
+            }
+            
+            return self._selectedField
+        }
+        
+        set {
+            self._selectedField = newValue
+        }
+    }
+    
     private func buildButtonView(for button: Button) -> View {
         
-        let hiliteComputation = retrieveHilite(of: button)
+        /* Handle families */
+        let familyCallback = {
+            [unowned self] (view: ButtonView) in
+            self.buttonViewDidSetHilite(view)
+        }
         
-        return ButtonView(button: button, hiliteComputation: hiliteComputation, fontManager: fontManager, resources: resources)
+        let hiliteComputation = retrieveHilite(of: button)
+        return ButtonView(button: button, hiliteComputation: hiliteComputation, fontManager: fontManager, resources: resources, familyCallback: familyCallback)
     }
     
     private func retrieveHilite(of button: Button) -> Computation<Bool> {
@@ -494,42 +600,95 @@ public class Browser {
         /* Special case: bg buttons with not shared hilite */
         if !button.sharedHilite && isPartInBackground(button) {
             
-            let computation = Computation<Bool> {
-                [unowned self, unowned button] () -> Bool in
-            
-                /* If we're displaying the background, do not display the card contents */
-                if self.displayOnlyBackground {
-                    return false
-                }
-                
-                /* Get the content of the button in the card */
-                guard let content = self.findContentInCurrentCard(of: button) else {
-                    return false
-                }
-                
-                /* If the card content is equal to "1", the button is hilited */
-                guard case PartContent.string(let textContent) = content, textContent == trueHiliteContent  else {
-                    return false
-                }
-            
-                return true
-            }
-            
-            /* Dependencies */
-            computation.dependsOn(self.cardIndexProperty)
-            computation.dependsOn(self.displayOnlyBackgroundProperty)
-            
+            let computation = self.buildBackgroundHiliteComputation(for: button)
             return computation
         }
         
         /* Usual case: just return hilite */
-        let computation = Computation<Bool> {
+        let computation = self.buildHiliteComputation(for: button)
+        return computation
+    }
+    
+    private func buildHiliteComputation(for button: Button) -> Computation<Bool> {
+        
+        let compute = {
             [unowned button] () -> Bool in
             return button.hilite
         }
+        let modify = {
+            [unowned button] (hilite: Bool) in
+            button.hilite = hilite
+        }
+        let computation = Computation<Bool>(compute: compute, modify: modify)
         computation.dependsOn(button.hiliteProperty)
-        
         return computation
+    }
+    
+    private func buildBackgroundHiliteComputation(for button: Button) -> Computation<Bool> {
+        
+        let compute = {
+            [unowned self, unowned button] () -> Bool in
+            
+            /* If we're displaying the background, do not display the card contents */
+            if self.displayOnlyBackground {
+                return false
+            }
+            
+            /* Get the content of the button in the card */
+            guard let content = self.findContentInCurrentCard(of: button) else {
+                return false
+            }
+            
+            /* If the card content is equal to "1", the button is hilited */
+            guard case PartContent.string(let textContent) = content, textContent == trueHiliteContent  else {
+                return false
+            }
+            
+            return true
+        }
+        let modify = {
+            [unowned self, unowned button] (hilite: Bool) -> () in
+            
+            /* Remove the current content */
+            self.currentCard.backgroundPartContents.removeAll(where: { $0.partIdentifier == button.identifier })
+            
+            /* If hilite, add the content to tell it */
+            if hilite {
+                let newContent = Card.BackgroundPartContent(partIdentifier: button.identifier, partContent: PartContent.string(trueHiliteContent))
+                self.currentCard.backgroundPartContents.append(newContent)
+            }
+        }
+        let computation = Computation<Bool>(compute: compute, modify: modify)
+        computation.dependsOn(self.cardIndexProperty)
+        computation.dependsOn(self.displayOnlyBackgroundProperty)
+        return computation
+    }
+    
+    private func buttonViewDidSetHilite(_ buttonView: ButtonView) {
+        
+        guard self.views.contains(where: { $0 === buttonView }) else {
+            return
+        }
+        guard buttonView.button.family > 0 else {
+            return
+        }
+        
+        let backgroundViewCount = 1 + currentBackground.parts.count + 1
+        let range: Range<Int> = self.isPartInBackground(buttonView.button) ? 0..<backgroundViewCount : backgroundViewCount..<self.views.count
+        
+        for i in range {
+            let otherView = self.views[i]
+            guard otherView !== buttonView else {
+                continue
+            }
+            guard let otherButtonView = otherView as? ButtonView else {
+                continue
+            }
+            guard otherButtonView.button.family == buttonView.button.family else {
+                continue
+            }
+            otherButtonView.hilite = false
+        }
     }
     
     private func isPartInBackground(_ part: Part) -> Bool {
@@ -549,17 +708,10 @@ public class Browser {
         return content.partContent
     }
     
-    public func buildImage() -> CGImage {
-        
-        return RgbConverter.createImage(forRgbData: cgdata, isOwner: false, width: self.image.width, height: self.image.height)
-    }
-    
-    public func findViewRespondingToMouseEvent(at position: Point) -> MouseResponder? {
+    public func findViewRespondingToMouseEvent(at position: Point) -> MouseResponder {
         
         /* Ask to the views, from the foremost to the outmost */
-        for viewRecord in viewRecords.reversed() {
-            
-            let view = viewRecord.view
+        for view in views.reversed() {
             
             /* Check if the view responds to the mouse */
             guard let responder = view as? MouseResponder else {
@@ -574,7 +726,52 @@ public class Browser {
             return responder
         }
         
-        return nil
+        return self
+    }
+    
+    public func doesRespondToMouseEvent(at position: Point) -> Bool {
+        return true
+    }
+    
+    public func respondToMouseEvent(_ mouseEvent: MouseEvent, at position: Point) {
+        
+        guard case MouseEvent.mouseUp = mouseEvent else {
+            return
+        }
+        
+        if let field = self.selectedField {
+            field.selectedRange = nil
+        }
+    }
+    
+    public func hasSelection() -> Bool {
+        return self.selectedField != nil
+    }
+    
+    public func getSelection() -> HString? {
+        guard let field = self.selectedField else {
+            return nil
+        }
+        return field.getSelection()
+    }
+    
+    public func selectAll() {
+        guard let field = self.selectedField else {
+            return
+        }
+        field.selectAll()
+    }
+    
+    public func getFieldView(of field: Field) -> FieldView {
+        
+        for view in self.views {
+            
+            if let fieldView = view as? FieldView, fieldView.field === field {
+                return fieldView
+            }
+        }
+        
+        fatalError()
     }
     
 }

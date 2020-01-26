@@ -10,15 +10,79 @@ import Cocoa
 import HyperCardCommon
 
 /// The view displaying the HyperCard stack
-class DocumentView: NSView, NSMenuDelegate {
+class DocumentView: NSView, NSMenuDelegate, NSUserInterfaceValidations {
+    
+    private var commandQueue: MTLCommandQueue
     
     required init?(coder: NSCoder) {
+        
+        let device = MTLCreateSystemDefaultDevice()!
+        self.commandQueue = device.makeCommandQueue()!
+        
         super.init(coder: coder)
         
-        let layer = CALayer()
+        let layer = CAMetalLayer()
+        layer.framebufferOnly = false
+        layer.device = device
         layer.isOpaque = true
+        layer.contentsGravity = CALayerContentsGravity.resizeAspect
         self.layer = layer
         self.wantsLayer = true
+    }
+    
+    func drawBuffer(_ imageBuffer: ImageBuffer) {
+        
+        if drawMetal(imageBuffer) {
+            return
+        }
+        
+        CATransaction.setDisableActions(true)
+        layer!.contents = imageBuffer.context.makeImage()
+    }
+    
+    private func drawMetal(_ imageBuffer: ImageBuffer) -> Bool {
+        
+        let metalLayer = (self.layer! as! CAMetalLayer)
+        
+        guard let drawable = metalLayer.nextDrawable() else {
+            return false
+        }
+        
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        
+        let texture = drawable.texture
+        guard texture.width == imageBuffer.width && texture.height == imageBuffer.height else {
+            return false
+        }
+        
+        texture.replace(region: MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0), size: MTLSize(width: imageBuffer.width, height: imageBuffer.height, depth: texture.depth)), mipmapLevel: 0, withBytes: UnsafeRawPointer(imageBuffer.pixels.baseAddress!), bytesPerRow: imageBuffer.countPerRow*4)
+        
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+        
+        return true
+    }
+    
+    var transform: AffineTransform {
+        
+        var transform = AffineTransform()
+        let scaleX = CGFloat(document.browser.image.width) / self.bounds.width
+        let scaleY = CGFloat(document.browser.image.height) / self.bounds.height
+        let scale = max(scaleX, scaleY)
+        let cardOriginX = (self.bounds.size.width - CGFloat(document.browser.image.width) / scale) / 2.0
+        let cardOriginY = (self.bounds.size.height - CGFloat(document.browser.image.height) / scale) / 2.0
+        
+        /* Center vertically */
+        transform.translate(x: cardOriginX, y: cardOriginY)
+        
+        /* Scale */
+        transform.scale(1.0 / scale)
+        
+        /* Flip */
+        transform.translate(x: 0.0, y: CGFloat(document.browser.stack.size.height))
+        transform.scale(x: 1.0, y: -1.0)
+        
+        return transform
     }
 
     override var wantsUpdateLayer: Bool {
@@ -40,8 +104,9 @@ class DocumentView: NSView, NSMenuDelegate {
     override func keyDown(with event: NSEvent) {
         
         /* Enter Key / Return Key */
-        if let characters = event.charactersIgnoringModifiers {
-            let character = Int(characters.utf16.first!)
+        if let characters = event.charactersIgnoringModifiers,
+            let characterValue = characters.utf16.first {
+            let character = Int(characterValue)
             
             /* Check if the character is return or enter */
             if (character == 13 || character == 3) {
@@ -145,6 +210,8 @@ class DocumentView: NSView, NSMenuDelegate {
     
     override func mouseDown(with event: NSEvent) {
         
+        self.document.removeScriptBorders()
+        
         /* If the user hold the control key, act like for a right click */
         guard !event.modifierFlags.contains(NSEvent.ModifierFlags.control) else {
             
@@ -166,7 +233,7 @@ class DocumentView: NSView, NSMenuDelegate {
         self.mouseDownResponder = responder
         
         /* Call it with the event */
-        responder?.respondToMouseEvent(.mouseDown, at: browserPosition)
+        responder.respondToMouseEvent(.mouseDown(clickCount: event.clickCount, modifiers: event.modifierFlags), at: browserPosition)
         
     }
     
@@ -176,6 +243,7 @@ class DocumentView: NSView, NSMenuDelegate {
         
         /* Create the menu */
         let menu = NSMenu(title: "Pop Up Menu")
+        menu.autoenablesItems = false
         
         for (index, itemName) in itemNames.enumerated() {
             
@@ -220,6 +288,8 @@ class DocumentView: NSView, NSMenuDelegate {
         
         /* Forget that view */
         self.mouseDownResponder = nil
+        
+        self.draggedResponder = nil
     }
     
     private func extractPosition(from event: NSEvent) -> Point {
@@ -227,8 +297,10 @@ class DocumentView: NSView, NSMenuDelegate {
         let locationInWindow = event.locationInWindow
         let locationInMe = self.convert(locationInWindow, from: nil)
         
-        return Point(x: Int(locationInMe.x), y: document.browser.image.height - Int(locationInMe.y))
+        let transform = self.transform.inverted()!
+        let newPoint = transform.transform(locationInMe)
         
+        return Point(x: Int(newPoint.x), y: Int(newPoint.y))
     }
     
     private var partsInMenu: [PartInMenu]? = nil
@@ -237,6 +309,7 @@ class DocumentView: NSView, NSMenuDelegate {
         let part: LayerPart
         let layerType: LayerType
         let number: Int
+        let partNumber: Int
     }
     
     override func rightMouseDown(with event: NSEvent) {
@@ -284,6 +357,7 @@ class DocumentView: NSView, NSMenuDelegate {
         /* Keep trace of the part numbers */
         var fieldNumber = 0
         var buttonNumber = 0
+        var partNumber = 1
         
         for part in layer.parts {
             
@@ -301,9 +375,10 @@ class DocumentView: NSView, NSMenuDelegate {
             
             /* Check if the part lies at the position */
             if part.part.rectangle.containsPosition(point) {
-                let partInMenu = PartInMenu(part: part, layerType: layerType, number: number)
+                let partInMenu = PartInMenu(part: part, layerType: layerType, number: number, partNumber: partNumber)
                 parts.append(partInMenu)
             }
+            partNumber += 1
         }
         
         return parts.reversed()
@@ -312,6 +387,7 @@ class DocumentView: NSView, NSMenuDelegate {
     private func buildContextualMenu(forParts parts: [PartInMenu]) -> NSMenu {
         
         let menu = NSMenu(title: "Parts")
+        menu.autoenablesItems = false
         
         /* Menu item explaining the menu */
         let explanationItem = NSMenuItem(title: "Parts at that point:", action: nil, keyEquivalent: "")
@@ -373,7 +449,7 @@ class DocumentView: NSView, NSMenuDelegate {
         let part = self.partsInMenu![tag]
         
         /* Show the script border of the part */
-        document.createScriptBorder(forPart: part.part, inLayerType: part.layerType)
+        document.createScriptBorder(forPart: part.part, inLayerType: part.layerType, number: part.number, partNumber: part.partNumber)
     }
     
     func menuDidClose(_ menu: NSMenu) {
@@ -390,9 +466,9 @@ class DocumentView: NSView, NSMenuDelegate {
         
         switch part.part {
         case .field(let field):
-            document.displayInfo().displayField(field, withContent: content)
+            document.displayInfo().displayField(field, withContent: content, layerType: part.layerType, number: part.number, partNumber: part.partNumber, stack: self.document.browser.stack)
         case .button(let button):
-            document.displayInfo().displayButton(button, withContent: content)
+            document.displayInfo().displayButton(button, withContent: content, layerType: part.layerType, number: part.number, partNumber: part.partNumber, stack: self.document.browser.stack)
         }
         
     }
@@ -413,7 +489,7 @@ class DocumentView: NSView, NSMenuDelegate {
         if scrollIsVertical {
             let browserPosition = extractPosition(from: event)
             let responder = document.browser.findViewRespondingToMouseEvent(at: browserPosition)
-            responder?.respondToMouseEvent(.verticalScroll(delta: Double(event.deltaY)), at: browserPosition)
+            responder.respondToMouseEvent(.verticalScroll(delta: Double(event.deltaY)), at: browserPosition)
             hasRespondedToScroll = true
             return
         }
@@ -454,6 +530,79 @@ class DocumentView: NSView, NSMenuDelegate {
         else {
             document.goToNextPage(self)
         }        
+    }
+    
+    private var draggedResponder: MouseResponder? = nil
+    
+    override func mouseDragged(with event: NSEvent) {
+        
+        let browserPosition = extractPosition(from: event)
+        
+        if let formerResponder = self.draggedResponder {
+            formerResponder.respondToMouseEvent(.mouseDragged, at: browserPosition)
+            return
+        }
+        
+        let responder = self.document.browser.findViewRespondingToMouseEvent(at: browserPosition)
+        
+        self.draggedResponder = responder
+        responder.respondToMouseEvent(.mouseDragged, at: browserPosition)
+    }
+    
+    override func resetCursorRects() {
+        
+        let cursorRects = document.browser.cursorRectanglesProperty.value
+        
+        for rectangle in cursorRects {
+            
+            let frame = self.computeRectangleFrame(of: rectangle)
+            self.addCursorRect(frame, cursor: NSCursor.iBeam)
+        }
+    }
+    
+    private func computeRectangleFrame(of rectangle: Rectangle) -> NSRect {
+        
+        let rectangleOrigin = CGPoint(x: rectangle.left, y: rectangle.top)
+        let rectangleEnd = CGPoint(x: rectangle.right, y: rectangle.bottom)
+        
+        let transformedOrigin = self.transform.transform(rectangleOrigin)
+        let transformedEnd = self.transform.transform(rectangleEnd)
+        
+        let frameOrigin = NSPoint(x: min(transformedOrigin.x, transformedEnd.x), y: min(transformedOrigin.y, transformedEnd.y))
+        let frameSize = NSSize(width: abs(transformedEnd.x - transformedOrigin.x), height: abs(transformedEnd.y - transformedOrigin.y))
+        
+        return NSRect(origin: frameOrigin, size: frameSize)
+    }
+    
+    func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+        
+        if item.action == #selector(DocumentView.copy(_:)) {
+            return document.browser.hasSelection()
+        }
+        
+        if item.action == #selector(DocumentView.selectAll(_:)) {
+            return document.browser.hasSelection()
+        }
+        
+        return false
+    }
+    
+    @objc
+    func copy(_ sender: Any?) {
+        
+        guard let selection = document.browser.getSelection() else {
+            return
+        }
+        
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(selection.description, forType: NSPasteboard.PasteboardType.string)
+    }
+    
+    @objc
+    override func selectAll(_ sender: Any?) {
+        
+        document.browser.selectAll()
     }
     
 } 

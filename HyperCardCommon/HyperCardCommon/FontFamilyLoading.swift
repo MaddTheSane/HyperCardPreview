@@ -7,56 +7,100 @@
 //
 
 
-public extension FontFamily {
+extension FontFamily: ResourceContent {
     
     /// Loads a font family from the data of a FOND resource
-    init(loadFromData data: DataRange, bitmapFonts: [BitmapFontResource], vectorFonts: [VectorFontResource]) {
-        
-        let reader = FontFamilyResourceReader(data: data)
-        
+    public init(loadFromData data: DataRange) {
+                
         /* Get the references from the resource */
-        let associations = reader.readFontAssociationTable()
+        let associations = FontFamily.readFontAssociationTable(in: data)
         
-        /* Load the bitmap fonts */
-        let bitmapAssociations = associations.filter({ $0.size != 0 })
-        let bitmapFonts = bitmapAssociations.compactMap { return FontFamily.convertAssociationToBitmapReference(association: $0, bitmapFonts: bitmapFonts)
-        }
-        
-        /* Load the vector fonts */
-        let vectorAssociations = associations.filter({ $0.size == 0 })
-        let vectorFonts = vectorAssociations.compactMap { return FontFamily.convertAssociationToVectorReference(association: $0, vectorFonts: vectorFonts)
-        }
+        /* Build the fonts */
+        let bitmapFonts: [FontFamily.FamilyBitmapFont] = associations.filter({ $0.size != 0 }).map({ FontFamily.FamilyBitmapFont(size: $0.size, style: $0.style, resourceIdentifier: $0.resourceIdentifier) })
+        let vectorFonts: [FontFamily.FamilyVectorFont] = associations.filter({ $0.size == 0 }).map({ FontFamily.FamilyVectorFont(style: $0.style, resourceIdentifier: $0.resourceIdentifier) })
         
         /* Build the family */
         self.init()
         self.bitmapFonts = bitmapFonts
         self.vectorFonts = vectorFonts
-        self.styleProperties = (reader.readUseIntegerExtraWidth()) ? nil : reader.readStyleProperties()
+        
+        let useIntegerExtraWidth = data.readFlag(at: 0, bitOffset: 13)
+        self.styleProperties = (useIntegerExtraWidth ? nil : FontFamily.readStyleProperties(in: data))
         
     }
     
-    private static func convertAssociationToBitmapReference(association: FontFamilyResourceReader.FontAssociation, bitmapFonts: [BitmapFontResource]) -> FontFamily.FamilyBitmapFont? {
+    private struct FontAssociation {
         
-        /* Find the font in the fork */
-        guard let bitmapFont = bitmapFonts.first(where: {$0.identifier == association.resourceIdentifier}) else {
-            return nil;
+        var size: Int
+        var style: TextStyle
+        var resourceIdentifier: Int
+    }
+    
+    private static func readFontAssociationTable(in data: DataRange) -> [FontAssociation] {
+        
+        var offset = 0x34
+        
+        let countMinusOne: Int = data.readUInt16(at: offset)
+        offset += 2
+        let count = countMinusOne + 1
+        
+        var table: [FontAssociation] = []
+        
+        for _ in 0..<count {
+            
+            let size: Int = data.readUInt16(at: offset)
+            let styleFlags: Int = data.readUInt16(at: offset + 2)
+            let identifier: Int = data.readUInt16(at: offset + 4)
+            
+            let association = FontAssociation(size: size, style: TextStyle(flags: styleFlags), resourceIdentifier: identifier)
+            table.append(association)
+            
+            offset += 6
         }
         
-        /* Build the reference */
-        return FontFamily.FamilyBitmapFont(size: association.size, style: association.style, resource: bitmapFont)
-        
+        return table
     }
     
-    private static func convertAssociationToVectorReference(association: FontFamilyResourceReader.FontAssociation, vectorFonts: [VectorFontResource]) -> FontFamily.FamilyVectorFont? {
+    /// Each value indicates the extra width, in pixels, that would be added to the glyphs of a 1-point font in this font family after a stylistic variation has been applied
+    private static func readStyleProperties(in data: DataRange) -> FontStyleProperties {
         
-        /* Find the vector font in the fork */
-        guard let vectorFont = vectorFonts.first(where: {$0.identifier == association.resourceIdentifier}) else {
-            return nil
+        let plainExtraWidth = data.readFraction(at: 0x1C)
+        let boldExtraWidth = data.readFraction(at: 0x1E)
+        let italicExtraWidth = data.readFraction(at: 0x20)
+        let underlineExtraWidth = data.readFraction(at: 0x22)
+        let outlineExtraWidth = data.readFraction(at: 0x24)
+        let shadowExtraWidth = data.readFraction(at: 0x26)
+        let condensedExtraWidth = data.readFraction(at: 0x28)
+        let extendedExtraWidth = data.readFraction(at: 0x2A)
+        
+        return FontStyleProperties(plainExtraWidth: plainExtraWidth, boldExtraWidth: boldExtraWidth, italicExtraWidth: italicExtraWidth, underlineExtraWidth: underlineExtraWidth, outlineExtraWidth: outlineExtraWidth, shadowExtraWidth: shadowExtraWidth, condensedExtraWidth: condensedExtraWidth, extendedExtraWidth: extendedExtraWidth)
+    }
+    
+}
+
+private extension DataRange {
+    
+    func readFraction(at offset: Int) -> Double {
+        let bits: Int = self.readUInt16(at: offset)
+        
+        /* Check sign bit */
+        let negative = ((bits >> 15) == 1)
+        if negative {
+            
+            /* Negative can be either the positive value with the sign bit, either a negative value. Apple
+             doesn't tell the convention in the spec so people made as they wished. So we infer the convention by looking at the next bit. */
+            
+            let secondBit: Bool = ((bits >> 14) & 1 == 1)
+            if secondBit {
+                return Double(bits - Int(UInt16.max) - 1) / Double(1 << 12)
+            }
+            else {
+                return -Double(bits & 0x7FFF) / Double(1 << 12)
+            }
+            
         }
         
-        /* Build the reference */
-        return FontFamily.FamilyVectorFont(style: association.style, resource: vectorFont)
-        
+        /* No problem, the value is positive */
+        return Double(bits) / Double(1 << 12)
     }
-    
 }
